@@ -43,10 +43,9 @@
     el('line', { x1: 40, x2: 600, y1: 30, y2: 30, class: 'axis' }, meter);
     [-1, -0.5, 0, 0.5, 1].forEach((v) => {
       el('line', { x1: MX(v), x2: MX(v), y1: 24, y2: 36, class: 'axis' }, meter);
-      el('text', { x: MX(v), y: 52, 'text-anchor': 'middle' }, meter).textContent = String(v);
+      const edge = v === -1 ? 'start' : v === 1 ? 'end' : 'middle';
+      el('text', { x: MX(v), y: 52, 'text-anchor': edge }, meter).textContent = v === -1 ? '−1 · perfect −' : v === 1 ? 'perfect + · +1' : String(v);
     });
-    el('text', { x: 40, y: 14 }, meter).textContent = 'perfect −';
-    el('text', { x: 600, y: 14, 'text-anchor': 'end' }, meter).textContent = 'perfect +';
     const needle = el('g', {}, meter);
     el('rect', { x: -5, y: 20, width: 10, height: 20, fill: 'var(--ink)' }, needle);
     const nTxt = el('text', { x: 0, y: 14, 'text-anchor': 'middle', fill: 'var(--ink)' }, needle);
@@ -75,9 +74,8 @@
       el('rect', { x: L, y: py(my), width: px(mx) - L, height: B - py(my), fill: 'var(--tint)' }, plot);
       el('line', { x1: L, x2: R, y1: B, y2: B, class: 'axis' }, plot);
       el('line', { x1: L, x2: L, y1: T, y2: B, class: 'axis' }, plot);
-      el('text', { x: R, y: B + 30, 'text-anchor': 'end' }, plot).textContent = labels[0] + ' →';
-      el('text', { x: L - 8, y: T + 6, 'text-anchor': 'end' }, plot).textContent = '↑';
-      el('text', { x: L + 4, y: T + 12 }, plot).textContent = labels[1];
+      el('text', { x: R, y: B + 36, 'text-anchor': 'end' }, plot).textContent = labels[0] + ' →';
+      el('text', { x: L + 6, y: T + 12 }, plot).textContent = '↑ ' + labels[1];
       [xl, (xl + xh) / 2, xh].forEach((v) => (el('text', { x: px(v), y: B + 16, 'text-anchor': 'middle' }, plot).textContent = fmt(v, 1)));
       [yl, (yl + yh) / 2, yh].forEach((v) => (el('text', { x: L - 6, y: py(v) + 4, 'text-anchor': 'end' }, plot).textContent = fmt(v, 1)));
       const vx = el('line', { x1: px(mx), x2: px(mx), y1: B, y2: B, stroke: 'var(--ink)', 'stroke-dasharray': '5 4' }, plot);

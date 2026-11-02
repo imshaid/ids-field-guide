@@ -24,7 +24,8 @@ const NAMES: Record<string, Record<string, string>> = {
   lead: { t: 'Tight', n: 'Normal', l: 'Loose' },
   width: { nr: 'Narrow', n: 'Normal', w: 'Wide' },
 };
-const DEF: Record<string, string> = { size: 'm', lead: 'n', width: 'n', flash: 'on', motion: 'on' };
+const DEF: Record<string, string> = { size: 'm', lead: 'n', width: 'n', flash: 'on', motion: 'on', tone: 'paper', radius: 's' };
+const TONE_COLOR: Record<string, string> = { paper: '#ebe7dd', sepia: '#e8dfcc', mist: '#e3e6e1' };
 
 function applyPrefs() {
   for (const k of Object.keys(DEF)) root.dataset[k] = prefs[k] || DEF[k];
@@ -37,7 +38,7 @@ function applyPrefs() {
   document.querySelectorAll<HTMLElement>('[data-pref]').forEach((g) => {
     const k = g.dataset.pref!;
     g.querySelectorAll<HTMLButtonElement>('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === root.dataset[k])));
-  });
+  });  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', TONE_COLOR[root.dataset.tone!] || TONE_COLOR.paper);
 }
 function setPref(k: string, v: string) {
   prefs[k] = v;
@@ -49,6 +50,10 @@ applyPrefs();
 export const motionOK = () =>
   root.dataset.motion !== 'off' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Bangla runs inside tracked/uppercase labels get a span that resets tracking.
+const BN_RUN = /[\u0980-\u09FF]+(?:[\s,।?!:()\-–—]+[\u0980-\u09FF]+)*/g;
+const bnHTML = (s: string) => s.replace(BN_RUN, '<span class="bn">$&</span>');
+
 /* ---------- progress ---------- */
 const done = new Set(store.get<string[]>('done', []));
 const flags = new Set(store.get<string[]>('flags', []));
@@ -57,12 +62,12 @@ function paintProgress() {
   document.querySelectorAll<HTMLButtonElement>('[data-done]').forEach((b) => {
     const on = done.has(b.dataset.done!);
     b.setAttribute('aria-pressed', String(on));
-    b.textContent = on ? '✓ বুঝেছি' : 'বুঝেছি — mark করো';
+    b.innerHTML = bnHTML(on ? '✓ বুঝেছি' : 'বুঝেছি — mark করো');
   });
   document.querySelectorAll<HTMLButtonElement>('[data-flag]').forEach((b) => {
     const on = flags.has(b.dataset.flag!);
     b.setAttribute('aria-pressed', String(on));
-    b.textContent = on ? '⚑ Revision list এ আছে' : '⚑ পরে revise করব';
+    b.innerHTML = bnHTML(on ? '⚑ Revision list এ আছে' : '⚑ পরে revise করব');
   });
   document.querySelectorAll<HTMLElement>('[data-progress]').forEach((el) => {
     const ids = el.dataset.progress!.split(',').filter(Boolean);
@@ -97,11 +102,11 @@ document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
   const day = 86400000;
   if (now < exam) {
     const d = Math.ceil((exam - now) / day);
-    el.textContent = d <= 1 ? 'Exam কালকে — শেষ revision এর সময়' : `Exam আর ${d} দিন পরে`;
+    el.innerHTML = bnHTML(d <= 1 ? 'Exam কালকে — শেষ revision এর সময়' : `Exam আর ${d} দিন পরে`);
   } else if (now < exam + day) {
-    el.textContent = 'আজকেই exam — all the best!';
+    el.innerHTML = bnHTML('আজকেই exam — all the best!');
   } else {
-    el.textContent = 'Midterm শেষ — final এর জন্য রেখে দাও';
+    el.innerHTML = bnHTML('Midterm শেষ — final এর জন্য রেখে দাও');
   }
 });
 
@@ -228,7 +233,7 @@ function showTip(a: HTMLAnchorElement) {
   clearTimeout(hideT);
   tipFor = a;
   tip.style.setProperty('--acc', getComputedStyle(a).getPropertyValue('--acc'));
-  tip.innerHTML = `<b>${a.dataset.tipTitle ?? ''}</b>${a.dataset.tip ?? ''}<br><a href="${a.href}">পুরোটা পড়ো →</a>`;
+  tip.innerHTML = `<b>${bnHTML(a.dataset.tipTitle ?? '')}</b>${a.dataset.tip ?? ''}<br><a href="${a.href}"><span class="bn">পুরোটা পড়ো</span> →</a>`;
   tip.hidden = false;
   if (motionOK()) {
     tip.classList.remove('ink-in');
@@ -310,6 +315,29 @@ if (motionOK() && 'IntersectionObserver' in window) {
       el.classList.add('ink-in');
     }
   });
+}
+
+/* ---------- diagrams: draw in sequence when scrolled into view ---------- */
+{
+  const dgs = document.querySelectorAll<HTMLElement>('.dg.anim');
+  const finish = (el: HTMLElement) => el.classList.add('in', 'done');
+  if (!motionOK() || !('IntersectionObserver' in window)) dgs.forEach(finish);
+  else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (!en.isIntersecting) continue;
+          const el = en.target as HTMLElement;
+          io.unobserve(el);
+          el.classList.add('in');
+          const steps = Number(el.dataset.steps || 8);
+          window.setTimeout(() => el.classList.add('done'), steps * 110 + 1100);
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    dgs.forEach((el) => io.observe(el));
+  }
 }
 
 /* ---------- answers: stagger children ---------- */

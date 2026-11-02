@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import Hero from '../components/Hero.astro';
+import Glyph from '../components/Glyph.astro';
 import { SITE } from '../data/site';
 import { WEEKS, TOPICS, LABS, weekTopics } from '../data/topics';
 import { PAPERS } from '../data/papers';
@@ -11,7 +13,9 @@ const nQ = PAPERS.reduce((a, p) => a + p.questions.length, 0);
 <Base title={SITE.name}>
   <div class="page cover">
     <div class="col-wide">
-      <div class="kicker">A {SITE.community} Field Guide · {SITE.edition}</div>
+      <div class="cover-top">
+      <div>
+      <div class="kicker">{SITE.edition} · CSE328 · DIU</div>
       <h1 class="cover-title">IDS<br /><em>Field Guide</em></h1>
       <p class="lead cover-lead">Introduction to Data Science (CSE328) — Week 1 থেকে 5 এর পুরো syllabus, সহজ Banglish ব্যাখ্যায়। সাথে ১০টা interactive lab, ৪টা semester এর solved question, cheat sheet, আর slide এর ভুলগুলোর সংশোধন।</p>
       <div class="cover-row">
@@ -19,11 +23,14 @@ const nQ = PAPERS.reduce((a, p) => a + p.questions.length, 0);
         <a class="btn solid" href="/start/">Start here <Icon name="arrow" size={16} /></a>
         <a class="btn" href="/" data-continue hidden>Continue: <span data-continue-title></span></a>
       </div>
+      </div>
+      <div class="hero-wrap"><Hero /></div>
+      </div>
 
       <section class="books" aria-label="Chapters">
-        {WEEKS.map((w) => { const ts = weekTopics(w.id); return (
+        {WEEKS.map((w, n) => { const ts = weekTopics(w.id); return (
           <a class="book" data-week={w.id} href={`/${w.id}/`}>
-            <span class="kicker">{w.label}</span>
+            <div class="book-top"><span class="kicker">{w.label}</span><Glyph name={w.id} n={n} /></div>
             <h2>{w.title}</h2>
             <p>{w.blurb}</p>
             <div class="book-foot"><span class="mono">{ts.length} pages · <span data-progress-label>0/{ts.length}</span></span></div>
@@ -41,37 +48,36 @@ const nQ = PAPERS.reduce((a, p) => a + p.questions.length, 0);
         <a class="card" href="/revise/"><span class="kicker">My revision list</span><h3>তোমার flag করা topic</h3><p>যেগুলো "পরে revise করব" দিয়েছ, সব এক জায়গায়।</p></a>
       </section>
 
-      <section class="tc" aria-label="Twilight Crows">
-        <div>
-          <span class="p-k">Published by</span>
-          <h2>{SITE.community}</h2>
-          <p>এই guide টা Twilight Crows এর পক্ষ থেকে — DIU এর students দের academic resource sharing community। প্রশ্ন, আলোচনা, আর পরের guide গুলোর খবর group এ।</p>
-        </div>
-        <a class="btn" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join on Telegram</a>
-      </section>
-      <p class="pagecount">{TOPICS.length} pages · {LABS.length} labs · {nQ} questions · made for the night before the exam</p>
+      <p class="pagecount">{TOPICS.length} pages · {LABS.length} labs · {nQ} questions</p>
     </div>
   </div>
 </Base>
 
+<script>
+  // replay a week glyph's line drawing when its card is hovered or focused
+  document.querySelectorAll<HTMLElement>('.book').forEach((b) => {
+    const replay = () => { b.classList.remove('re'); void b.offsetWidth; b.classList.add('re'); };
+    b.addEventListener('pointerenter', replay);
+    b.addEventListener('focus', replay);
+  });
+</script>
+
 <style>
   .cover { padding-top: 3.4rem; }
+  .cover-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 27rem); gap: 2rem 3rem; align-items: center; }
+  .hero-wrap { padding: 1rem 0 1.4rem; }
+  @media (max-width: 899px) { .cover-top { grid-template-columns: 1fr; } .hero-wrap { max-width: 30rem; padding: 0 0 1.6rem; } }
+  .book-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
   .cover-title { font-size: clamp(3.4rem, 2rem + 7vw, 7.2rem); font-weight: 300; line-height: 0.95; letter-spacing: -0.03em; margin: 1rem 0 1.4rem; }
   .cover-title em { font-style: italic; font-weight: 280; }
   .cover-lead { max-width: 40rem; }
-  .cover-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 1.6rem 0 3rem; }
+  .cover-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 1.6rem 0 1rem; }
   .cd { padding: 0.7rem 0.8rem; font-size: 0.7rem; }
-  .books { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin-bottom: 2.4rem; }
-  .book { display: flex; flex-direction: column; gap: 0.4rem; padding: 1.2rem 1.25rem 1rem; border: 1px solid var(--ink); border-top: 8px solid var(--acc); text-decoration: none; background: color-mix(in srgb, var(--paper) 70%, white); min-height: 13rem; }
+  .books { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1.6rem 0 2.4rem; }
+  .book { display: flex; flex-direction: column; gap: 0.4rem; padding: 1.1rem 1.25rem 1rem; border: 1px solid var(--ink-4); border-top: 6px solid var(--acc); border-radius: var(--r); text-decoration: none; background: var(--sheet); min-height: 13rem; transition: background .2s, border-color .2s; }
   .book h2 { font-size: 1.35rem; font-weight: 480; line-height: 1.2; }
   .book p { margin: 0; font-size: 0.9rem; color: var(--ink-2); flex: 1; }
   .book-foot { font-size: 0.72rem; color: var(--ink-3); }
-  .book:hover { background: var(--tint); }
+  .book:hover { background: var(--tint); border-color: var(--ink); border-top-color: var(--acc); }
   .shelf { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin-bottom: 2.4rem; }
-  .tc { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; justify-content: space-between; background: var(--panel); color: var(--panel-ink); padding: 1.6rem 1.6rem; border-left: 6px solid var(--w5); }
-  .tc h2 { font-size: 1.8rem; font-weight: 400; margin: 0.2rem 0 0.4rem; }
-  .tc p { margin: 0; max-width: 38rem; color: var(--panel-mute); font-size: 0.93rem; }
-  .tc .p-k { font: 500 0.64rem var(--mono); letter-spacing: 0.15em; text-transform: uppercase; color: var(--panel-mute); }
-  .tc .btn { background: var(--panel-ink); color: var(--ink); border-color: var(--panel-ink); }
-  .tc .btn:hover { background: transparent; color: var(--panel-ink); }
 </style>

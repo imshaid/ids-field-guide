@@ -1,0 +1,36 @@
+---
+// Small line-art mark per week. Strokes draw on load and replay on card hover.
+interface Props { name: string; n?: number }
+const { name, n = 0 } = Astro.props;
+const G: Record<string, { s: string[]; f?: string[]; c?: [number, number][] }> = {
+  w1: { s: ['M37,15 A15,15 0 1 0 39,29', 'M31,14 L37.5,15 L38.5,8.5'], c: [[24, 9], [9.5, 27], [33, 37]] },
+  w2: { s: ['M7,40 H41 L24,8 Z', 'M12.8,29 H35.2', 'M18.3,19 H29.7'] },
+  w3: { s: ['M5,24 H14 M34,24 H43', 'M5,19 V29 M43,19 V29', 'M14,15 H34 V33 H14 Z', 'M22,15 V33'] },
+  w4: { s: ['M4,40 H44', 'M5,38 C15,38 16,10 24,10 C32,10 33,38 43,38'] },
+  w5: { s: ['M4,40 H44', 'M5,38 C15,38 16,12 24,12 C32,12 33,38 43,38', 'M34,24 V40'], f: ['M34,24.5 C36,31 39,37 43,38 L43,40 L34,40 Z'] },
+  bonus: { s: ['M5,42 L43,8'], c: [[10, 35], [15, 36], [19, 28], [26, 26], [30, 19], [37, 16]] },
+};
+const g = G[name] ?? G.w1;
+---
+<svg class="glyph" viewBox="0 0 48 48" aria-hidden="true" style={`--n:${n}`}>
+  {g.f?.map((d) => <path d={d} class="gf" />)}
+  {g.s.map((d, i) => <path d={d} class="g" pathLength="1" style={`--k:${i}`} />)}
+  {g.c?.map(([x, y], i) => <circle cx={x} cy={y} r="2.2" class="gc" style={`--k:${i}`} />)}
+</svg>
+
+<style>
+  .glyph { width: 40px; height: 40px; flex-shrink: 0; overflow: visible; }
+  .g { fill: none; stroke: color-mix(in srgb, var(--acc) 72%, var(--ink)); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .gf { fill: var(--acc); fill-opacity: 0.45; }
+  .gc { fill: color-mix(in srgb, var(--acc) 72%, var(--ink)); transform-box: fill-box; transform-origin: center; }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-motion='on']) .g { animation: gd 1s var(--ease) calc(var(--n) * 130ms + var(--k) * 160ms + 350ms) backwards; }
+    :global(html[data-motion='on']) .gc, :global(html[data-motion='on']) .gf { animation: gp 0.5s var(--ease) calc(var(--n) * 130ms + var(--k) * 90ms + 800ms) backwards; }
+    :global(html[data-motion='on'] .re) .g { animation: gd2 0.85s var(--ease) calc(var(--k) * 120ms) backwards; }
+    :global(html[data-motion='on'] .re) .gc, :global(html[data-motion='on'] .re) .gf { animation: gp2 0.45s var(--ease) calc(var(--k) * 70ms + 300ms) backwards; }
+  }
+  @keyframes gd { from { stroke-dasharray: 1 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1 1; stroke-dashoffset: 0; } }
+  @keyframes gd2 { from { stroke-dasharray: 1 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1 1; stroke-dashoffset: 0; } }
+  @keyframes gp { from { opacity: 0; transform: scale(0.3); } }
+  @keyframes gp2 { from { opacity: 0; transform: scale(0.3); } }
+</style>

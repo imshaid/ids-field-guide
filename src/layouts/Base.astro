@@ -17,20 +17,22 @@ const { title, description = SITE.description, week, crumbs = [], topicId } = As
 const fullTitle = title === SITE.name ? `${SITE.name} — ${SITE.edition}` : `${title} · ${SITE.name}`;
 const path = Astro.url.pathname;
 const cur = (p: string) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : undefined;
+const railPaths = ['/questions/', '/labs/', '/cheatsheet/', '/revise/'];
+const inContents = path !== '/' && !railPaths.some((p) => path.startsWith(p));
 const ogImage = new URL('/og.png', SITE.url).href;
 ---
 <!doctype html>
-<html lang="bn" data-size="m" data-lead="n" data-width="n" data-flash="on" data-motion="on">
+<html lang="bn" data-size="m" data-lead="n" data-width="n" data-flash="on" data-motion="on" data-tone="paper" data-radius="s">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f2f0e9" />
+    <meta name="theme-color" content="#ebe7dd" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(path, SITE.url).href} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={`${SITE.name} · ${SITE.community}`} />
+    <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
@@ -47,7 +49,12 @@ const ogImage = new URL('/og.png', SITE.url).href;
           d.dataset.width = s.width || 'n';
           d.dataset.flash = s.flash || 'on';
           d.dataset.motion = s.motion || 'on';
+          d.dataset.tone = s.tone || 'paper';
+          d.dataset.radius = s.radius || 's';
+          var tc = { paper: '#ebe7dd', sepia: '#e8dfcc', mist: '#e3e6e1' }[d.dataset.tone];
+          if (tc) document.querySelector('meta[name="theme-color"]').setAttribute('content', tc);
         } catch (e) {}
+        document.documentElement.classList.add('js');
       })();
     </script>
   </head>
@@ -55,9 +62,9 @@ const ogImage = new URL('/og.png', SITE.url).href;
     <a class="skip" href="#main">Skip to content</a>
     <div class="shell">
       <nav class="rail" aria-label="Main navigation">
-        <a href="/" class="brand desk" data-label="Cover">IDS</a>
+        <a href="/" class="brand desk" data-label="Cover" aria-label="IDS Field Guide cover">IDS</a>
         <a href="/" data-label="Cover" aria-current={cur('/')} aria-label="Cover"><Icon name="book" /></a>
-        <button type="button" data-open="dlg-toc" data-label="Contents" aria-label="Contents"><Icon name="toc" /></button>
+        <button type="button" data-open="dlg-toc" data-label="Contents" aria-label="Contents" data-active={inContents ? "" : undefined}><Icon name="toc" /></button>
         <button type="button" data-open="dlg-search" data-label="Search  /" aria-label="Search"><Icon name="search" /></button>
         <a href="/questions/" data-label="Previous questions" aria-current={cur('/questions/')} aria-label="Previous questions"><Icon name="paper" /></a>
         <a href="/labs/" data-label="Labs" aria-current={cur('/labs/')} aria-label="Labs"><Icon name="flask" /></a>
@@ -65,7 +72,7 @@ const ogImage = new URL('/og.png', SITE.url).href;
         <a href="/revise/" class="desk" data-label="My revision list" aria-current={cur('/revise/')} aria-label="Revision list"><Icon name="flag" /></a>
         <span class="sep desk"></span>
         <button type="button" data-open="dlg-prefs" data-label="Reader settings" aria-label="Reader settings"><Icon name="aa" /></button>
-        <a href={SITE.telegram} class="desk" target="_blank" rel="noopener" data-label="Join Twilight Crows" aria-label="Join Twilight Crows on Telegram"><Icon name="plane" /></a>
+        <a href={SITE.telegram} class="desk" target="_blank" rel="noopener" data-label="Telegram group" aria-label="Twilight Crows on Telegram"><Icon name="plane" /></a>
       </nav>
 
       <div class="main-area">
@@ -86,11 +93,11 @@ const ogImage = new URL('/og.png', SITE.url).href;
 
         <footer class="site-foot">
           <div>
-            <span class="kicker">A {SITE.community} Field Guide</span>
-            <p>Published by <b>{SITE.community}</b> — DIU এর students দের জন্য, students দের হাতে বানানো। কিছু না বুঝলে বা ভুল পেলে group এ জানাও।</p>
+            <span class="kicker">{SITE.name} · {SITE.edition}</span>
+            <p>Shared with the {SITE.community} community. Spotted a mistake or stuck on a topic? Ask in the group.</p>
           </div>
-          <a class="btn solid" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join {SITE.community}</a>
-          <small>{SITE.name} · {SITE.edition} · {SITE.course} · {SITE.uni}. Course এর slide গুলো course teacher দের; এখানের ব্যাখ্যা, diagram আর lab নতুন করে লেখা ও বানানো।</small>
+          <a class="btn ghost" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join on Telegram</a>
+          <small>{SITE.course} · {SITE.uni}. The course slides belong to the course teachers; the explanations, diagrams and labs here are original.</small>
         </footer>
       </div>
     </div>
@@ -120,7 +127,7 @@ const ogImage = new URL('/og.png', SITE.url).href;
             <h3><span class="kicker"><span class="dot"></span></span><a href={`/${w.id}/`} style="text-decoration:none">{w.label} · {w.title}</a></h3>
             <ul>
               {TOPICS.filter((t) => t.week === w.id).map((t) => (
-                <li><a href={topicUrl(t)}><span class="done-mark" data-done-mark={t.id}>✓</span>{t.title}</a></li>
+                <li><a href={topicUrl(t)} aria-current={topicUrl(t) === path ? 'page' : undefined}><span class="done-mark" data-done-mark={t.id}>✓</span>{t.title}</a></li>
               ))}
             </ul>
           </div>
@@ -131,12 +138,14 @@ const ogImage = new URL('/og.png', SITE.url).href;
     <dialog id="dlg-prefs" aria-label="Reader settings">
       <div class="dlg-h"><span class="kicker">Reader settings</span><button class="x" type="button" data-close aria-label="Close">✕</button></div>
       <div class="dlg-b">
+        <div class="pref"><span>Paper</span><div class="seg" data-pref="tone"><button data-v="paper">Paper</button><button data-v="sepia">Sepia</button><button data-v="mist">Mist</button></div></div>
+        <div class="pref"><span>Corners</span><div class="seg" data-pref="radius"><button data-v="0">Sharp</button><button data-v="s">Soft</button><button data-v="r">Round</button></div></div>
         <div class="pref"><span>Size</span><div class="seg" data-pref="size"><button data-v="s">S</button><button data-v="m">M</button><button data-v="l">L</button><button data-v="xl">XL</button></div></div>
         <div class="pref"><span>Leading</span><div class="seg" data-pref="lead"><button data-v="t">Tight</button><button data-v="n">Normal</button><button data-v="l">Loose</button></div></div>
         <div class="pref"><span>Width</span><div class="seg" data-pref="width"><button data-v="nr">Narrow</button><button data-v="n">Normal</button><button data-v="w">Wide</button></div></div>
         <div class="pref"><span>Page flash</span><div class="seg" data-pref="flash"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
         <div class="pref"><span>Motion</span><div class="seg" data-pref="motion"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
-        <p class="muted" style="font-size:.85rem;margin:.9rem 0 0">Page flash = page বদলানোর সময় e-ink এর মত ছোট্ট একটা "refresh"। Setting গুলো এই browser এ save থাকে।</p>
+        <p class="muted" style="font-size:.85rem;margin:.9rem 0 0">লম্বা সময় পড়ার জন্য Paper টাই default; রাতে Sepia, দিনের আলোয় Mist আরাম দেবে। Page flash = page বদলানোর সময় e-ink এর মত হালকা একটা refresh। Setting গুলো এই browser এ save থাকে।</p>
       </div>
     </dialog>
 

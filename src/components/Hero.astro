@@ -1,0 +1,104 @@
+---
+// Cover animation: scattered values settle into a dot histogram, the bell
+// curve draws over it, then a random sample of 6 is drawn every ~2s and its
+// mean (x-bar) is marked. Old means stay as faint ticks, so the viewer sees
+// sample means cluster around mu far tighter than the raw data.
+const counts = [1, 2, 3, 5, 7, 9, 10, 9, 7, 5, 3, 2, 1];
+const MU = 220, BIN = 28, BASE = 246, STEP = 11.5, AXIS = 254;
+let seed = 7;
+const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+const dots: { x: number; y: number; dx: number; dy: number; d: number }[] = [];
+counts.forEach((c, b) => {
+  for (let k = 0; k < c; k++) {
+    const x = MU + (b - 6) * BIN; const y = BASE - k * STEP;
+    const sx = 24 + rnd() * 392; const sy = 118 + rnd() * 122;
+    dots.push({ x, y, dx: sx - x, dy: sy - y, d: 0 });
+  }
+});
+const order = dots.map((_, i) => i).sort(() => rnd() - 0.5);
+order.forEach((i, rank) => (dots[i].d = 120 + rank * 13));
+let v = 0; counts.forEach((c, b) => (v += c * (b - 6) ** 2));
+const SIG = Math.sqrt(v / dots.length) * BIN;
+const pts: string[] = [];
+for (let x = 24; x <= 416; x += 4) pts.push(`${x === 24 ? 'M' : 'L'}${x},${(AXIS - 126 * Math.exp(-((x - MU) ** 2) / (2 * SIG * SIG))).toFixed(1)}`);
+const bell = pts.join('');
+---
+<svg class="hero" data-hero viewBox="0 86 440 214" role="img" aria-label="Random values settle into a bell-shaped distribution. Every two seconds a random sample of 6 is drawn and its mean is marked.">
+  <g class="hl hf" style="--t:2.3s">
+    <circle cx="22" cy="100" r="4.5" class="pkd" /><text x="32" y="104">sample (n = 6)</text>
+    <path d="M136,106 L142,96 L148,106 Z" class="mk" /><text x="154" y="104">its mean, x̄</text>
+    <text x="418" y="104" text-anchor="end" class="cnt"> </text>
+  </g>
+  <path d={`M24,${AXIS} H416`} class="ax" />
+  {dots.map((p, i) => <circle class="hd" data-x={p.x} cx={p.x} cy={p.y.toFixed(1)} r="4.6" style={`--dx:${p.dx.toFixed(1)}px;--dy:${p.dy.toFixed(1)}px;--d:${p.d}ms`} />)}
+  <path d={bell} class="bell" pathLength="1" />
+  <g class="hf" style="--t:2.5s">
+    <path d={`M${MU},120 V${AXIS}`} class="mu" />
+    <path d={`M${(MU - SIG).toFixed(1)},${AXIS} v6 M${(MU + SIG).toFixed(1)},${AXIS} v6`} class="ax" />
+    <text x={MU} y="276" text-anchor="middle">μ</text>
+    <text x={(MU - SIG).toFixed(1)} y="276" text-anchor="middle">−σ</text>
+    <text x={(MU + SIG).toFixed(1)} y="276" text-anchor="middle">+σ</text>
+  </g>
+  <g class="xhist"></g>
+  <g class="xbar"><path d={`M${MU},${AXIS + 4} l-6,10 h12 Z`} class="mk" /><text x={MU} y="296" text-anchor="middle" class="xb">x̄</text></g>
+</svg>
+
+<script>
+  import { motionOK } from '../scripts/stats';
+  const hero = document.querySelector<SVGSVGElement>('[data-hero]');
+  if (hero && motionOK()) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const dots = Array.from(hero.querySelectorAll<SVGCircleElement>('.hd'));
+    const mk = hero.querySelector<SVGGElement>('.xbar')!;
+    const hist = hero.querySelector<SVGGElement>('.xhist')!;
+    const cnt = hero.querySelector<SVGTextElement>('.cnt')!;
+    let n = 0, timer = 0, ready = false, visible = true;
+    const tick = () => {
+      dots.forEach((d) => d.classList.remove('pk'));
+      const pick = new Set<number>();
+      while (pick.size < 6) pick.add(Math.floor(Math.random() * dots.length));
+      let sum = 0;
+      pick.forEach((i) => { dots[i].classList.add('pk'); sum += Number(dots[i].dataset.x); });
+      const xb = sum / 6;
+      mk.classList.add('on');
+      mk.style.transform = `translateX(${(xb - 220).toFixed(1)}px)`;
+      cnt.textContent = `sample #${++n}`;
+      const t = document.createElementNS(NS, 'path');
+      t.setAttribute('d', `M${xb.toFixed(1)},248 V254`);
+      t.setAttribute('class', 'ht');
+      hist.appendChild(t);
+      if (hist.childNodes.length > 36) hist.firstChild!.remove();
+    };
+    const start = () => { if (ready && visible && !document.hidden && !timer) timer = window.setInterval(tick, 2000); };
+    const stop = () => { window.clearInterval(timer); timer = 0; };
+    window.setTimeout(() => { ready = true; tick(); start(); }, 3100);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }).observe(hero);
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  }
+</script>
+
+<style>
+  .hero { width: 100%; height: auto; display: block; overflow: visible; }
+  text { font: 500 11px var(--mono); fill: var(--ink-3); }
+  .xb { font-size: 12px; fill: var(--pen); font-weight: 600; }
+  .ax { stroke: var(--ink-3); stroke-width: 1; fill: none; }
+  .mu { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 4; fill: none; }
+  .bell { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .hd { fill: var(--w1); fill-opacity: 0.62; transform-box: fill-box; transform-origin: center; transition: fill 0.35s, fill-opacity 0.35s, transform 0.35s var(--ease); }
+  .hd.pk, .pkd { fill: var(--ink); fill-opacity: 1; }
+  .hd.pk { transform: scale(1.22); }
+  .mk { fill: var(--pen); }
+  .xbar { opacity: 0; transform: translateX(0); transition: transform 0.7s var(--ease), opacity 0.4s; }
+  .xbar.on { opacity: 1; }
+  :global(.ht) { stroke: var(--pen); stroke-width: 1.4; opacity: 0.32; }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-motion='on']) .hd { animation: settle 1.05s var(--ease) var(--d) backwards; }
+    :global(html[data-motion='on']) .bell { animation: draw 1.4s var(--ease) 1.45s backwards; }
+    :global(html[data-motion='on']) .hf { animation: fade 0.6s ease var(--t) backwards; }
+  }
+  :global(html[data-motion='off']) .hl, :global(html[data-motion='off']) .xbar { display: none; }
+  @media (prefers-reduced-motion: reduce) { .hl, .xbar { display: none; } }
+  @keyframes settle { from { transform: translate(var(--dx), var(--dy)); fill-opacity: 0.15; } }
+  @keyframes draw { from { stroke-dasharray: 1 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1 1; stroke-dashoffset: 0; } }
+  @keyframes fade { from { opacity: 0; } }
+</style>

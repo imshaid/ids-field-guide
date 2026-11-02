@@ -61,7 +61,7 @@
     function build() {
       svg.innerHTML = '';
       const R = rng(7);
-      mk('text', { x: 34, y: 20 }).textContent = 'Population · N = 120';
+      mk('text', { x: 34, y: 12 }).textContent = 'Population · N = 120';
       mk('text', { x: 450, y: 52 }).textContent = 'Sample · n = 12';
       for (let i = 0; i < n; i++) { const [x, y] = SLOT(i); mk('rect', { x: x - 16, y: y - 16, width: 32, height: 32, fill: 'none', stroke: 'var(--rule)', 'stroke-dasharray': '3 3' }); }
       const regions = [[0, 0], [6, 0], [0, 5], [6, 5]].map(([c, r], k) => {
