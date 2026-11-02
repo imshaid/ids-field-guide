@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import { GLOSSARY } from '../data/glossary';
+import { getTopic, topicUrl, getWeek } from '../data/topics';
+const sorted = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term));
+const letters = [...new Set(sorted.map((g) => g.term[0].toUpperCase()))];
+---
+<Base title="Glossary" description="IDS এর সব গুরুত্বপূর্ণ term, এক লাইনের সংজ্ঞাসহ।" crumbs={[{ label: 'Glossary' }]}>
+  <div class="page">
+    <article class="col" data-pagefind-body>
+      <div class="kicker">Glossary · {GLOSSARY.length} terms</div>
+      <h1 class="display">শব্দকোষ</h1>
+      <p class="lead">প্রতিটা term এর এক লাইনের মানে, আর পুরো ব্যাখ্যার page এর link।</p>
+      <div class="meta" data-pagefind-ignore>{letters.map((l) => <a href={`#g-${l}`} style="font-family:var(--mono)">{l}</a>)}</div>
+      {letters.map((l) => (
+        <section id={`g-${l}`}>
+          <h2 class="kicker" style="margin:2rem 0 .4rem;font-size:1rem">{l}</h2>
+          <dl class="gl">
+            {sorted.filter((g) => g.term[0].toUpperCase() === l).map((g) => { const t = getTopic(g.topic); return (
+              <div data-week={t.week}><dt>{g.term}</dt><dd>{g.def} <a class="t" data-week={t.week} href={topicUrl(t)} data-tip={t.summary} data-tip-title={t.title}>{getWeek(t.week).label} →</a></dd></div>
+            ); })}
+          </dl>
+        </section>
+      ))}
+    </article>
+  </div>
+</Base>
+<style>
+  .gl { margin: 0; border-top: 1px solid var(--ink); }
+  .gl > div { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
+  dt { font-weight: 600; border-left: 3px solid var(--acc); padding-left: 0.6rem; }
+  dd { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+  @media (max-width: 600px) { .gl > div { grid-template-columns: 1fr; gap: 0.2rem; } }
+</style>

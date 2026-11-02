@@ -1,0 +1,60 @@
+## Statistics কী
+
+**Statistics হলো data সংগ্রহ, সাজানো, বিশ্লেষণ, ব্যাখ্যা আর উপস্থাপনের বিদ্যা।** Data ছাড়া statistics সম্ভব না।
+
+Statistics দুই রকম:
+
+| | Descriptive statistics | Inferential statistics |
+|---|---|---|
+| কাজ | হাতে থাকা data কে **বর্ণনা** করা | Sample দেখে পুরো population নিয়ে **সিদ্ধান্ত** নেওয়া |
+| Tool | Mean, median, SD, graph | Hypothesis test, estimation |
+| উদাহরণ | "এই class এর গড় নম্বর 72" | "এই sample দেখে বলা যায় সারা DIU এর গড় 70 এর বেশি" |
+| কোথায় পড়বে | Week 3–4 | <T id="inference">Week 5</T> |
+
+## Data এর উৎস: primary বনাম secondary
+
+- **Primary data** — statistician নিজে বা নিজের team দিয়ে সংগ্রহ করেন। যেমন তুমি নিজে class এ survey করলে।
+- **Secondary data** — অন্য কারো সংগ্রহ করা, যেমন BBS এর census report বা Kaggle এর dataset। **Secondary data ব্যবহার করলে source উল্লেখ করতেই হবে।**
+
+## Statistical method এর ধাপ
+
+Slide এর flowchart টা এরকম:
+
+1. Problem identify করা
+2. Population আর sample ঠিক করা
+3. Data collection
+4. Descriptive data analysis
+5. উপযুক্ত statistical method দিয়ে problem solve
+6. Result analysis আর report
+
+<T id="ds-process">Data science process</T> এর সাথে মিলটা খেয়াল করো — দুই জায়গাতেই শুরু হয় প্রশ্ন দিয়ে।
+
+## Population আর sample
+
+<Diagram name="pop-sample" caption="Population থেকে কয়েকজনকে বেছে নেওয়া হলো sample" />
+
+- **Population** — যাদের নিয়ে আমাদের প্রশ্ন, **তাদের সবাই**। যেমন "বাংলাদেশের সব IT professional"।
+- **Sample** — population এর একটা ছোট অংশ, যাদের থেকে আসলে data নেওয়া হয়।
+- **Census survey** — population এর **প্রত্যেকের** data নেওয়া।
+
+## Sampling কেন লাগে
+
+ধরো জানতে চাও বাংলাদেশের সব IT professional এর গড় বেতন। সঠিক উত্তর পেতে সবার কাছে যেতে হবে (census) — কিন্তু তাতে লাগবে **প্রচুর সময়, লোকবল আর টাকা**। তাই population কে represent করে এমন একটা ছোট অংশ (sample) নেওয়া হয়।
+
+## Sample কে representative হতে হবে
+
+Sample এর একমাত্র কাজ পুরো population এর "ছোট্ট প্রতিচ্ছবি" হওয়া।
+
+<Example title="আমের ঝুড়ি">
+
+সাধারণ একজন মানুষকে ঝুড়ি থেকে একটা আম তুলতে বললে সে বেছে বেছে বড়, তাজা, পাকা আমটাই তুলবে। তাতে sample **একপেশে (biased)** হয়ে যায় — ঝুড়ির ছোট, কাঁচা, দাগী আমগুলো বাদ পড়ে। তখন "ঝুড়ির আম কেমন" প্রশ্নের উত্তর ভুল আসবে।
+
+</Example>
+
+তাই sample এমনভাবে বাছতে হবে যেন **bias এর কোনো সুযোগ না থাকে**। ভুল sample মানে পুরো study র ফলাফল ভুল — এজন্যই sampling এত গুরুত্বপূর্ণ। কোন কোন উপায়ে বাছা যায়, সেটা পরের page এ: <T id="sampling">Sampling methods</T>।
+
+<Exam>
+
+এই ধারণা গুলো সব sampling প্রশ্নের ভূমিকায় লাগে: কেন census না করে sample (সময়, লোকবল, টাকা), আর কেন sample representative হতে হবে। যেমন <QL id="f25-q2">Fall 2025 Q2</QL> শুরুই হয় "full census survey is not practical" দিয়ে।
+
+</Exam>

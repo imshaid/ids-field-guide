@@ -1,0 +1,28 @@
+{
+  "name": "ids-field-guide",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.5",
+    "@astrojs/mdx": "^8.1.2",
+    "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource-variable/noto-serif-bengali": "^5.3.0",
+    "@fontsource/atma": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "astro": "^7.4.4",
+    "katex": "^0.19.1",
+    "pagefind": "^1.6.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "description": "IDS Field Guide — an interactive, e-ink styled study guide for Introduction to Data Science (CSE328). A Twilight Crows Field Guide."
+}

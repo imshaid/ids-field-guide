@@ -1,0 +1,89 @@
+## Range যথেষ্ট না কেন
+
+<T id="quartiles">Range</T> শুধু সবচেয়ে বড় আর সবচেয়ে ছোট মান দেখে — মাঝের data কেমন ছড়ানো সেটা বলে না। আমরা জানতে চাই: **প্রতিটা মান গড় থেকে গড়ে কতটা দূরে?** এটাই মাপে **variance**।
+
+## Variance — ধারণাটা
+
+তিনটা ধাপ:
+
+1. প্রতিটা মান থেকে mean বিয়োগ করো → **deviation** (কতটা দূরে)
+2. প্রতিটা deviation কে **বর্গ** করো (না করলে + আর − মিলে যোগফল সবসময় 0 হয়ে যায়)
+3. বর্গগুলোর **গড়** নাও
+
+<Formula title="Population বনাম sample variance">
+
+$$\sigma^2 = \frac{\sum (x_i - \mu)^2}{N} \qquad\qquad s^2 = \frac{\sum (x_i - \bar{x})^2}{n-1}$$
+
+</Formula>
+
+| চিহ্ন | Population | Sample |
+|---|---|---|
+| Variance | σ² | s² |
+| Mean | μ | x̄ |
+| Size | N | n |
+| ভাগ করি | **N** দিয়ে | **n − 1** দিয়ে |
+
+<Deep title="Sample এ n − 1 কেন?">
+
+Sample এর mean (x̄) টা ঠিক ওই sample থেকেই বের করা, তাই sample এর মানগুলো population mean এর চেয়ে x̄ এর একটু বেশি কাছে থাকে। ফলে Σ(x − x̄)² একটু কম আসে, variance কম মনে হয়। n এর বদলে n − 1 দিয়ে ভাগ করলে এই কম-দেখানোটা ঠিক হয়ে যায়। (এর নাম Bessel's correction; df = n − 1 এর ধারণাও এখান থেকে।)
+
+</Deep>
+
+## Slide এর উদাহরণ: ৫টা কুকুর
+
+উচ্চতা (cm): 60, 47, 17, 43, 30 → mean μ = 197/5 = **39.4 cm**
+
+| x | x − μ | (x − μ)² |
+|---|---|---|
+| 60 | 20.6 | 424.36 |
+| 47 | 7.6 | 57.76 |
+| 17 | −22.4 | 501.76 |
+| 43 | 3.6 | 12.96 |
+| 30 | −9.4 | 88.36 |
+| **মোট** | **0** | **1085.2** |
+
+- Population variance σ² = 1085.2 / 5 = **217.04 cm²**
+- (Sample হিসেবে ধরলে s² = 1085.2 / 4 = 271.3)
+
+<Errata id="variance-unit" />
+
+## Standard deviation
+
+Variance এর একটা সমস্যা: unit বর্গ হয়ে যায় (cm²), আর মান অনেক বড় দেখায় — বোঝা কঠিন। সমাধান: **বর্গমূল নাও।**
+
+<Formula title="Standard deviation">
+
+$$\sigma = \sqrt{\sigma^2} = \sqrt{217.04} = 14.73 \text{ cm}$$
+
+</Formula>
+
+**মানে:** কুকুরগুলোর উচ্চতা সাধারণত গড় 39.4 cm থেকে প্রায় 14.73 cm এদিক-ওদিক — মোটামুটি **24.67 cm থেকে 54.13 cm** এর মধ্যে।
+
+- **SD কম** → বেশিরভাগ মান গড়ের কাছে → data **stable / consistent**
+- **SD বেশি** → মান অনেক ছড়ানো → ওঠানামা বেশি
+
+<Example title="দুইজন batsman (slide)">
+
+দুইজনেরই গড় ৫০ রান। Batsman A এর SD কম — প্রায় প্রতি ম্যাচে ৪৫–৫৫। Batsman B এর SD বেশি — কোনো ম্যাচে ১১০, কোনোটায় ৫। দলের জন্য A বেশি **নির্ভরযোগ্য** (curve সরু আর উঁচু), B অনিশ্চিত (curve চ্যাপ্টা আর ছড়ানো)।
+
+</Example>
+
+## গড় আলাদা হলে: Coefficient of Variation
+
+দুইটা data set এর গড় আলাদা হলে শুধু SD দিয়ে তুলনা ঠিক না। ধরো একটা company র গড় লাভ 10 কোটি, SD 1 কোটি; আরেকটার গড় 100 কোটি, SD 2 কোটি। দ্বিতীয়টার SD বেশি, কিন্তু নিজের আকারের তুলনায় সে অনেক বেশি stable।
+
+<Formula title="Coefficient of variation">
+
+$$CV = \frac{s}{\bar{x}} \times 100\%$$
+
+</Formula>
+
+প্রথমটার CV = 10%, দ্বিতীয়টার 2% → **CV কম মানে বেশি stable।** (CV slide এ নেই, কিন্তু stability এর প্রশ্নে এটা ব্যবহার করলে answer অনেক শক্ত হয়।)
+
+<LabEmbed id="variance-table" />
+
+<Exam>
+
+<QL id="f25-q4">Fall 2025 Q4</QL> (10 marks): চারটা company র ৫ বছরের লাভ, "কোনটা সবচেয়ে stable"। প্রতিটার mean, variance, SD বের করে তুলনা — Innovatech সবচেয়ে stable। Trap: প্রশ্নে বলা সবার গড় সমান, কিন্তু TechSolutions এর গড় 12.6, তাই **CV** দিয়েও তুলনা দেখাতে হয়। উপরের lab এ "4 companies" চাপলেই পুরো হিসাব দেখবে।
+
+</Exam>

@@ -1,0 +1,125 @@
+<div class="lab-cor">
+  <div class="row">
+    <div><label class="f">X values</label><input type="text" data-x value="14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2" /></div>
+    <div><label class="f">Y values</label><input type="text" data-y value="215, 325, 185, 332, 406, 522, 412, 614, 544, 421, 445, 408" /></div>
+  </div>
+  <div class="btn-row" style="margin-bottom:.6rem">
+    <button class="btn sm ghost" data-p="ice">Ice cream vs temp (slide)</button>
+    <button class="btn sm ghost" data-p="ads">Sales vs advertising · S'24</button>
+    <button class="btn sm ghost" data-p="train">Training vs score · F'24</button>
+    <button class="btn sm ghost" data-line aria-pressed="false">Regression line</button>
+    <button class="btn sm solid" data-run>Calculate ↵</button>
+  </div>
+  <svg class="chart cor-plot" viewBox="0 0 640 330" aria-label="Scatter plot"></svg>
+  <svg class="chart cor-meter" viewBox="0 0 640 58" aria-label="Correlation meter"></svg>
+  <div class="stats"></div>
+  <p class="cap"></p>
+  <details class="deep"><summary>পুরো হিসাবের table আর exam working</summary><div class="deep-b cor-work"></div></details>
+</div>
+
+<script>
+  import { parseNums, mean, fmt, tween, lerp, el, inkIn, param } from '../../scripts/stats';
+  const PRE: Record<string, [string, string, string, string]> = {
+    ice: ['14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2', '215, 325, 185, 332, 406, 522, 412, 614, 544, 421, 445, 408', 'Temperature °C', 'Sales $'],
+    ads: ['10, 8, 12, 13, 12, 12, 15, 16', '150, 120, 100, 220, 240, 200, 150, 110', 'Advertising (k$)', 'Monthly sales (k$)'],
+    train: ['2, 3, 5, 7, 8, 9, 11, 12', '50, 55, 65, 70, 80, 90, 95, 105', 'Training hours', 'Performance score'],
+  };
+  document.querySelectorAll<HTMLElement>('.lab-cor').forEach((root) => {
+    const ix = root.querySelector<HTMLInputElement>('[data-x]')!;
+    const iy = root.querySelector<HTMLInputElement>('[data-y]')!;
+    const plot = root.querySelector<SVGSVGElement>('.cor-plot')!;
+    const meter = root.querySelector<SVGSVGElement>('.cor-meter')!;
+    const statsEl = root.querySelector('.stats')!;
+    const cap = root.querySelector('.cap')!;
+    const work = root.querySelector('.cor-work')!;
+    const lineBtn = root.querySelector<HTMLButtonElement>('[data-line]')!;
+    let labels = ['X', 'Y'];
+    let prevR = 0;
+    let showLine = false;
+    if (param('x') && param('y')) { ix.value = param('x')!; iy.value = param('y')!; }
+
+    // meter skeleton
+    const MX = (r: number) => 40 + ((r + 1) / 2) * 560;
+    el('line', { x1: 40, x2: 600, y1: 30, y2: 30, class: 'axis' }, meter);
+    [-1, -0.5, 0, 0.5, 1].forEach((v) => {
+      el('line', { x1: MX(v), x2: MX(v), y1: 24, y2: 36, class: 'axis' }, meter);
+      el('text', { x: MX(v), y: 52, 'text-anchor': 'middle' }, meter).textContent = String(v);
+    });
+    el('text', { x: 40, y: 14 }, meter).textContent = 'perfect −';
+    el('text', { x: 600, y: 14, 'text-anchor': 'end' }, meter).textContent = 'perfect +';
+    const needle = el('g', {}, meter);
+    el('rect', { x: -5, y: 20, width: 10, height: 20, fill: 'var(--ink)' }, needle);
+    const nTxt = el('text', { x: 0, y: 14, 'text-anchor': 'middle', fill: 'var(--ink)' }, needle);
+
+    function run() {
+      const x = parseNums(ix.value), y = parseNums(iy.value);
+      const n = Math.min(x.length, y.length);
+      if (n < 3) { cap.textContent = 'X আর Y তে অন্তত ৩টা করে সমান সংখ্যক মান দাও।'; return; }
+      const X = x.slice(0, n), Y = y.slice(0, n);
+      const mx = mean(X), my = mean(Y);
+      const dx = X.map((v) => v - mx), dy = Y.map((v) => v - my);
+      const sxy = dx.reduce((a, v, i) => a + v * dy[i], 0);
+      const sxx = dx.reduce((a, v) => a + v * v, 0);
+      const syy = dy.reduce((a, v) => a + v * v, 0);
+      const r = sxy / Math.sqrt(sxx * syy);
+      const cov = sxy / (n - 1);
+      const b = sxy / sxx, a0 = my - b * mx;
+
+      // plot
+      plot.innerHTML = '';
+      const L = 60, R = 620, T = 15, B = 290;
+      const xl = Math.min(...X), xh = Math.max(...X), yl = Math.min(...Y), yh = Math.max(...Y);
+      const px = (v: number) => L + ((v - xl) / (xh - xl || 1)) * (R - L - 20) + 10;
+      const py = (v: number) => B - ((v - yl) / (yh - yl || 1)) * (B - T - 20) - 10;
+      el('rect', { x: px(mx), y: T, width: R - px(mx), height: py(my) - T, fill: 'var(--tint)' }, plot);
+      el('rect', { x: L, y: py(my), width: px(mx) - L, height: B - py(my), fill: 'var(--tint)' }, plot);
+      el('line', { x1: L, x2: R, y1: B, y2: B, class: 'axis' }, plot);
+      el('line', { x1: L, x2: L, y1: T, y2: B, class: 'axis' }, plot);
+      el('text', { x: R, y: B + 30, 'text-anchor': 'end' }, plot).textContent = labels[0] + ' →';
+      el('text', { x: L - 8, y: T + 6, 'text-anchor': 'end' }, plot).textContent = '↑';
+      el('text', { x: L + 4, y: T + 12 }, plot).textContent = labels[1];
+      [xl, (xl + xh) / 2, xh].forEach((v) => (el('text', { x: px(v), y: B + 16, 'text-anchor': 'middle' }, plot).textContent = fmt(v, 1)));
+      [yl, (yl + yh) / 2, yh].forEach((v) => (el('text', { x: L - 6, y: py(v) + 4, 'text-anchor': 'end' }, plot).textContent = fmt(v, 1)));
+      const vx = el('line', { x1: px(mx), x2: px(mx), y1: B, y2: B, stroke: 'var(--ink)', 'stroke-dasharray': '5 4' }, plot);
+      const hy = el('line', { x1: L, x2: L, y1: py(my), y2: py(my), stroke: 'var(--ink)', 'stroke-dasharray': '5 4' }, plot);
+      el('text', { x: px(mx) + 4, y: T + 12 }, plot).textContent = `x̄ = ${fmt(mx)}`;
+      el('text', { x: R - 4, y: py(my) - 6, 'text-anchor': 'end' }, plot).textContent = `ȳ = ${fmt(my)}`;
+      tween(600, (k) => { vx.setAttribute('y2', String(lerp(B, T, k))); hy.setAttribute('x2', String(lerp(L, R, k))); });
+      X.forEach((v, i) => {
+        const pos = dx[i] * dy[i] >= 0;
+        const c = el('circle', { cx: px(v), cy: py(Y[i]), r: 0, fill: pos ? 'var(--ink)' : 'var(--paper)', stroke: pos ? 'var(--ink)' : 'var(--pen)', 'stroke-width': 2 }, plot);
+        setTimeout(() => tween(380, (k) => c.setAttribute('r', String(5.5 * k))), 60 * i);
+      });
+      if (showLine) {
+        const ln = el('line', { x1: px(xl), y1: py(a0 + b * xl), x2: px(xl), y2: py(a0 + b * xl), stroke: 'var(--pen)', 'stroke-width': 2.2 }, plot);
+        tween(800, (k) => { const xv = lerp(xl, xh, k); ln.setAttribute('x2', String(px(xv))); ln.setAttribute('y2', String(py(a0 + b * xv))); });
+      }
+      // meter
+      const from = prevR;
+      prevR = r;
+      tween(800, (k) => {
+        const v = lerp(from, r, k);
+        needle.setAttribute('transform', `translate(${MX(v)},0)`);
+        nTxt.textContent = `r = ${fmt(v, 3)}`;
+      });
+
+      const strength = Math.abs(r) >= 0.8 ? 'খুব strong' : Math.abs(r) >= 0.5 ? 'moderate' : Math.abs(r) >= 0.2 ? 'weak' : 'প্রায় কোনো';
+      const dir = r > 0.05 ? 'positive (একটা বাড়লে অন্যটাও বাড়ে)' : r < -0.05 ? 'negative (একটা বাড়লে অন্যটা কমে)' : 'নির্দিষ্ট দিক নেই';
+      const agree = dx.filter((v, i) => v * dy[i] >= 0).length;
+      statsEl.innerHTML = `<div><small>n</small><strong>${n}</strong></div><div><small>Σ(x−x̄)(y−ȳ)</small><strong>${fmt(sxy, 3)}</strong></div><div><small>Covariance</small><strong>${fmt(cov, 3)}</strong></div><div class="hl"><small>Pearson r</small><strong>${fmt(r, 4)}</strong></div>${showLine ? `<div><small>ŷ = a + bx</small><strong>${fmt(a0, 3)} + ${fmt(b, 3)}x</strong></div>` : ''}`;
+      inkIn(statsEl.children);
+      cap.innerHTML = `কালো ভরা বিন্দুগুলো (${agree}টা) রঙিন কোণায় — সেখানে x আর y দুইটাই একসাথে গড়ের উপরে বা নিচে, তাই (x−x̄)(y−ȳ) positive। লাল ফাঁপা বিন্দুগুলো (${n - agree}টা) উল্টো কোণায় — তারা যোগফল কমায়। ফলাফল: r = <b>${fmt(r, 3)}</b>, মানে <b>${strength}</b> linear সম্পর্ক, দিক ${dir}।`;
+      work.innerHTML = `<table><thead><tr><th>x</th><th>y</th><th class="n">x−x̄</th><th class="n">y−ȳ</th><th class="n">(x−x̄)(y−ȳ)</th><th class="n">(x−x̄)²</th><th class="n">(y−ȳ)²</th></tr></thead><tbody>${X.map((v, i) => `<tr><td>${fmt(v)}</td><td>${fmt(Y[i])}</td><td class="n">${fmt(dx[i], 3)}</td><td class="n">${fmt(dy[i], 3)}</td><td class="n">${fmt(dx[i] * dy[i], 3)}</td><td class="n">${fmt(dx[i] ** 2, 3)}</td><td class="n">${fmt(dy[i] ** 2, 3)}</td></tr>`).join('')}<tr><td colspan="4"><b>Sum</b> (x̄ = ${fmt(mx, 3)}, ȳ = ${fmt(my, 3)})</td><td class="n"><b>${fmt(sxy, 3)}</b></td><td class="n"><b>${fmt(sxx, 3)}</b></td><td class="n"><b>${fmt(syy, 3)}</b></td></tr></tbody></table>
+      <div class="working"><ol><li>x̄ = ${fmt(mx, 3)}, ȳ = ${fmt(my, 3)}</li><li>Cov(X,Y) = Σ(x−x̄)(y−ȳ)/(n−1) = ${fmt(sxy, 3)}/${n - 1} = ${fmt(cov, 3)}</li><li>r = ${fmt(sxy, 3)} / √(${fmt(sxx, 3)} × ${fmt(syy, 3)}) = ${fmt(r, 4)}</li><li>Interpretation: r = ${fmt(r, 2)} → ${Math.abs(r) >= 0.8 ? 'strong' : Math.abs(r) >= 0.5 ? 'moderate' : Math.abs(r) >= 0.2 ? 'weak' : 'no/negligible'} ${r >= 0 ? 'positive' : 'negative'} linear relationship.</li>${showLine ? `<li>Regression: b = Sxy/Sxx = ${fmt(b, 4)}, a = ȳ − b·x̄ = ${fmt(a0, 4)}</li>` : ''}</ol></div>`;
+    }
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const p = t.closest<HTMLButtonElement>('[data-p]');
+      if (p) { const v = PRE[p.dataset.p!]; ix.value = v[0]; iy.value = v[1]; labels = [v[2], v[3]]; run(); }
+      if (t.closest('[data-line]')) { showLine = !showLine; lineBtn.setAttribute('aria-pressed', String(showLine)); run(); }
+      if (t.closest('[data-run]')) run();
+    });
+    labels = [PRE.ice[2], PRE.ice[3]];
+    run();
+  });
+</script>

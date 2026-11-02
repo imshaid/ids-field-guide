@@ -1,0 +1,69 @@
+## Scale of measurement কী
+
+একটা variable এর data দিয়ে কী কী হিসাব করা যায় — গোনা, সাজানো, যোগ-বিয়োগ, গুণ-ভাগ — সেটা ঠিক করে তার **measurement scale**। Scale হলো data এর "স্বভাব"। চারটা scale আছে, প্রতিটা আগেরটার সব ক্ষমতা রাখে আর একটা নতুন যোগ করে: **N → O → I → R**।
+
+## Nominal — শুধু নাম
+
+Data কে শুধু category তে ভাগ করা যায়, কোনো ক্রম নেই। অনেকে একে শুধু "label" বলে।
+
+- উদাহরণ: gender, রং, কারো বা কোনো জায়গার নাম, blood group, Smoker (Yes/No)
+- করা যায়: শুধু **গোনা** (কতজন B+) আর **mode**
+
+চুলের রং "কালো, সাদা, সোনালি" — এদের মধ্যে কোনটা বড়, বলার উপায় নেই।
+
+## Ordinal — ক্রম আছে
+
+Nominal data কে যদি ছোট-বড় ক্রমে সাজানো যায়, সেটা ordinal।
+
+- উদাহরণ: restaurant review (very good → good → fair → bad → very bad), Exercise (Low < High), class position (1st, 2nd, 3rd)
+- করা যায়: গোনা, mode, **order**, **median**
+
+কিন্তু ধাপগুলোর মধ্যের দূরত্ব সমান না। "Very good" আর "good" এর ফারাক আর "fair" আর "bad" এর ফারাক এক কিনা, জানার উপায় নেই।
+
+## Interval — সমান দূরত্ব, কিন্তু আসল শূন্য নেই
+
+Ordinal এর সব আছে, সাথে নতুন একটা বৈশিষ্ট্য: **fixed distance**। মানে দুইটা ধাপের ফারাক সব জায়গায় সমান।
+
+- Slide এর উদাহরণ: thermometer — 0, 10, 20, 30… প্রতি ধাপ ঠিক 10°C
+- আরেকটা: calendar year (2020, 2026)
+- করা যায়: সব আগের + **mean**, **যোগ-বিয়োগ** (30°C, 20°C এর চেয়ে 10° বেশি গরম)
+
+<Warn title="Interval এর আটকে যাওয়ার জায়গা">
+
+0°C মানে "কোনো তাপ নেই" না — তাপমাত্রা মাইনাসেও যায়। তাই **শূন্যটা বানানো, আসল না**। এজন্য বলা যায় না যে 30°C হলো 15°C এর "দ্বিগুণ গরম"। গুণ-ভাগ অর্থহীন।
+
+</Warn>
+
+## Ratio — আসল শূন্য আছে
+
+Ratio scale এর সবচেয়ে বড় বৈশিষ্ট্য **absolute zero** — শূন্য মানে সত্যিই "কিছু নেই"।
+
+- উদাহরণ: ওজন, উচ্চতা, বয়স, আয়, দূরত্ব, cholesterol, blood pressure (0 mmHg = কোনো চাপ নেই)
+- করা যায়: সবকিছু, **গুণ-ভাগ** সহ — 80 kg হলো 40 kg এর দ্বিগুণ
+
+## কোন scale এ কী করা যায়
+
+| Operation | Nominal | Ordinal | Interval | Ratio |
+|---|:-:|:-:|:-:|:-:|
+| Count (গোনা) | ✓ | ✓ | ✓ | ✓ |
+| Mode | ✓ | ✓ | ✓ | ✓ |
+| Order (সাজানো) | | ✓ | ✓ | ✓ |
+| Median | | ✓ | ✓ | ✓ |
+| Mean | | | ✓ | ✓ |
+| Add / subtract | | | ✓ | ✓ |
+| Multiply / divide | | | | ✓ |
+| Absolute zero | | | | ✓ |
+
+<Idea title="এক প্রশ্নে scale চেনা">
+
+নিজেকে ক্রমে চারটা প্রশ্ন করো: **ক্রম আছে?** না → Nominal। হ্যাঁ → **দূরত্ব সমান?** না → Ordinal। হ্যাঁ → **শূন্য মানে "কিছু নেই"?** না → Interval। হ্যাঁ → **Ratio**।
+
+</Idea>
+
+<LabEmbed id="scale-classifier" />
+
+<Exam>
+
+<QL id="s26-q2a">Spring 2026 Q2(a)</QL> তে ঠিক এটাই এসেছে — Patient ID, Age, Weight, Blood Pressure, Blood Group, Cholesterol, Smoker, Exercise এর type আর scale। উপরের lab এর প্রথম ৮টা ঠিক ওই প্রশ্নের variable। Answer একটা table আকারে লিখবে: Variable | Type | Scale | এক লাইনের কারণ।
+
+</Exam>

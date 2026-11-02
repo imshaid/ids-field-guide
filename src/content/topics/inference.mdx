@@ -1,0 +1,69 @@
+## Inference মানে "যুক্তি দিয়ে আন্দাজ"
+
+**Sample থেকে পাওয়া তথ্য দিয়ে statistical method ব্যবহার করে population সম্পর্কে আন্দাজ করাকে statistical inference বলে।**
+
+<Example title="Bus driver দের আয় (slide)">
+
+তুমি ২০০ জন bus driver এর মাসিক আয়ের data নিলে, তাদের গড় আয় বের করলে। কিন্তু আসল প্রশ্ন: **পুরো বাংলাদেশের** bus driver দের গড় আয় কত? ২০০ জনের তথ্য দিয়ে সবার ব্যাপারে আন্দাজ করা — এটাই inference।
+
+</Example>
+
+## Statistic বনাম parameter
+
+| | Statistic | Parameter |
+|---|---|---|
+| কার তথ্য | **Sample** এর | **Population** এর |
+| চিহ্ন | ইংরেজি অক্ষর | গ্রিক অক্ষর |
+| Mean | x̄ | μ (mu) |
+| SD | s | σ (sigma) |
+| জানা থাকে? | হ্যাঁ, হিসাব করি | সাধারণত না — এটাই আন্দাজ করতে চাই |
+
+মনে রাখার trick: **S**ample → **S**tatistic, **P**opulation → **P**arameter।
+
+## Inference এর দুই রূপ
+
+1. **Estimation** — population parameter এর মান কত, সেটা বের করা
+2. **Hypothesis testing** — population নিয়ে একটা দাবি সত্য কিনা যাচাই করা (পরের page: <T id="hypothesis">Hypothesis testing</T>)
+
+## Point estimation
+
+Population parameter এর জন্য **একটা নির্দিষ্ট মান** দেওয়া — sample এর তথ্যকেই population এর তথ্য ধরে নেওয়া।
+
+উদাহরণ: ২০০ জন driver এর গড় আয় ১৮,০০০ টাকা → "সারা দেশের গড় ≈ ১৮,০০০ টাকা"।
+
+Point estimate বের করার দুইটা নামকরা পদ্ধতি: **method of moments** আর **maximum likelihood** (নাম মনে রাখলেই এই course এ যথেষ্ট)।
+
+## Interval estimation
+
+একটা মানে যে কিছুটা ভুল থাকবেই, সেটা মেনে নিয়ে parameter কে **একটা range এর মধ্যে** বলা। সাথে থাকে একটা **confidence level** — 90%, 95% বা 99%।
+
+<Formula title="Interval estimate">
+
+$$\text{Interval} = \text{Point estimate} \pm \text{Margin of error}$$
+
+</Formula>
+
+<Example title="95% confidence interval">
+
+১০০ জন student এর গড় মাসিক খরচ x̄ = ৮,০০০ টাকা, population SD σ = ১,৫০০ জানা। 95% confidence এর জন্য z = 1.96:
+
+$$8000 \pm 1.96 \times \frac{1500}{\sqrt{100}} = 8000 \pm 294$$
+
+মানে আমরা 95% নিশ্চিত যে সব student এর গড় খরচ **৭,৭০৬ থেকে ৮,২৯৪ টাকার** মধ্যে।
+
+</Example>
+
+## z না t?
+
+Interval estimate (আর hypothesis test) দুই ভাবে হয়:
+
+- Population SD **σ জানা** থাকলে → **z distribution**
+- **σ জানা না** থাকলে (শুধু sample এর s জানা) → **t distribution**
+
+t distribution দেখতে normal এর মতই, কিন্তু লেজ একটু ভারী — কারণ σ না জানায় অনিশ্চয়তা বেশি। Sample বড় হলে t প্রায় z এর মত হয়ে যায়। হাতে-কলমে: <T id="z-t-tests">z-test আর t-test</T>।
+
+<Exam>
+
+"Statistic আর parameter এর পার্থক্য" বা "point বনাম interval estimation" ছোট প্রশ্ন হিসেবে আসতে পারে। আর hypothesis test এর Step 2 তে "σ জানা, তাই z" — এই যুক্তিটা এখান থেকেই আসে।
+
+</Exam>

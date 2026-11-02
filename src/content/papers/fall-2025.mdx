@@ -1,0 +1,273 @@
+<Idea title="এই paper এক নজরে">
+
+Midterm · Level 3 Term 3 · 1.5 ঘণ্টা · 25 marks। চারটা প্রশ্নই scenario-based: data science plan, sampling approach চেনা, outlier এর প্রভাব, আর stability তুলনা (variance/SD)।
+
+</Idea>
+
+<Q id="f25-q1">
+
+**1.** **Scenario 1:** An organization whose core operations depend on data specifically through the collection, storage, and processing of large-scale datasets has recently implemented a new system. This system now produces an extensive matrix containing millions of observations and thousands of variables that capture detailed aspects of customer behavior and operational performance.
+
+The CEO has outlined a broad business objective:
+
+> "We need to understand our customers better in order to extract value from our data and make our marketing campaigns more effective."
+
+However, the data science team is uncertain where to begin and has not yet established a clear direction for the project.
+
+**Question:** **Apply** the concepts of Data Science to develop a **step-by-step plan** that the data science team could follow to achieve the CEO's goal.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+একটা অস্পষ্ট লক্ষ্যকে (CEO এর কথা) data science এর ধাপে ভেঙে একটা কাজের plan বানানো — **এই company র ভাষায়**, generic না।
+
+#### কোন topic লাগবে
+
+<T id="ds-process">Data Science Process</T>, <T id="why-ds">Data science tasks</T> (clustering, classification)।
+
+#### Answer এর কাঠামো
+
+5 marks, ~১ page: ৭টা ধাপ, প্রতিটায় "এই company তে কী করবে" এর ২–৩ লাইন। শুরুতে এক লাইন যে objective টা অস্পষ্ট, তাই প্রথম কাজ সেটাকে measurable করা।
+
+</Brief>
+
+<Answer>
+
+The CEO's goal is broad, so the team should follow the data science process step by step:
+
+1. **Define the business problem.** Convert the vague goal into specific, measurable questions, e.g. "Which customer segments exist?" and "Which customers are likely to respond to a campaign?" Agree on success metrics such as campaign conversion rate and return on investment.
+2. **Acquire and understand the data.** Identify which of the thousands of variables are relevant (purchase history, demographics, website behaviour, past campaign responses) and where they come from (CRM, transaction database, web logs). Check data quality and coverage.
+3. **Prepare the data.** Clean missing values and duplicates, fix inconsistent formats, normalise numerical features, and reduce dimensionality through feature selection, since thousands of variables would make models slow and noisy. Ensure customer privacy is protected.
+4. **Explore the data (EDA).** Use summary statistics, distributions and correlations to discover patterns, such as which products are bought together or which customer groups spend the most.
+5. **Build and evaluate models.** Apply **clustering** to segment customers into groups with similar behaviour, and **classification** to predict who will respond to a campaign. Split the data into training and test sets and evaluate the models with suitable metrics (accuracy, precision, F1-score).
+6. **Communicate the insights.** Present customer personas and response predictions to the marketing team using clear visualisations and dashboards, with concrete recommendations (e.g. which segment to target with which offer).
+7. **Deploy and monitor.** Use the models to run targeted campaigns, measure results through A/B testing, and retrain the models regularly as customer behaviour changes.
+
+Because data science is iterative, the team should revisit earlier steps whenever results or business needs change.
+
+</Answer>
+
+<Pitfalls>
+
+- ৭টা ধাপের নাম শুধু লিখে দেওয়া, company র scenario তে না মেলানো ("Apply" মানেই scenario তে বসানো)।
+- প্রথম ধাপে objective কে measurable না করা।
+
+</Pitfalls>
+
+<Q id="f25-q2">
+
+**2.** **Scenario:** A large research organization has been assigned to investigate the professional opinions of all IT professionals across an entire nation, defined as the population. However, due to limitations in time, manpower, and financial resources, conducting a full census survey is not practical. The organization must therefore select a representative sample of IT professionals.
+
+The lead statistician has proposed three possible sampling approaches:
+
+1. **Approach A:** The statistician personally selects individuals they believe are most informative. No probability mechanism is used.
+2. **Approach B:** The population is divided into homogenous groups based on years of experience (e.g., 0–5 years, 6–15 years, 16+ years), and samples are drawn separately from each group.
+3. **Approach C:** Samples are selected by following a specific sequence, such as choosing every 5th IT professional listed in the national database.
+
+The statistician need your help to find appropriate method among these.
+
+**Question:** **Analyze** the three proposed sampling approaches (A, B, and C) and **Select** the most appropriate method for obtaining a representative sample of IT professionals with proper justification.
+
+[NB. You must name the methods first]
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+প্রথমেই তিনটা method এর **নাম** (NB তে বলা আছে!), তারপর প্রতিটার ভালো-মন্দ, শেষে একটা বেছে নিয়ে কারণ।
+
+#### কোন topic লাগবে
+
+<T id="sampling">Sampling methods</T> — A = judgmental, B = stratified, C = systematic।
+
+#### Answer এর কাঠামো
+
+~¾ page: নাম (৩ লাইন) → প্রতিটার analysis (২–৩ লাইন করে) → selection + ৩টা justification point।
+
+</Brief>
+
+<Answer>
+
+**Naming the methods**
+
+- **Approach A – Judgmental (purposive) sampling**, a non-probability method.
+- **Approach B – Stratified random sampling**, a probability method.
+- **Approach C – Systematic sampling**, a probability method.
+
+**Analysis**
+
+- **A (Judgmental):** quick and useful for expert opinions, but selection depends entirely on the statistician's personal judgment. There is no probability mechanism, so the sample is likely to be biased and results cannot be generalised to all IT professionals.
+- **B (Stratified):** professionals are grouped into homogeneous strata by experience (0–5, 6–15, 16+ years), and a random sample is drawn from each stratum, ideally in proportion to its size. Every experience level is guaranteed to be represented.
+- **C (Systematic):** simple and efficient when a national database exists; every 5th person is chosen after a random start. However, if the list has a hidden pattern (e.g. sorted by company or experience), the sample may be biased, and small groups such as very senior professionals may be under-represented by chance.
+
+**Selection: Approach B – Stratified sampling**
+
+1. Professional opinions are likely to differ strongly with experience; stratification ensures juniors, mid-level and seniors are all represented in the right proportions.
+2. Because each stratum is homogeneous, the sampling error is lower and estimates are more precise than with simple or systematic sampling of the same size.
+3. It is still a probability method (random selection within each stratum), so results can be generalised to the national population, unlike Approach A.
+
+(Within each stratum, the national database can even be used to select members systematically, combining the efficiency of C with the representativeness of B.)
+
+</Answer>
+
+<Pitfalls>
+
+- নাম না লিখে সরাসরি analysis শুরু করা — NB তে স্পষ্ট নির্দেশ।
+- Stratified আর cluster গুলিয়ে ফেলা (B তে group গুলো homogeneous, আর সব group থেকেই নেওয়া হয়)।
+
+</Pitfalls>
+
+<Q id="f25-q3" lq="data=12,15,13,11,14,16,10,14,13,15,12,14,30,11">
+
+**3.** **Scenario:** A data scientist is analyzing the number of daily support tickets logged for a new software feature over a two-week period (14 days). The daily ticket counts are recorded as follows:
+
+**12, 15, 13, 11, 14, 16, 10, 14, 13, 15, 12, 14, 30, 11**
+
+**Question:** **Examine** the daily support ticket data, **Distinguish** any values that deviate from the typical pattern, and infer how these values could affect the interpretation of overall performance metrics.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+"Deviate from the typical pattern" মানে outlier — একটা formal method (IQR) দিয়ে খুঁজে বের করো, তারপর দেখাও সেটা mean/SD এর মত metric কে কীভাবে বদলে দেয়।
+
+#### কোন topic লাগবে
+
+<T id="outliers">IQR method</T>, <T id="central-tendency">Mean বনাম median</T>, <T id="variance">SD</T>।
+
+#### Answer এর কাঠামো
+
+~¾ page: sort → Q1, Q3, IQR → fence → outlier → with/without তুলনার ছোট table → interpretation। Lab: <LL id="iqr-boxplot" q="data=12,15,13,11,14,16,10,14,13,15,12,14,30,11">এই data দিয়ে চালাও</LL>।
+
+</Brief>
+
+<Answer>
+
+**Step 1 – Sort (n = 14):** 10, 11, 11, 12, 12, 13, 13, 14, 14, 14, 15, 15, 16, 30
+
+**Step 2 – Quartiles**
+
+- Median = (7th + 8th)/2 = (13 + 14)/2 = **13.5**
+- Lower half: 10, 11, 11, **12**, 12, 13, 13 → **Q1 = 12**
+- Upper half: 14, 14, 14, **15**, 15, 16, 30 → **Q3 = 15**
+- IQR = 15 − 12 = **3**
+
+**Step 3 – Fences:** Lower = 12 − 1.5(3) = **7.5**; Upper = 15 + 1.5(3) = **19.5**
+
+**Step 4 – Deviating value:** All values lie between 7.5 and 19.5 except **30** (day 13), which is a clear **outlier**. The typical pattern is 10–16 tickets per day.
+
+**Effect on performance metrics**
+
+| Metric | With 30 | Without 30 |
+|---|---|---|
+| Mean | 14.29 | 13.08 |
+| Median | 13.5 | 13 |
+| Standard deviation | 4.84 | 1.80 |
+| Range | 20 | 6 |
+
+- The single outlier **inflates the mean** by about 1.2 tickets/day, making the feature look more problematic than it usually is, and could lead to over-staffing the support team.
+- It **almost triples the standard deviation**, suggesting the workload is highly unpredictable when it is actually very stable.
+- The **median and IQR barely change**, so they better describe typical daily performance.
+
+**Inference:** the spike on day 13 should be investigated separately (e.g. a release bug, outage or marketing event). For routine performance reporting, the median and IQR should be used, and the outlier reported as a special incident rather than mixed into the average.
+
+</Answer>
+
+<Pitfalls>
+
+- চোখে দেখে "30 is an outlier" লেখা, কোনো method/criterion না দেখানো।
+- Interpretation অংশ ("how could it affect metrics") বাদ দেওয়া — "infer" মানে এটাই।
+
+</Pitfalls>
+
+<Q id="f25-q4" lq="data=Innovatech:10,11,10,9,10|FutureCorp:15,5,10,15,5|TechSolutions:12,14,12,13,12|NextGen:8,10,12,9,11">
+
+**4.** An investor is deciding which of four technology companies, **Innovatech, FutureCorp, TechSolutions, and NextGen**, represents the most stable investment. All four firms have achieved the same average annual profit over the past five years, but their year-to-year performance varies.
+
+| Year | Innovatech | FutureCorp | TechSolutions | NextGen |
+|---|---|---|---|---|
+| 1 | 10 | 15 | 12 | 8 |
+| 2 | 11 | 5 | 14 | 10 |
+| 3 | 10 | 10 | 12 | 12 |
+| 4 | 9 | 15 | 13 | 9 |
+| 5 | 10 | 5 | 12 | 11 |
+
+**Question:** **Apply** appropriate measures to determine the most stable investment, and **demonstrate** how your analysis can guide the investor's decision.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+"Stable" মানে কম ওঠানামা — variance আর SD দিয়ে মাপো, সবগুলোর তুলনা করো, তারপর investor কে বাস্তব পরামর্শ দাও।
+
+#### কোন topic লাগবে
+
+<T id="variance">Variance, SD আর CV</T>।
+
+#### Answer এর কাঠামো
+
+10 marks, ~১.৫ page: একটা company র পুরো হিসাব table সহ, বাকিগুলোর summary table, ranking, তারপর decision এর ব্যাখ্যা। Lab: <LL id="variance-table" q="data=Innovatech:10,11,10,9,10|FutureCorp:15,5,10,15,5|TechSolutions:12,14,12,13,12|NextGen:8,10,12,9,11">৪টা company এক click এ</LL>।
+
+**Trap:** প্রশ্ন বলছে সবার average সমান, কিন্তু TechSolutions এর average আসলে **12.6** (বাকিদের 10)। তাই CV দিয়েও তুলনা দেখাও — এতে answer অনেক শক্ত হয়।
+
+</Brief>
+
+<Answer>
+
+**Measures used:** Since we want stability (consistency) of profit, we use measures of dispersion: **range, variance and standard deviation (SD)**. Because one company's mean differs, we also use the **coefficient of variation (CV = SD/mean × 100%)**. Five yearly values form a sample, so we use s² = Σ(x − x̄)²/(n − 1).
+
+**Detailed calculation – Innovatech** (x̄ = 50/5 = 10)
+
+| x | x − x̄ | (x − x̄)² |
+|---|---|---|
+| 10 | 0 | 0 |
+| 11 | 1 | 1 |
+| 10 | 0 | 0 |
+| 9 | −1 | 1 |
+| 10 | 0 | 0 |
+| | | **Σ = 2** |
+
+s² = 2/4 = **0.5**, s = √0.5 = **0.707**, CV = 0.707/10 × 100 = **7.07%**
+
+Similarly, Σ(x − x̄)² = 100 for FutureCorp, 3.2 for TechSolutions and 10 for NextGen.
+
+**Summary**
+
+| Company | Mean | Range | Variance (s²) | SD (s) | CV |
+|---|---|---|---|---|---|
+| Innovatech | 10 | 2 | 0.50 | 0.707 | 7.07% |
+| FutureCorp | 10 | 10 | 25.00 | 5.000 | 50.00% |
+| TechSolutions | 12.6 | 2 | 0.80 | 0.894 | 7.10% |
+| NextGen | 10 | 4 | 2.50 | 1.581 | 15.81% |
+
+(Using population formulas gives the same ranking: σ = 0.632, 4.472, 0.800, 1.414.)
+
+**Ranking by stability:** Innovatech (most stable) → TechSolutions → NextGen → FutureCorp (least stable).
+
+**How this guides the investor**
+
+- **Innovatech** has the smallest SD (0.707) and CV (7.07%): its profit stays very close to 10 every year, so it is the **most stable and lowest-risk** investment.
+- **FutureCorp** has the same average as Innovatech but swings between 5 and 15 (SD = 5, CV = 50%); its results are highly unpredictable, so a risk-averse investor should avoid it despite the equal mean.
+- **NextGen** is moderately stable (CV 15.81%).
+- **TechSolutions** actually has a higher mean (12.6) than stated in the question; its relative variability (CV 7.10%) is almost identical to Innovatech's. An investor seeking both stability and higher return could therefore prefer TechSolutions, while a purely stability-focused investor should choose Innovatech.
+
+**Conclusion:** based on the lowest standard deviation and coefficient of variation, **Innovatech is the most stable investment**, with TechSolutions a very close alternative offering higher average profit.
+
+</Answer>
+
+<Pitfalls>
+
+- শুধু mean দেখে "সবাই সমান" বলা — প্রশ্নটাই stability নিয়ে।
+- Variance বের করে SD তে না যাওয়া, বা unit/অর্থ না বলা।
+- TechSolutions এর mean যে 12.6, সেটা খেয়াল না করে সবার mean 10 ধরে নেওয়া।
+
+</Pitfalls>

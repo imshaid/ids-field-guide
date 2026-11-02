@@ -1,0 +1,62 @@
+<Warn title="Slide এর বাইরে, কিন্তু exam এ এসেছে">
+
+Week 1–5 এর slide এ "5 V" বা "data lake" নেই, অথচ <QL id="s26-q1b">Spring 2026 Q1(b)</QL> এ সরাসরি এসেছে। তাই এখানে শুধু ততটুকু, যতটুকু ওই প্রশ্নের জন্য লাগে।
+
+</Warn>
+
+## Big data মানে কী
+
+যখন data এত বেশি, এত দ্রুত, বা এত রকম format এ আসে যে সাধারণ database আর Excel দিয়ে সামলানো যায় না — তখন সেটাকে big data বলি। কোন দিক থেকে "big", সেটা বোঝাতে ৫টা V ব্যবহার হয়।
+
+## ৫টা V
+
+| V | প্রশ্ন | চেনা উদাহরণ |
+|---|---|---|
+| **Volume** | কত বেশি data? | bKash এ প্রতিদিন কোটি কোটি transaction |
+| **Velocity** | কত দ্রুত আসে? | Sensor প্রতি সেকেন্ডে reading পাঠায় |
+| **Variety** | কত রকম format? | Table, ছবি, video, text একসাথে |
+| **Veracity** | কতটা বিশ্বাসযোগ্য? | নষ্ট sensor ভুল reading দেয়, ঝাপসা ছবি |
+| **Value** | আসলে কাজে লাগে কতটা? | সব data রাখার খরচ আছে, কিন্তু সব data কাজের না |
+
+মনে রাখার trick: প্রথম তিনটা (Volume, Velocity, Variety) data এর **আকার-গতি-ধরন**; শেষ দুইটা (Veracity, Value) data এর **মান আর উপযোগিতা**।
+
+## Data কোথায় রাখবে: warehouse বনাম lake
+
+<T id="dikw">Week 2</T> এ দেখবে data দুই রকম — **structured** (row-column এ সাজানো) আর **unstructured** (ছবি, video, লেখা)। রাখার জায়গাও দুই রকম:
+
+| | Data warehouse | Data lake |
+|---|---|---|
+| কী রাখে | পরিষ্কার, structured data | সব রকম raw data, যেমন আছে তেমন |
+| Structure কখন ঠিক হয় | লেখার আগে (**schema-on-write**) | পড়ার সময় (**schema-on-read**) |
+| নতুন format এলে | Schema বদলাতে হয়, pipeline ভেঙে যেতে পারে | সমস্যা নেই — নতুন file সরাসরি জমা হয় |
+| ভালো কাজে | Report, dashboard | Machine learning, exploration |
+
+<Idea title="Format বদলালেও system চলবে কীভাবে">
+
+Data lake এ data ঢোকার সময় কোনো নির্দিষ্ট গঠন চাওয়া হয় না। Sensor company নতুন firmware দিয়ে নতুন একটা field যোগ করলো? Drone এর camera বদলে নতুন format এর ছবি দিচ্ছে? Lake সেগুলো raw অবস্থায় জমা রাখে। যে program পড়বে, সে পড়ার সময় ঠিক করবে কোন field নেবে। তাই ingestion বন্ধ হয় না। বাস্তবে অনেকে lake + warehouse মিলিয়ে "lakehouse" ব্যবহার করে।
+
+</Idea>
+
+## Agri-Tech উদাহরণে মিলিয়ে দেখি
+
+একটা company ফসলের রোগ আগে থেকে ধরতে চায়। Data আসে দুই জায়গা থেকে:
+
+**১. IoT soil sensor (real-time)** — মাটির আর্দ্রতা, তাপ, pH, প্রতি কয়েক সেকেন্ডে।
+
+- **Velocity** — অবিরাম stream আসছে, real-time process করতে হবে
+- **Volume** — হাজার sensor × প্রতি সেকেন্ড = অনেক data
+- **Veracity** — sensor নষ্ট হলে বা বৃষ্টিতে ভুল reading দেয়
+
+**২. Drone ছবি (প্রতিদিন)** — মাঠের high-resolution ছবি।
+
+- **Volume** — প্রতিটা ছবিই বড় file
+- **Variety** — unstructured image, sensor এর সংখ্যার থেকে পুরো আলাদা ধরন
+- **Value** — ছবি থেকেই পাতার দাগ বা রং বদল দেখে রোগ ধরা যায়
+
+Architecture: sensor stream আর drone ছবি দুইটাই প্রথমে data lake এর **raw zone** এ যায় → processing করে পরিষ্কার data **curated zone** এ → সেখান থেকে model train ও prediction → farmer এর কাছে alert।
+
+<Exam>
+
+পুরো model answer: <QL id="s26-q1b">Spring 2026 Q1(b)</QL>। Answer এ তিনটা জিনিস লাগবে — storage architecture (data lake / schema-on-read), কেন format বদলালেও চলবে, আর প্রতিটা data source এর সাথে কোন V খাটে আর কেন।
+
+</Exam>

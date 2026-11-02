@@ -1,0 +1,83 @@
+## Hypothesis কী
+
+**Hypothesis হলো population নিয়ে একটা দাবি, যেটা গাণিতিকভাবে যাচাই করা যায়।** যেমন: "এই company র employee রা গড়ে ৯০ মিনিটে machine চালানো শেখে।"
+
+Hypothesis testing হলো data দিয়ে যাচাই করা দাবিটা টিকে থাকে কিনা।
+
+## দুইটা hypothesis
+
+**Null hypothesis (H₀)** — শুরুতে যে দাবিটা **সত্য ধরে নেওয়া হয়**, যতক্ষণ না প্রমাণ হয় এটা মিথ্যা। এতে চিহ্ন থাকে **=, ≤ বা ≥**।
+
+**Alternative hypothesis (Hₐ বা H₁)** — H₀ মিথ্যা প্রমাণ হলে যেটা সত্য ধরব। এতে H₀ এর চিহ্ন থাকতে পারে না; থাকে **≠, < বা >**।
+
+<Example title="আদালতের মত">
+
+আদালতে আসামিকে শুরুতে **নির্দোষ ধরা হয়** (H₀)। Prosecutor কে প্রমাণ দিয়ে দেখাতে হয় সে দোষী (Hₐ)। প্রমাণ যথেষ্ট হলে রায় "দোষী" — H₀ reject। প্রমাণ যথেষ্ট না হলে রায় "দোষী প্রমাণিত হয়নি" — এর মানে কিন্তু "নির্দোষ প্রমাণিত" না। Hypothesis test ঠিক এভাবে কাজ করে।
+
+</Example>
+
+| দাবি | H₀ | Hₐ | Test |
+|---|---|---|---|
+| "গড় ঠিক ১২০ মিনিট" | μ = 120 | μ ≠ 120 | Two-tailed |
+| "গড় **অন্তত** ৩ লাখ" | μ ≥ 300000 | μ < 300000 | Left-tailed |
+| "গড় ৫০ এর **বেশি**" | μ ≤ 50 | μ > 50 | Right-tailed |
+
+<Idea title="Claim কোন দিকে যাবে">
+
+দাবিতে "=, অন্তত, বড়জোর" থাকলে সেটা H₀ তে যায়। দাবিতে "বেশি, কম, আলাদা" থাকলে সেটা Hₐ তে যায়, আর H₀ হয় তার উল্টো। যেমন selector বলছেন "Saif এর গড় ৫০ এর **বেশি**" → Hₐ: μ > 50, H₀: μ = 50 (বা ≤ 50)।
+
+</Idea>
+
+## p-value আর significance level (α)
+
+- **α (significance level)** — H₀ ভুলভাবে reject করার কতটা ঝুঁকি আমরা মেনে নিতে রাজি। সাধারণত 0.05 (5%); confidence level = 1 − α।
+- **p-value** — H₀ সত্য হলে, আমাদের sample এর মত বা তার চেয়েও extreme ফল পাওয়ার সম্ভাবনা। p ছোট মানে "H₀ সত্য হলে এমন data পাওয়া খুবই অস্বাভাবিক"।
+
+<Diagram name="decision" caption="Decision rule — শুধু একটা তুলনা" />
+
+<Formula title="Decision rule">
+
+$$p < \alpha \;\Rightarrow\; \text{Reject } H_0 \qquad\qquad p \ge \alpha \;\Rightarrow\; \text{Fail to reject } H_0$$
+
+</Formula>
+
+<Errata id="accept-h0" />
+
+## One-tail বনাম two-tail
+
+Hₐ এর চিহ্ন দেখে ঠিক হয় rejection region কোথায়:
+
+- **Hₐ: μ > মান** → right-tail — rejection region ডান লেজে
+- **Hₐ: μ < মান** → left-tail — বাম লেজে
+- **Hₐ: μ ≠ মান** → two-tail — দুই লেজেই, প্রতিটায় α/2। এক লেজের p পেলে **দ্বিগুণ** করতে হয়।
+
+## Type I আর Type II error
+
+Test যতই সাবধানে করি, ভুল হতে পারে:
+
+| | H₀ আসলে সত্য | H₀ আসলে মিথ্যা |
+|---|---|---|
+| **Reject H₀** | ✗ **Type I error** (α) | ✓ ঠিক সিদ্ধান্ত |
+| **Reject করিনি** | ✓ ঠিক সিদ্ধান্ত | ✗ **Type II error** (β) |
+
+- **Type I** = সত্য H₀ কে reject করা — নির্দোষকে শাস্তি
+- **Type II** = মিথ্যা H₀ কে reject না করা — দোষীকে ছেড়ে দেওয়া
+
+α ছোট করলে Type I কমে, কিন্তু Type II এর ঝুঁকি বাড়ে।
+
+## p-value method এর ৪টা ধাপ
+
+1. **H₀ আর Hₐ ঠিক করো**
+2. **কোন distribution** — σ জানা থাকলে z, না থাকলে t (<T id="inference">কেন</T>)
+3. **p-value বের করো** — test statistic হিসাব করে table থেকে
+4. **সিদ্ধান্ত** — p কে α এর সাথে তুলনা, তারপর প্রশ্নের ভাষায় মানে লেখো
+
+পুরো হিসাবসহ উদাহরণ: <T id="z-t-tests">z-test আর t-test</T>।
+
+<LabEmbed id="hypothesis" />
+
+<Exam>
+
+<QL id="s26-q4c">Spring 2026 Q4(c)</QL>: H₀: μ = 50 বনাম Hₐ: μ > 50, α = 0.05, p = 0.03 দেওয়া আছে। হিসাব লাগবে না, শুধু interpret: 0.03 < 0.05 → H₀ reject → Saif এর আসল গড় ৫০ এর বেশি, এর পক্ষে statistically significant প্রমাণ আছে। সাথে বলতে হবে এতে 5% Type I error এর ঝুঁকি আছে, আর "significant" মানে "নিশ্চিত" না।
+
+</Exam>

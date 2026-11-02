@@ -1,0 +1,73 @@
+## প্রশ্নটা
+
+গরম বাড়লে কি ice cream বেশি বিক্রি হয়? জানতে বাসার পাশের দোকান থেকে ১২ দিনের বিক্রি আর সেই দিনগুলোর তাপমাত্রা নিলে। Scatter plot এ আঁকলে পরিষ্কার দেখা যায় — **তাপমাত্রা বাড়লে বিক্রিও বাড়ে, কমলে কমে।** এই "একসাথে বদলানো" কে সংখ্যায় মাপে covariance আর correlation।
+
+| Temp (°C) | 14.2 | 16.4 | 11.9 | 15.2 | 18.5 | 22.1 | 19.4 | 25.1 | 23.4 | 18.1 | 22.6 | 17.2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Sales ($) | 215 | 325 | 185 | 332 | 406 | 522 | 412 | 614 | 544 | 421 | 445 | 408 |
+
+## Covariance
+
+**Covariance মাপে দুইটা variable একসাথে কতটা বদলায়।**
+
+<Formula title="Covariance">
+
+$$\text{Cov}_{pop}(X,Y) = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{n} \qquad \text{Cov}_{sample}(X,Y) = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{n-1}$$
+
+</Formula>
+
+কীভাবে কাজ করে: কোনো দিন তাপ গড়ের উপরে **আর** বিক্রিও গড়ের উপরে হলে গুণফল (+)(+) = positive। দুইটাই নিচে হলেও (−)(−) = positive। একটা উপরে একটা নিচে হলে গুণফল negative। সব দিনের গুণফল যোগ করলে যদি বড় positive হয় → একসাথে বাড়ে।
+
+Slide এর হিসাব: x̄ = 18.675, ȳ = 402.42, Σ(x − x̄)(y − ȳ) = 5325.02
+
+$$\text{Cov} = \frac{5325.02}{12 - 1} = 484.09$$
+
+<Warn title="Covariance এর সমস্যা">
+
+Covariance এর **কোনো নির্দিষ্ট scale নেই**। তাপ °F এ নিলে বা বিক্রি টাকায় নিলে একই সম্পর্কের covariance পুরো আলাদা সংখ্যা হয়ে যাবে। তাই 484.09 "বেশি না কম" বলা যায় না — শুধু sign টা (+) দেখে বোঝা যায় দিক positive। এজন্য লাগে correlation।
+
+</Warn>
+
+## Correlation (Pearson r)
+
+Correlation হলো covariance কে দুই variable এর spread দিয়ে ভাগ করে একটা **scale এ আনা** — মান সবসময় **−1 থেকে +1**।
+
+<Formula title="Pearson correlation">
+
+$$r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \; \sum (y_i - \bar{y})^2}}$$
+
+</Formula>
+
+Slide এর হিসাব: Σ(x − x̄)² = 176.98, Σ(y − ȳ)² = 174754.91
+
+$$r = \frac{5325.02}{\sqrt{176.98 \times 174754.91}} = 0.95$$
+
+মানে ice cream বিক্রি আর তাপমাত্রার মধ্যে **খুব strong positive** সম্পর্ক।
+
+## r এর মান পড়া
+
+| r | মানে |
+|---|---|
+| +1 | Perfect positive — সব বিন্দু এক সরলরেখায়, উপরের দিকে |
+| ≈ +0.8 | Strong positive |
+| ≈ +0.5 | Moderate positive |
+| ≈ +0.2 | Weak positive |
+| 0 | কোনো linear সম্পর্ক নেই |
+| ≈ −0.5 | Moderate negative |
+| −1 | Perfect negative — একটা বাড়লে অন্যটা ঠিক অনুপাতে কমে |
+
+**Sign = দিক, সংখ্যার আকার = শক্তি।** r = −0.9 আর r = +0.9 সমান শক্তিশালী, শুধু দিক উল্টো।
+
+<LabEmbed id="correlation" />
+
+<Warn title="Correlation ≠ Causation">
+
+Ice cream বিক্রি আর পানিতে ডুবে যাওয়ার ঘটনা — দুইটাই গরমে বাড়ে, তাই এদের মধ্যেও strong correlation পাবে। কিন্তু ice cream খেলে মানুষ ডোবে না! দুইটার পেছনে আসল কারণ তৃতীয় একটা জিনিস: গরম। তাই correlation বললে "একসাথে বদলায়" বলবে, "একটা অন্যটার কারণ" বলবে না।
+
+</Warn>
+
+<Exam>
+
+<QL id="s24-q2b">Spring 2024 Q2(b)</QL>: ৮টা store এর advertising খরচ আর monthly sales। হিসাব করলে **r ≈ 0.008** — প্রায় শূন্য! মানে এই data তে advertising বাড়ালে sales বাড়ে এমন কোনো linear সম্পর্ক দেখা যাচ্ছে না। প্রশ্ন শক্তি আর দিক দুইটাই ব্যাখ্যা করতে বলেছে — "negligible, practically no linear relationship" লিখতে হবে, আর বলতে হবে যে ৮টা data point খুব কম। Linear regression এর জন্য দেখো <T id="regression">Bonus: regression</T>।
+
+</Exam>

@@ -1,0 +1,148 @@
+---
+import '@fontsource-variable/literata/wght.css';
+import '@fontsource-variable/literata/wght-italic.css';
+import '@fontsource-variable/noto-serif-bengali/wght.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/atma/500.css';
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+import { SITE } from '../data/site';
+import { WEEKS, TOPICS, topicUrl } from '../data/topics';
+import Icon from '../components/Icon.astro';
+
+interface Crumb { label: string; href?: string }
+interface Props { title: string; description?: string; week?: string; crumbs?: Crumb[]; topicId?: string }
+const { title, description = SITE.description, week, crumbs = [], topicId } = Astro.props;
+const fullTitle = title === SITE.name ? `${SITE.name} — ${SITE.edition}` : `${title} · ${SITE.name}`;
+const path = Astro.url.pathname;
+const cur = (p: string) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : undefined;
+const ogImage = new URL('/og.png', SITE.url).href;
+---
+<!doctype html>
+<html lang="bn" data-size="m" data-lead="n" data-width="n" data-flash="on" data-motion="on">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f2f0e9" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={new URL(path, SITE.url).href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={`${SITE.name} · ${SITE.community}`} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('idsfg:prefs') || '{}');
+          var d = document.documentElement;
+          d.dataset.size = s.size || 'm';
+          d.dataset.lead = s.lead || 'n';
+          d.dataset.width = s.width || 'n';
+          d.dataset.flash = s.flash || 'on';
+          d.dataset.motion = s.motion || 'on';
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body data-week={week} data-topic={topicId}>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="shell">
+      <nav class="rail" aria-label="Main navigation">
+        <a href="/" class="brand desk" data-label="Cover">IDS</a>
+        <a href="/" data-label="Cover" aria-current={cur('/')} aria-label="Cover"><Icon name="book" /></a>
+        <button type="button" data-open="dlg-toc" data-label="Contents" aria-label="Contents"><Icon name="toc" /></button>
+        <button type="button" data-open="dlg-search" data-label="Search  /" aria-label="Search"><Icon name="search" /></button>
+        <a href="/questions/" data-label="Previous questions" aria-current={cur('/questions/')} aria-label="Previous questions"><Icon name="paper" /></a>
+        <a href="/labs/" data-label="Labs" aria-current={cur('/labs/')} aria-label="Labs"><Icon name="flask" /></a>
+        <a href="/cheatsheet/" class="desk" data-label="Cheat sheet" aria-current={cur('/cheatsheet/')} aria-label="Cheat sheet"><Icon name="card" /></a>
+        <a href="/revise/" class="desk" data-label="My revision list" aria-current={cur('/revise/')} aria-label="Revision list"><Icon name="flag" /></a>
+        <span class="sep desk"></span>
+        <button type="button" data-open="dlg-prefs" data-label="Reader settings" aria-label="Reader settings"><Icon name="aa" /></button>
+        <a href={SITE.telegram} class="desk" target="_blank" rel="noopener" data-label="Join Twilight Crows" aria-label="Join Twilight Crows on Telegram"><Icon name="plane" /></a>
+      </nav>
+
+      <div class="main-area">
+        <header class="topbar">
+          <div class="crumbs">
+            <a href="/">{SITE.name}</a>
+            {crumbs.map((c) => (<><span class="sl">/</span>{c.href ? <a href={c.href}>{c.label}</a> : <span>{c.label}</span>}</>))}
+          </div>
+          <div class="reader" aria-label="Reader controls">
+            <button type="button" data-cycle="size">Size <b>M</b></button>
+            <button type="button" data-cycle="lead">Leading <b>Normal</b></button>
+            <button type="button" data-cycle="width">Width <b>Normal</b></button>
+          </div>
+          <span class="scrollbar" aria-hidden="true"></span>
+        </header>
+
+        <main id="main"><slot /></main>
+
+        <footer class="site-foot">
+          <div>
+            <span class="kicker">A {SITE.community} Field Guide</span>
+            <p>Published by <b>{SITE.community}</b> — DIU এর students দের জন্য, students দের হাতে বানানো। কিছু না বুঝলে বা ভুল পেলে group এ জানাও।</p>
+          </div>
+          <a class="btn solid" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join {SITE.community}</a>
+          <small>{SITE.name} · {SITE.edition} · {SITE.course} · {SITE.uni}. Course এর slide গুলো course teacher দের; এখানের ব্যাখ্যা, diagram আর lab নতুন করে লেখা ও বানানো।</small>
+        </footer>
+      </div>
+    </div>
+
+    <dialog id="dlg-search" aria-label="Search">
+      <div class="dlg-h"><span class="kicker">Search the guide</span><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+      <div class="dlg-b">
+        <input id="q-search" type="search" placeholder="যেমন: IQR, snowball, p-value…" autocomplete="off" />
+        <ul class="results" id="q-results"></ul>
+      </div>
+    </dialog>
+
+    <dialog id="dlg-toc" aria-label="Contents">
+      <div class="dlg-h"><span class="kicker">Contents</span><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+      <div class="dlg-b">
+        <div class="btn-row" style="margin-bottom:1.1rem">
+          <a class="btn sm ghost" href="/start/">Start here</a>
+          <a class="btn sm ghost" href="/questions/">Questions</a>
+          <a class="btn sm ghost" href="/labs/">Labs</a>
+          <a class="btn sm ghost" href="/cheatsheet/">Cheat sheet</a>
+          <a class="btn sm ghost" href="/errata/">Errata</a>
+          <a class="btn sm ghost" href="/glossary/">Glossary</a>
+          <a class="btn sm ghost" href="/revise/">Revise</a>
+        </div>
+        {WEEKS.map((w) => (
+          <div class="toc-w" data-week={w.id}>
+            <h3><span class="kicker"><span class="dot"></span></span><a href={`/${w.id}/`} style="text-decoration:none">{w.label} · {w.title}</a></h3>
+            <ul>
+              {TOPICS.filter((t) => t.week === w.id).map((t) => (
+                <li><a href={topicUrl(t)}><span class="done-mark" data-done-mark={t.id}>✓</span>{t.title}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </dialog>
+
+    <dialog id="dlg-prefs" aria-label="Reader settings">
+      <div class="dlg-h"><span class="kicker">Reader settings</span><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+      <div class="dlg-b">
+        <div class="pref"><span>Size</span><div class="seg" data-pref="size"><button data-v="s">S</button><button data-v="m">M</button><button data-v="l">L</button><button data-v="xl">XL</button></div></div>
+        <div class="pref"><span>Leading</span><div class="seg" data-pref="lead"><button data-v="t">Tight</button><button data-v="n">Normal</button><button data-v="l">Loose</button></div></div>
+        <div class="pref"><span>Width</span><div class="seg" data-pref="width"><button data-v="nr">Narrow</button><button data-v="n">Normal</button><button data-v="w">Wide</button></div></div>
+        <div class="pref"><span>Page flash</span><div class="seg" data-pref="flash"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
+        <div class="pref"><span>Motion</span><div class="seg" data-pref="motion"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
+        <p class="muted" style="font-size:.85rem;margin:.9rem 0 0">Page flash = page বদলানোর সময় e-ink এর মত ছোট্ট একটা "refresh"। Setting গুলো এই browser এ save থাকে।</p>
+      </div>
+    </dialog>
+
+    <div class="tip" id="tip" hidden role="tooltip"></div>
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>

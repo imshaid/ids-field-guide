@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import LabSwitch from '../../components/LabSwitch.astro';
+import { LABS, getLab, getTopic, topicUrl, getWeek } from '../../data/topics';
+import { questionsForLab } from '../../data/papers';
+
+export function getStaticPaths() {
+  return LABS.map((l) => ({ params: { lab: l.id } }));
+}
+const lab = getLab(Astro.params.lab!);
+const w = getWeek(lab.week);
+const qs = questionsForLab(lab.id);
+const i = LABS.findIndex((x) => x.id === lab.id);
+---
+<Base title={`Lab · ${lab.title}`} description={lab.summary} week={lab.week} crumbs={[{ label: 'Labs', href: '/labs/' }, { label: lab.title }]}>
+  <div class="page">
+    <div class="col-wide" data-pagefind-body>
+      <div class="kicker"><span class="dot"></span>Lab {String(i + 1).padStart(2, '0')} · {w.label}</div>
+      <h1 class="display">{lab.title}</h1>
+      <p class="lead" style="max-width:42rem">{lab.summary}</p>
+      <LabSwitch id={lab.id} />
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));margin-top:2rem" data-pagefind-ignore>
+        <div class="card">
+          <span class="kicker">যে topic এর lab</span>
+          {lab.topics.map((t) => { const tp = getTopic(t); return <p style="margin:.5rem 0 0"><a class="t" data-week={tp.week} href={topicUrl(tp)} data-tip={tp.summary} data-tip-title={tp.title}>{tp.title}</a></p>; })}
+        </div>
+        <div class="card">
+          <span class="kicker">যে প্রশ্নে কাজে লাগে</span>
+          {qs.length ? qs.map((x) => <p style="margin:.5rem 0 0"><a href={x.url}>{x.paper.title} {x.q.label} — {x.q.title}</a></p>) : <p class="muted" style="margin:.5rem 0 0">Concept বোঝার জন্য।</p>}
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="rfoot" aria-label="Labs">
+    {i > 0 ? <a href={`/labs/${LABS[i - 1].id}/`}><small>← আগের lab</small>{LABS[i - 1].title}</a> : <a href="/labs/"><small>←</small>All labs</a>}
+    {i < LABS.length - 1 ? <a href={`/labs/${LABS[i + 1].id}/`}><small>পরের lab →</small>{LABS[i + 1].title}</a> : <a href="/labs/"><small>→</small>All labs</a>}
+  </nav>
+</Base>

@@ -1,0 +1,6 @@
+---
+import { findQuestion } from '../data/papers';
+interface Props { id: string }
+const { paper, q, url } = findQuestion(Astro.props.id);
+---
+<a class="t" href={url} data-tip={q.title} data-tip-title={`${paper.title} · ${q.label}`}><slot /></a>

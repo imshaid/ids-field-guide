@@ -1,0 +1,85 @@
+## কখন z, কখন t
+
+| অবস্থা | Test | Statistic |
+|---|---|---|
+| Population SD **σ জানা** | **z-test** | $z = \dfrac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}$ |
+| σ **অজানা**, শুধু sample SD **s** জানা | **t-test** | $t = \dfrac{\bar{x} - \mu_0}{s / \sqrt{n}}$, df = n − 1 |
+
+Slide এর শর্তগুলো সহজ করে:
+
+- Sample size n ≥ 30 হলে সাধারণত সমস্যা নেই (sample mean প্রায় normal হয়)।
+- n < 30 হলে population কে **normal** ধরে নিতে হবে।
+- এর কোনোটাই না মানলে non-parametric method (এই course এর বাইরে)।
+
+<Errata id="n30" />
+
+<Idea title="Denominator টার মানে">
+
+σ/√n কে বলে **standard error** — sample mean নিজে কতটা ওঠানামা করে। Sample যত বড় (n বড়), standard error তত ছোট, তাই ছোট পার্থক্যও significant হতে পারে।
+
+</Idea>
+
+## Table থেকে p-value
+
+**z-table:** z = −2.50 হলে row −2.5, column .00 → **0.00621** = P(Z < −2.50)। Two-tail হলে দ্বিগুণ: 0.01242।
+
+**t-table:** সাধারণত নির্দিষ্ট p এর জন্য critical value দেয়। df এর row তে গিয়ে দেখো তোমার t কোন দুইটা মানের মাঝে পড়ে — p-ও ওই দুইটা মানের মাঝে। যেমন df = 14 এ t = 2.517 পড়ে 2.145 (p = .025) আর 2.624 (p = .01) এর মাঝে → **0.01 < p < 0.025**।
+
+## Slide এর উদাহরণ ১ · z-test (two-tail)
+
+একটা company দাবি করে, নতুন machine চালানো শিখতে গড়ে **৯০ মিনিট** লাগে। Supervisor ২০ জনের sample নিলেন। Learning time normal, σ জানা, α = 0.01।
+
+<Errata id="z1-numbers" />
+
+নিচে solution এর সংখ্যা (x̄ = 85, σ = 7) ধরে:
+
+1. **Hypotheses:** H₀: μ = 90, Hₐ: μ ≠ 90 (দাবিটা "=", আর supervisor জানতে চান কম না বেশি — two-tail)
+2. **Distribution:** n = 20 < 30, কিন্তু σ জানা আর population normal → **z**
+3. **Statistic:** $z = \dfrac{85 - 90}{7/\sqrt{20}} = \dfrac{-5}{1.565} = -3.19$। Table থেকে P(Z < −3.19) = 0.0007, two-tail তাই **p = 0.0014**
+4. **Decision:** p = 0.0014 < α = 0.01 → **Reject H₀**। নতুন employee দের শেখার গড় সময় ৯০ মিনিট না।
+
+<Errata id="z1-decision" />
+
+## Slide এর উদাহরণ ২ · z-test (left-tail)
+
+Mayor দাবি করেন, শহরের পরিবারগুলোর গড় সম্পদ **অন্তত ৩,০০,০০০**। ২৫টা পরিবারের random sample, α = 0.025।
+
+<Errata id="z2-numbers" />
+
+Solution এর সংখ্যা (x̄ = 2,88,000, σ = 80,000) ধরে:
+
+1. **Hypotheses:** H₀: μ ≥ 300000 ("অন্তত" → H₀), Hₐ: μ < 300000 → left-tail
+2. **Distribution:** σ জানা → **z**
+3. **Statistic:** $z = \dfrac{288000 - 300000}{80000/\sqrt{25}} = \dfrac{-12000}{16000} = -0.75$ → **p = P(Z < −0.75) = 0.2266**
+4. **Decision:** p = 0.2266 > α = 0.025 → **Fail to reject H₀**। Mayor এর দাবি বাতিল করার মত যথেষ্ট প্রমাণ নেই।
+
+## Slide এর উদাহরণ ৩ · t-test (right-tail)
+
+একজন expert দাবি করেন, যারা নিয়মিত ব্যায়াম করেন তাদের oxygen intake সাধারণ মানুষের গড়ের **চেয়ে বেশি**। Random ১৫ জন, oxygen intake normal, α = 0.05।
+
+<Errata id="t1-numbers" />
+
+Solution এর সংখ্যা (μ = 36.7, x̄ = 40.6, s = 6) ধরে:
+
+1. **Hypotheses:** H₀: μ = 36.7, Hₐ: μ > 36.7 → right-tail
+2. **Distribution:** n = 15 < 30 আর σ **অজানা** (শুধু sample SD) → **t**, df = 15 − 1 = 14
+3. **Statistic:** $t = \dfrac{40.6 - 36.7}{6/\sqrt{15}} = \dfrac{3.9}{1.549} = 2.517$ → table এ df = 14 এ 2.145 আর 2.624 এর মাঝে → **0.01 < p < 0.025**
+4. **Decision:** p < α = 0.05 → **Reject H₀**। নিয়মিত ব্যায়াম করা মানুষের oxygen intake বেশি — এর পক্ষে প্রমাণ আছে।
+
+## Exam এ লেখার template
+
+> **Step 1:** H₀: μ = … ; Hₐ: μ ≠ … (or less than / greater than; … -tailed test, α = …)
+>
+> **Step 2:** Since σ is known (or unknown) and …, we use the z (or t) distribution (df = n − 1 = …).
+>
+> **Step 3:** z (or t) = (x̄ − μ₀)/(σ/√n) = … ; p-value = …
+>
+> **Step 4:** Since p is less than (or not less than) α, we reject (or fail to reject) H₀. Therefore, … (প্রশ্নের ভাষায় এক লাইন)।
+
+নিজের সংখ্যা বসিয়ে চালাতে: <LL id="hypothesis">Hypothesis Stepper lab</LL>।
+
+<Exam>
+
+<QL id="s24-q1a">Spring 2024 Q1(a)</QL>: company দাবি করে গড় resolve time ১২০ মিনিট; ২৫ জনের sample এ x̄ = 115, SD = 10, α = 0.02 (98%)। প্রশ্নের সাথে z-table দেওয়া, তাই z ধরো: z = (115 − 120)/(10/5) = −2.5, two-tail p = 2 × 0.00621 = 0.0124 < 0.02 → reject। একটা লাইনে উল্লেখ করো যে SD টা sample এর হলে কড়াকড়িভাবে t-test হতো (তাতেও p ≈ 0.0197 < 0.02, একই সিদ্ধান্ত)।
+
+</Exam>

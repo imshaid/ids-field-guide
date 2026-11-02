@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { TOPICS, topicUrl } from '../data/topics';
+const index = TOPICS.map((t) => ({ id: t.id, title: t.title, url: topicUrl(t), week: t.week, summary: t.summary }));
+---
+<Base title="My revision list" description="তোমার flag করা topic গুলো।" crumbs={[{ label: 'Revision list' }]}>
+  <div class="page">
+    <div class="col">
+      <div class="kicker">My revision list</div>
+      <h1 class="display">পরে revise করব</h1>
+      <p class="lead" data-revise-stat>—</p>
+      <div data-revise></div>
+      <p class="muted" style="font-size:.85rem;margin-top:2rem">এই list টা শুধু তোমার browser এ save থাকে, কোথাও upload হয় না।</p>
+    </div>
+  </div>
+  <script type="application/json" id="topic-index" set:html={JSON.stringify(index)} />
+</Base>

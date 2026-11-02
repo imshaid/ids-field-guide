@@ -1,0 +1,10 @@
+---
+import { getErratum } from '../../data/errata';
+const e = getErratum(Astro.props.id);
+---
+<div class="pen" data-ink>
+  <span class="co-k">✎ Slide এ ভুল · {e.where}</span>
+  <p class="wrong">{e.wrong}</p>
+  <p class="right">{e.right}</p>
+  {e.why && <p class="why">{e.why}</p>}
+</div>

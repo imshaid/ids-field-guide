@@ -1,0 +1,126 @@
+<div class="lab-var">
+  <label class="f">প্রতি লাইনে একটা data set — <code>নাম: মান, মান, …</code></label>
+  <textarea rows="4" spellcheck="false">Innovatech: 10, 11, 10, 9, 10
+FutureCorp: 15, 5, 10, 15, 5
+TechSolutions: 12, 14, 12, 13, 12
+NextGen: 8, 10, 12, 9, 11</textarea>
+  <div class="btn-row" style="margin:.6rem 0">
+    <button class="btn sm ghost" data-p="co">4 companies · F'25</button>
+    <button class="btn sm ghost" data-p="dogs">Dogs (slide)</button>
+    <button class="btn sm ghost" data-p="bat">Batsman A vs B</button>
+    <span class="seg" data-kind><button data-v="s" aria-pressed="true">Sample (n−1)</button><button data-v="p">Population (N)</button></span>
+    <button class="btn sm solid" data-run>Calculate ↵</button>
+  </div>
+  <svg class="chart" viewBox="0 0 640 10" aria-label="Spread around the mean"></svg>
+  <div class="var-cmp"></div>
+  <p class="cap"></p>
+  <div class="var-tabs btn-row" style="margin-top:1rem"></div>
+  <div class="var-table"></div>
+</div>
+
+<style is:global>
+  .var-cmp { margin: 0.8rem 0; }
+  .var-row { display: grid; grid-template-columns: minmax(7rem, 9rem) 1fr 1fr; gap: 0.7rem; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); font-size: 0.86rem; }
+  .var-row .bar { height: 10px; }
+  .var-row small { font: 500 0.66rem var(--mono); color: var(--ink-3); }
+  .var-row.best { background: var(--tint); }
+  .var-head { font: 500 0.62rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--ink); }
+  .var-table table { margin-top: 0.6rem; }
+</style>
+
+<script>
+  import { mean, ss, fmt, tween, lerp, el, inkIn, param } from '../../scripts/stats';
+  const PRE: Record<string, string> = {
+    co: 'Innovatech: 10, 11, 10, 9, 10\nFutureCorp: 15, 5, 10, 15, 5\nTechSolutions: 12, 14, 12, 13, 12\nNextGen: 8, 10, 12, 9, 11',
+    dogs: 'Dog heights (cm): 60, 47, 17, 43, 30',
+    bat: 'Batsman A: 48, 52, 50, 47, 55, 49, 51\nBatsman B: 5, 110, 12, 95, 30, 88, 10',
+  };
+  const COLORS = ['var(--w1)', 'var(--w4)', 'var(--w2)', 'var(--w5)', 'var(--w3)'];
+  document.querySelectorAll<HTMLElement>('.lab-var').forEach((root) => {
+    const ta = root.querySelector('textarea')!;
+    const svg = root.querySelector('svg')!;
+    const cmp = root.querySelector('.var-cmp')!;
+    const cap = root.querySelector('.cap')!;
+    const tabs = root.querySelector('.var-tabs')!;
+    const tbl = root.querySelector('.var-table')!;
+    let kind = 's';
+    let sel = 0;
+    const q = param('data');
+    if (q) ta.value = q.replace(/\|/g, '\n');
+
+    function parse() {
+      return ta.value.split('\n').map((line, i) => {
+        const [name, rest] = line.includes(':') ? [line.split(':')[0].trim(), line.slice(line.indexOf(':') + 1)] : [`Set ${i + 1}`, line];
+        const v = rest.split(/[\s,;]+/).map(Number).filter((n) => Number.isFinite(n) && rest.trim() !== '');
+        return { name, v };
+      }).filter((s) => s.v.length >= 2);
+    }
+    function run() {
+      const sets = parse();
+      if (!sets.length) return;
+      sel = Math.min(sel, sets.length - 1);
+      const R = sets.map((s, i) => {
+        const m = mean(s.v);
+        const variance = ss(s.v) / (kind === 's' ? s.v.length - 1 : s.v.length);
+        const sd = Math.sqrt(variance);
+        return { ...s, m, variance, sd, cv: (sd / Math.abs(m)) * 100, color: COLORS[i % COLORS.length] };
+      });
+      // spread chart
+      const all = R.flatMap((r) => r.v);
+      const lo = Math.min(...all), hi = Math.max(...all);
+      const pad = (hi - lo) * 0.08 || 1;
+      const X = (v: number) => 130 + ((v - lo + pad) / (hi - lo + 2 * pad)) * 490;
+      const rowH = 34;
+      svg.setAttribute('viewBox', `0 0 640 ${R.length * rowH + 24}`);
+      svg.innerHTML = '';
+      R.forEach((r, i) => {
+        const y = 18 + i * rowH;
+        el('text', { x: 0, y: y + 4 }, svg).textContent = r.name.slice(0, 16);
+        el('line', { x1: 130, x2: 620, y1: y, y2: y, class: 'grid' }, svg);
+        const mx = X(r.m);
+        el('line', { x1: mx, x2: mx, y1: y - 12, y2: y + 12, stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+        r.v.forEach((v, j) => {
+          const ln = el('line', { x1: mx, x2: mx, y1: y + (j % 2 ? 4 : -4), y2: y + (j % 2 ? 4 : -4), stroke: r.color, 'stroke-width': 2, opacity: 0.8 }, svg);
+          const c = el('circle', { cx: mx, cy: y + (j % 2 ? 4 : -4), r: 4.5, fill: r.color, stroke: 'var(--ink)', 'stroke-width': 0.8 }, svg);
+          const tx = X(v);
+          tween(650 + j * 40, (k) => {
+            const xx = lerp(mx, tx, k);
+            c.setAttribute('cx', String(xx));
+            ln.setAttribute('x2', String(xx));
+          });
+        });
+      });
+      // comparison bars
+      const maxSd = Math.max(...R.map((r) => r.sd)) || 1;
+      const maxCv = Math.max(...R.map((r) => r.cv)) || 1;
+      const best = R.reduce((b, r, i) => (r.cv < R[b].cv ? i : b), 0);
+      cmp.innerHTML = `<div class="var-row var-head"><span>Set</span><span>SD</span><span>CV</span></div>` + R.map((r, i) => `<div class="var-row ${i === best && R.length > 1 ? 'best' : ''}" style="--acc:${r.color}"><span>${i === best && R.length > 1 ? '★ ' : ''}${r.name}<br><small>mean ${fmt(r.m)}</small></span><span><div class="bar"><i style="--p:${(r.sd / maxSd) * 100}%"></i></div><small>${fmt(r.sd, 3)}</small></span><span><div class="bar"><i style="--p:${(r.cv / maxCv) * 100}%"></i></div><small>${fmt(r.cv)}%</small></span></div>`).join('');
+      cmp.querySelectorAll<HTMLElement>('.bar > i').forEach((b) => {
+        const p = b.style.getPropertyValue('--p');
+        b.style.setProperty('--p', '0%');
+        requestAnimationFrame(() => requestAnimationFrame(() => b.style.setProperty('--p', p)));
+      });
+      const meansDiffer = new Set(R.map((r) => fmt(r.m, 4))).size > 1;
+      cap.innerHTML = R.length > 1
+        ? `${meansDiffer ? 'সবার mean সমান না, তাই শুধু SD দিয়ে না — <b>CV</b> দিয়ে তুলনা করা উচিত। ' : 'সবার mean সমান, তাই SD সরাসরি তুলনা করা যায়। '}সবচেয়ে কম ওঠানামা <b>${R[best].name}</b> এর (SD ${fmt(R[best].sd, 3)}, CV ${fmt(R[best].cv)}%)। উপরের ছবিতে প্রতিটা বিন্দু তার নিজের mean (কালো দাগ) থেকে কতটা দূরে ছিটকে যায়, সেটাই variance এর আসল ছবি।`
+        : `প্রতিটা মান mean (${fmt(R[0].m)}) থেকে কতটা দূরে, সেই দূরত্বের বর্গের গড় = variance ${fmt(R[0].variance, 3)}। তার বর্গমূল SD = ${fmt(R[0].sd, 3)} — মানে সাধারণত মানগুলো mean থেকে এতটুকু দূরে থাকে।`;
+      tabs.innerHTML = R.map((r, i) => `<button class="btn sm ${i === sel ? '' : 'ghost'}" data-sel="${i}">${r.name}</button>`).join('');
+      const r = R[sel];
+      const div = kind === 's' ? `n − 1 = ${r.v.length - 1}` : `N = ${r.v.length}`;
+      tbl.innerHTML = `<table><thead><tr><th>x</th><th class="n">x − x̄</th><th class="n">(x − x̄)²</th></tr></thead><tbody>${r.v.map((x) => `<tr><td class="n" style="text-align:left">${fmt(x)}</td><td class="n">${fmt(x - r.m, 3)}</td><td class="n">${fmt((x - r.m) ** 2, 3)}</td></tr>`).join('')}<tr><td><b>Σx = ${fmt(r.v.reduce((a, b) => a + b, 0))}</b></td><td class="n">0</td><td class="n"><b>${fmt(ss(r.v), 3)}</b></td></tr></tbody></table>
+      <div class="working"><ol><li>Mean x̄ = ${fmt(r.v.reduce((a, b) => a + b, 0))} / ${r.v.length} = ${fmt(r.m, 3)}</li><li>Variance = Σ(x − x̄)² / (${div}) = ${fmt(ss(r.v), 3)} / ${kind === 's' ? r.v.length - 1 : r.v.length} = ${fmt(r.variance, 3)}</li><li>SD = √${fmt(r.variance, 3)} = ${fmt(r.sd, 3)}</li><li>CV = SD / mean × 100 = ${fmt(r.sd, 3)} / ${fmt(r.m, 3)} × 100 = ${fmt(r.cv)}%</li></ol></div>`;
+      inkIn(tbl.querySelectorAll('tr, li'));
+    }
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const p = t.closest<HTMLButtonElement>('[data-p]');
+      if (p) { ta.value = PRE[p.dataset.p!]; sel = 0; run(); }
+      const k = t.closest<HTMLButtonElement>('[data-kind] button');
+      if (k) { kind = k.dataset.v!; root.querySelectorAll('[data-kind] button').forEach((b) => b.setAttribute('aria-pressed', String(b === k))); run(); }
+      const s = t.closest<HTMLButtonElement>('[data-sel]');
+      if (s) { sel = Number(s.dataset.sel); run(); }
+      if (t.closest('[data-run]')) run();
+    });
+    run();
+  });
+</script>

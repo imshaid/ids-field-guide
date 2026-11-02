@@ -1,0 +1,7 @@
+---
+import { getTopic, topicUrl } from '../data/topics';
+interface Props { id: string; h?: string }
+const { id, h } = Astro.props;
+const t = getTopic(id);
+---
+<a class="t" data-week={t.week} href={topicUrl(t) + (h ? `#${h}` : '')} data-tip={t.summary} data-tip-title={t.title}><slot /></a>

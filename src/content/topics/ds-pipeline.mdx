@@ -1,0 +1,64 @@
+## Data science এর Venn diagram
+
+Data science হলো **data কে কাজে লাগার মত insight এ রূপান্তরের বিজ্ঞান।** তিনটা ভিন্ন জ্ঞান মিলে এটা তৈরি:
+
+<Diagram name="venn" caption="তিনটা বৃত্তের মাঝখানে data science; দুইটা করে মিললে অন্য জিনিস তৈরি হয়" />
+
+- **Computer Science + Math & Statistics** = Machine Learning
+- **Computer Science + Domain expertise** = Traditional software
+- **Math & Statistics + Domain expertise** = Data analysis
+- **তিনটাই একসাথে** = Data Science
+
+মানে, শুধু coding বা শুধু statistics জানলে data scientist হওয়া যায় না — যে বিষয় নিয়ে কাজ (domain), সেটাও বুঝতে হয়।
+
+## একই data, ভিন্ন রহস্য
+
+Slide এ একটা medical dataset দেখানো: প্রতিটা row একজন রোগীর tumor এর মাপ (radius, texture, perimeter…), আর একটা column বলে **Malignant (M) না Benign (B)**। সংখ্যার এই দেয়াল দেখে প্রশ্ন: ভেতরে কী ধরনের data? কোনো pattern আছে? Data science এর কাজ হলো এই ভেতরের তথ্যটা বের করা।
+
+Data representation এর slide এ দেখানো, এমন data দিয়ে **logistic regression** একটা S-আকৃতির curve টানে — feature এর মান বাড়লে malignant হওয়ার সম্ভাবনা 0 থেকে 1 এর দিকে যায়। (Details এই course এ লাগবে না, শুধু ধারণাটা।)
+
+## একজন data scientist এর profile
+
+Slide এর bar chart এ "Rachel" নামের এক data scientist এর দক্ষতা: computer science, math, statistics (সবচেয়ে বেশি), machine learning, domain expertise, communication & presentation, data visualization। মূল কথা: **সবার profile আলাদা**, কিন্তু এই সাতটা দক্ষতার মিশ্রণই লাগে।
+
+## Data science pipeline
+
+| ধাপ | কী হয় |
+|---|---|
+| Reality | বাস্তব জগত থেকে |
+| Raw data collected | কাঁচা data সংগ্রহ |
+| Data is processed | Process করা |
+| Clean dataset | পরিষ্কার data |
+| EDA / Models & algorithms | Explore করা, model বানানো |
+| Communicate, visualize, report | ফলাফল জানানো |
+| Make decisions / Data product | সিদ্ধান্ত, বা একটা data product যা আবার reality তে ফিরে যায় |
+
+এটা আসলে <T id="ds-process">data science process</T> এরই আরেকটা ছবি — শেষে আবার বাস্তবে ফিরে আসা loop টা খেয়াল করো।
+
+## Domain knowledge
+
+Data science project এর প্রথম কাজ: **user ঠিক কী output চায়** সেটা জানা।
+
+তার জন্য লাগে **business understanding আর domain knowledge** — data টা বাস্তবে কোথা থেকে আসে, কীভাবে তৈরি হয়, কীভাবে মাপা হয়, প্রতিটা attribute বা feature এর মানে কী। এই পুরো বাস্তব ধারণাটাই domain knowledge।
+
+<Example title="কেন এটা জরুরি">
+
+একটা hospital এর data তে blood sugar এর কিছু মান 600। Domain knowledge না থাকলে মনে হবে ভুল data, মুছে ফেলবে। একজন ডাক্তার জানেন — এটা সম্ভব, এরা আসলে সবচেয়ে বিপদের রোগী। ভুলে মুছে ফেললে model ঠিক সেই রোগীদেরই চিনবে না।
+
+</Example>
+
+## Iris dataset — একটা classic উদাহরণ
+
+Statistician আর biologist **R.A. Fisher** 1936 সালে Iris ফুলের এই dataset প্রকাশ করেন।
+
+- **Samples** (instances, observations) — প্রতিটা row একটা ফুল; মোট **150**টা
+- **Features** (attributes, measurements, dimensions) — **৪টা**: sepal length, sepal width, petal length, petal width
+- **Class labels** (targets) — **৩টা** প্রজাতি: Setosa, Versicolor, Virginica
+
+Domain knowledge এখানে মানে sepal আর petal কী, কীভাবে মাপা হয় সেটা জানা। কাজ হলো ৪টা মাপ দেখে ফুলটা কোন প্রজাতির, সেটা predict করা।
+
+<Exam>
+
+এই page থেকে সরাসরি বড় প্রশ্ন কম, কিন্তু Venn diagram আর "domain knowledge কেন লাগে" ছোট প্রশ্ন বা অন্য answer এর justification হিসেবে কাজে লাগে।
+
+</Exam>

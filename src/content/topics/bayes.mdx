@@ -1,0 +1,90 @@
+## Probability কী
+
+**Probability হলো কোনো ঘটনা ঘটার সম্ভাবনার গাণিতিক মাপ।**
+
+<Formula title="Probability">
+
+$$P(\text{event}) = \frac{\text{favorable outcome এর সংখ্যা}}{\text{মোট outcome এর সংখ্যা}}$$
+
+</Formula>
+
+<Example title="লুডুর ছক্কা (slide)">
+
+লুডুর ছক্কায় মোট outcome ৬টা (1, 2, 3, 4, 5, 6)। ছক্কা ওঠার favorable outcome ১টা (6)। তাই P(6) = **1/6**।
+
+</Example>
+
+- Probability সবসময় **0 থেকে 1** এর মধ্যে।
+- যা কখনো ঘটবে না (চিরকাল বেঁচে থাকা) → **impossible event**, P = 0।
+- যা অবশ্যই ঘটবে (একদিন মারা যাওয়া) → **certain event**, P = 1।
+
+## Probability এর উপাদান
+
+| শব্দ | মানে | লুডু উদাহরণ |
+|---|---|---|
+| **Experiment** | বারবার করা যায় এমন কাজ, যার নির্দিষ্ট কিছু সম্ভাব্য ফল আছে | ছক্কা চালা |
+| **Outcome** | Experiment এর প্রতিটা সম্ভাব্য ফল | 1, 2, 3, 4, 5, 6 |
+| **Sample space** | সব outcome একসাথে | {1, 2, 3, 4, 5, 6} |
+| **Event** | এক বা একাধিক outcome | জোড় সংখ্যা ওঠা = {2, 4, 6} |
+
+## Conditional probability: "যদি … হয়"
+
+**P(A | B)** পড়ো "B ঘটেছে জানা থাকলে A এর probability"। নতুন একটা তথ্য পেলে সম্ভাবনা বদলে যায় — Bayes theorem ঠিক এই বদলটা হিসাব করে।
+
+## Bayes theorem
+
+A আর B দুইটা event। B ঘটেছে জানলে A এর probability:
+
+<Formula title="Bayes theorem">
+
+$$P(A \mid B) = \frac{P(A)\,P(B \mid A)}{P(B)}$$
+
+</Formula>
+
+| অংশ | মানে | নাম |
+|---|---|---|
+| P(A) | নতুন তথ্যের আগে A এর probability | Prior |
+| P(B \| A) | A ঘটলে B ঘটার probability | Likelihood |
+| P(B) | B ঘটার মোট probability | Evidence |
+| P(A \| B) | B দেখার পরে A এর probability | Posterior |
+
+<Errata id="bayes-two" />
+
+## Slide এর উদাহরণ: পিকনিক আর মেঘ
+
+জানুয়ারির এক শুক্রবার পরিবার আর বন্ধুদের নিয়ে পিকনিক। সকালে উঠে দেখলে আকাশ মেঘলা — বৃষ্টি হলে সব plan বাতিল! আগের তথ্য:
+
+- সকালে আকাশ মেঘলা থাকে **40%** দিন → P(Cloud) = 0.4
+- বৃষ্টির দিনের **50%** তে সকালটা মেঘলা থাকে → P(Cloud | Rain) = 0.5
+- জানুয়ারিতে বৃষ্টি হয় খুব কম, প্রায় **10%** দিন → P(Rain) = 0.1
+
+$$P(\text{Rain} \mid \text{Cloud}) = \frac{P(\text{Rain}) \times P(\text{Cloud} \mid \text{Rain})}{P(\text{Cloud})} = \frac{0.1 \times 0.5}{0.4} = 0.125$$
+
+মেঘ দেখার পরেও বৃষ্টির সম্ভাবনা মাত্র **12.5%** — নিশ্চিন্তে পিকনিকে যাও!
+
+<Idea title="১০০ দিন দিয়ে ভাবো — অনেক সহজ">
+
+১০০টা জানুয়ারির দিন কল্পনা করো। বৃষ্টি হয় ১০ দিন। তার অর্ধেক, মানে **৫ দিন**, সকালে মেঘ ছিল। মোট মেঘলা সকাল ৪০টা। আজ মেঘলা — মানে আজ ওই ৪০টার একটা। তার মধ্যে বৃষ্টি মাত্র ৫টায় → 5/40 = **0.125**। নিচের lab টা ঠিক এভাবে দেখায়।
+
+</Idea>
+
+<LabEmbed id="bayes" />
+
+## Slide এর Python code
+
+```python
+def bayes(a, b, ba):
+    ab = a * ba / b
+    print("P(A | B)=", round(ab, 3))
+
+rain = 0.1
+cloud = 0.4
+cloud_given_rain = 0.5
+bayes(rain, cloud, cloud_given_rain)   # P(A | B)= 0.125
+```
+
+<Exam>
+
+এই semester এর slide এ শুধু Bayes theorem আছে। পুরনো paper এ (CSE315) এর উপর ভিত্তি করে **Naive Bayes** classification এসেছে — <QL id="f24-q3c">Fall 2024 Q3(c)</QL> আর <QL id="s24-q3">Spring 2024 Q3</QL>। Class এ পড়ানো হয়ে থাকলে দেখো: <T id="naive-bayes">Bonus: Naive Bayes</T>।
+
+</Exam>

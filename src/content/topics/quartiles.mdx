@@ -1,0 +1,81 @@
+## কেন spread লাগে
+
+দুইটা class এর গড় নম্বর 70। একটাতে সবাই 65–75 পেয়েছে, আরেকটাতে কেউ 20, কেউ 100। গড় একই, কিন্তু class দুইটা মোটেও একরকম না। **Data কতটা ছড়ানো (spread)**, সেটা না জানলে ছবিটা অসম্পূর্ণ। এই page এ spread এর তিনটা মাপ: range, quartile, IQR।
+
+## Range
+
+**Range = Maximum − Minimum।** সবচেয়ে বড় আর সবচেয়ে ছোট মানের পার্থক্য — data কতটা জায়গা জুড়ে আছে।
+
+Slide এর data: 14, 13, 11, 14, 15, 12, 16, 17, 11 → max 17, min 11 → **Range = 17 − 11 = 6**।
+
+<Errata id="range-sum" />
+
+<Errata id="range-18" />
+
+Range এর দুর্বলতা: শুধু দুইটা মান দেখে। একটা outlier থাকলেই range অনেক বড় হয়ে যায়, বাকি data কেমন সেটা বলে না।
+
+## Quartile
+
+**Quartile data কে চারটা সমান ভাগে ভাগ করে, প্রতিটা ভাগে 25% data।**
+
+- **Q1** (first quartile) — এর নিচে 25% data
+- **Q2** — এর নিচে 50% data; এটাই **median**
+- **Q3** (third quartile) — এর নিচে 75% data
+
+### কীভাবে বের করবে (median-of-halves method)
+
+Slide যে পদ্ধতিতে করেছে, সেটাই সবচেয়ে সহজ:
+
+1. Data ছোট থেকে বড় **সাজাও**।
+2. **Median (Q2)** বের করো।
+3. Median এর **বাম পাশের অর্ধেকের median = Q1**।
+4. **ডান পাশের অর্ধেকের median = Q3**।
+
+n বিজোড় হলে median টা নিজে কোনো অর্ধেকে যাবে না। n জোড় হলে data ঠিক মাঝখান থেকে দুই ভাগ।
+
+<Example title="Slide এর ১২টা building">
+
+সাজানো: **502, 550, 561, 607, 630, 662 | 678, 685, 714, 725, 762, 901**
+
+- n = 12 (জোড়), median = (662 + 678)/2 = **670**
+- বাম অর্ধেক (৬টা): 502, 550, 561, **607**, 630, 662 → মাঝের দুইটা 561 আর 607 → **Q1 = 584**
+- ডান অর্ধেক: 678, 685, 714, 725, 762, 901 → মাঝের দুইটা 714 আর 725 → **Q3 = 719.5**
+
+</Example>
+
+<Warn title="অন্য বইয়ে অন্য সংখ্যা কেন">
+
+Quartile বের করার কয়েকটা ভিন্ন পদ্ধতি আছে (যেমন (n+1)/4 position বা Excel এর পদ্ধতি), তাই কখনো কখনো সামান্য আলাদা উত্তর আসে। **Exam এ slide এর পদ্ধতিটাই (median-of-halves) ব্যবহার করো আর ধাপগুলো দেখাও** — তাহলে examiner বুঝবে তুমি কী করেছ।
+
+</Warn>
+
+## IQR — Interquartile range
+
+**IQR = Q3 − Q1** — মাঝের 50% data কতটা জায়গা জুড়ে আছে।
+
+উপরের উদাহরণে IQR = 719.5 − 584 = **135.5**।
+
+Range এর চেয়ে IQR অনেক বেশি নির্ভরযোগ্য, কারণ দুই প্রান্তের extreme মানগুলো এতে ঢোকেই না। এই IQR দিয়েই পরের page এ <T id="outliers">outlier ধরা</T> হয়।
+
+## Box plot
+
+একটা ছবিতে পুরো spread দেখানোর উপায়:
+
+<Diagram name="boxplot" caption="Box = মাঝের 50% (Q1 থেকে Q3); ভেতরের দাগ = median; দুই পাশের whisker = বাকি data; আলাদা বিন্দু = outlier" />
+
+- **Box** এর দুই প্রান্ত Q1 আর Q3, মানে box এর দৈর্ঘ্যই IQR।
+- Box এর ভেতরের মোটা দাগ **median**।
+- **Whisker** দুইটা যায় সবচেয়ে ছোট আর সবচেয়ে বড় মান পর্যন্ত — যেগুলো outlier না।
+- **Outlier** আলাদা বিন্দু হিসেবে আঁকা হয়।
+
+<Idea title="Box plot থেকে আকার পড়া">
+
+Median যদি box এর মাঝখানে আর দুই whisker সমান লম্বা হয় → data symmetric। Median Q1 এর দিকে সরে থাকলে আর ডানের whisker লম্বা হলে → positive skew; উল্টো হলে → negative skew। বিস্তারিত: <T id="shape">Skewness</T>।
+
+</Idea>
+
+<Exam>
+
+Box plot আঁকতে বলে <QL id="s26-q4b">Spring 2026 Q4(b)</QL> এ — আগে five-number summary (min, Q1, median, Q3, max) আর fence বের করবে, তারপর একটা horizontal number line এর উপর আঁকবে, সব কিছু label করে। Q1, Q3 বের করা লাগে <QL id="f24-q2b">Fall 2024 Q2(b)</QL> তেও।
+
+</Exam>

@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import { ERRATA } from '../data/errata';
+import { getTopic, topicUrl } from '../data/topics';
+---
+<Base title="Errata — slide এর ভুল" description="IDS Week 1–5 slide এ যেসব ভুল বা গরমিল আছে, সেগুলোর সংশোধন।" crumbs={[{ label: 'Errata' }]}>
+  <div class="page">
+    <article class="col" data-pagefind-body>
+      <div class="kicker">Errata · {ERRATA.length}টা সংশোধন</div>
+      <h1 class="display">Slide এর ভুলগুলো</h1>
+      <p class="lead">Slide গুলো বেশিরভাগ ঠিক, কিন্তু কিছু জায়গায় typo, উল্টা শব্দ বা question আর solution এর সংখ্যা মেলে না। এগুলো মুখস্থ করলে exam এ ভুল লিখবে — তাই এক জায়গায় সব।</p>
+      <div class="prose">
+        {ERRATA.map((e) => { const t = getTopic(e.topic); return (
+          <div class="pen" data-ink data-week={t.week}>
+            <span class="co-k">✎ {e.where} · <a href={topicUrl(t)}>{t.title}</a></span>
+            <p class="wrong">{e.wrong}</p>
+            <p class="right">{e.right}</p>
+            {e.why && <p class="why">{e.why}</p>}
+          </div>
+        ); })}
+      </div>
+    </article>
+  </div>
+</Base>

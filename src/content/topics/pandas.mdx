@@ -1,0 +1,42 @@
+<Warn title="Bonus — এবারের slide এ নেই">
+
+<QL id="f24-q2a">Fall 2024 Q2(a)</QL> এ ৩ marks এর জন্য এসেছিল। ৩ লাইন code মুখস্থ রাখলেই যথেষ্ট।
+
+</Warn>
+
+## Pandas কী
+
+Pandas হলো Python এর একটা library, যেটা দিয়ে table আকারের data (Excel sheet এর মত) সহজে সামলানো যায়। এর প্রধান জিনিস **DataFrame** — row আর column ওয়ালা একটা table।
+
+## Dictionary থেকে DataFrame
+
+```python
+import pandas as pd
+
+employee_data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [25, 30, 35, 40],
+    'Department': ['HR', 'Finance', 'IT', 'Marketing'],
+    'Salary': [50000, 60000, 70000, 80000]
+}
+
+df = pd.DataFrame(employee_data)   # i. dictionary → DataFrame
+print(df.head(2))                  # ii. first two rows
+print(df['Salary'].mean())         # iii. average salary → 65000.0
+```
+
+## প্রতিটা লাইনের মানে
+
+- `import pandas as pd` — pandas library টা `pd` নামে আনা।
+- `pd.DataFrame(employee_data)` — dictionary এর প্রতিটা **key একটা column** হয়ে যায়, list এর মানগুলো সেই column এর row।
+- `df.head(2)` — প্রথম **২টা row** দেখায়। (শুধু `head()` দিলে default ৫টা।) `df.iloc[:2]` দিয়েও হয়।
+- `df['Salary'].mean()` — Salary column টা নিয়ে তার **গড়**: (50000 + 60000 + 70000 + 80000) / 4 = **65000**।
+
+## Output
+
+```
+    Name  Age Department  Salary
+0  Alice   25         HR   50000
+1    Bob   30    Finance   60000
+65000.0
+```

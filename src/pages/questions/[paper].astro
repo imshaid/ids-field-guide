@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PAPERS, getPaper } from '../../data/papers';
+import { mdxComponents } from '../../components/mdx';
+
+export function getStaticPaths() {
+  return PAPERS.map((p) => ({ params: { paper: p.id } }));
+}
+const p = getPaper(Astro.params.paper!);
+const mods = import.meta.glob('../../content/papers/*.mdx', { eager: true }) as Record<string, any>;
+const mod = mods[`../../content/papers/${p.id}.mdx`];
+if (!mod) throw new Error(`Missing paper content: ${p.id}.mdx`);
+const Content = mod.default;
+const i = PAPERS.findIndex((x) => x.id === p.id);
+---
+<Base title={`${p.title} ${p.exam} — solved`} description={`${p.code} ${p.title} midterm এর সব প্রশ্ন, breakdown আর model answer।`} crumbs={[{ label: 'Questions', href: '/questions/' }, { label: p.title }]}>
+  <div class="page">
+    <article class="col" data-pagefind-body>
+      <div class="kicker">{p.code} · {p.batch} · {p.exam} · 25 marks · 1.5 hrs</div>
+      <h1 class="display">{p.title}</h1>
+      {p.note && <p class="lead">{p.note}</p>}
+      <div class="meta" data-pagefind-ignore>
+        {p.questions.map((q) => <a href={`#${q.id}`} style="font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">{q.label}</a>)}
+      </div>
+      <div class="btn-row" style="margin:1rem 0 0" data-pagefind-ignore>
+        <button class="btn sm" type="button" data-answers="open">সব answer খোলো</button>
+        <button class="btn sm ghost" type="button" data-answers="close">সব বন্ধ করো (exam mode)</button>
+      </div>
+      <div class="prose"><Content components={mdxComponents} /></div>
+    </article>
+  </div>
+  <nav class="rfoot" aria-label="Papers">
+    {i > 0 ? <a href={`/questions/${PAPERS[i - 1].id}/`}><small>← আগের paper</small>{PAPERS[i - 1].title}</a> : <a href="/questions/"><small>←</small>All papers</a>}
+    {i < PAPERS.length - 1 ? <a href={`/questions/${PAPERS[i + 1].id}/`}><small>পরের paper →</small>{PAPERS[i + 1].title}</a> : <a href="/cheatsheet/"><small>শেষ! এবার →</small>Cheat sheet</a>}
+  </nav>
+</Base>

@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LABS, getWeek } from '../../data/topics';
+---
+<Base title="Labs" description="IDS এর ১০টা interactive lab — নিজে চালিয়ে statistics বোঝো।" crumbs={[{ label: 'Labs' }]}>
+  <div class="page">
+    <div class="col-wide">
+      <div class="kicker">⚗ Labs</div>
+      <h1 class="display">নিজে চালিয়ে বোঝো</h1>
+      <p class="lead" style="max-width:40rem">প্রতিটা lab একটা নির্দিষ্ট প্রশ্নের উত্তর দেয়। Data বদলাও, step ধরে ধরে দেখো, আর নিচের "exam working" থেকে দেখে নাও খাতায় কীভাবে লিখবে।</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));margin-top:2rem">
+        {LABS.map((l, i) => (
+          <a class="card" data-week={l.week} href={`/labs/${l.id}/`} style="border-top:6px solid var(--acc)">
+            <span class="kicker">{String(i + 1).padStart(2, '0')} · {getWeek(l.week).label}</span>
+            <h3>{l.title}</h3>
+            <p><b>{l.question}</b><br />{l.summary}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</Base>

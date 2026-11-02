@@ -1,0 +1,109 @@
+<div class="lab-mm">
+  <div class="btn-row" style="margin-bottom:.7rem">
+    <button class="btn sm" data-p="ages" aria-pressed="true">Class ages (slide)</button>
+    <button class="btn sm" data-p="saif">Saif Hasan · S'26</button>
+    <button class="btn sm" data-p="salary">অফিসের বেতন (হাজার ৳)</button>
+  </div>
+  <label class="f mm-lbl">শেষ মানটা টেনে বদলাও</label>
+  <input type="range" min="0" max="100" step="1" value="14" />
+  <svg class="chart" viewBox="0 0 640 150" aria-label="Number line"></svg>
+  <div class="stats"></div>
+  <p class="cap"></p>
+</div>
+
+<script>
+  import { mean, median, modes, fmt, tween, lerp, el, param, parseNums } from '../../scripts/stats';
+  const PRESETS: Record<string, { data: number[]; max: number; label: string; unit: string }> = {
+    ages: { data: [14, 13, 11, 14, 15, 12, 16, 17, 11, 14], max: 60, label: 'শেষ ছাত্রের বয়স', unit: ' বছর' },
+    saif: { data: [51, 100, 56, 59, 160, 76, 54, 100, 90, 89, 81, 98, 0, 4, 0], max: 200, label: 'শেষ innings এর run', unit: ' run' },
+    salary: { data: [25, 28, 30, 30, 32, 35, 38, 40, 42, 45], max: 500, label: 'Boss এর বেতন (হাজার ৳)', unit: 'k' },
+  };
+  document.querySelectorAll<HTMLElement>('.lab-mm').forEach((root) => {
+    const range = root.querySelector<HTMLInputElement>('input[type=range]')!;
+    const lbl = root.querySelector('.mm-lbl')!;
+    const svg = root.querySelector('svg')!;
+    const statsEl = root.querySelector('.stats')!;
+    const cap = root.querySelector('.cap')!;
+    const L = 30, R = 610;
+    let key = 'ages';
+    let base: number[] = [];
+    let max = 60;
+    const axis = el('g', {}, svg);
+    const dots = el('g', {}, svg);
+    const mkMarker = (color: string, label: string, y: number) => {
+      const g = el('g', {}, svg);
+      el('line', { x1: 0, x2: 0, y1: y, y2: 118, stroke: color, 'stroke-width': 2.4 }, g);
+      el('path', { d: `M-6,${y - 10} L6,${y - 10} L0,${y} Z`, fill: color }, g);
+      el('text', { x: 8, y: y - 2, fill: color }, g).textContent = label;
+      return g;
+    };
+    const mMean = mkMarker('var(--pen)', 'mean', 22);
+    const mMed = mkMarker('var(--ink)', 'median', 48);
+    let pos = { mean: 0, med: 0 };
+    let raf = 0;
+
+    function load(k: string) {
+      key = k;
+      const p = PRESETS[k];
+      base = p.data.slice(0, -1);
+      max = p.max;
+      range.max = String(max);
+      range.value = String(p.data[p.data.length - 1]);
+      lbl.textContent = p.label + ' — টেনে বদলাও';
+      draw(true);
+    }
+    const X = (v: number) => L + (v / max) * (R - L);
+    function draw(animate = false) {
+      const last = Number(range.value);
+      const data = [...base, last];
+      const mu = mean(data), md = median(data), mo = modes(data);
+      axis.innerHTML = '';
+      el('line', { x1: L, x2: R, y1: 118, y2: 118, class: 'axis' }, axis);
+      for (let i = 0; i <= 5; i++) {
+        const v = (max / 5) * i;
+        el('text', { x: X(v), y: 138, 'text-anchor': 'middle' }, axis).textContent = fmt(v);
+      }
+      dots.innerHTML = '';
+      const stack = new Map<number, number>();
+      data.forEach((v, i) => {
+        const k = stack.get(v) ?? 0;
+        stack.set(v, k + 1);
+        el('circle', { cx: X(v), cy: 108 - k * 9, r: i === data.length - 1 ? 6 : 4.2, fill: i === data.length - 1 ? 'var(--w3)' : 'var(--ink-2)', stroke: i === data.length - 1 ? 'var(--ink)' : 'none' }, dots);
+      });
+      const to = { mean: X(mu), med: X(md) };
+      const from = { ...pos };
+      cancelAnimationFrame(raf);
+      tween(animate ? 600 : 260, (k) => {
+        pos = { mean: lerp(from.mean, to.mean, k), med: lerp(from.med, to.med, k) };
+        mMean.setAttribute('transform', `translate(${pos.mean},0)`);
+        mMed.setAttribute('transform', `translate(${pos.med},0)`);
+      });
+      const u = PRESETS[key].unit;
+      statsEl.innerHTML = `<div><small>Mean</small><strong>${fmt(mu)}</strong></div><div><small>Median</small><strong>${fmt(md)}</strong></div><div><small>Mode</small><strong>${mo.length ? mo.map((x) => fmt(x)).join(', ') : 'নেই'}</strong></div><div class="hl"><small>Mean − Median</small><strong>${fmt(mu - md)}</strong></div>`;
+      const gap = mu - md;
+      const typical = median(base);
+      const far = Math.abs(last - typical) > 2.5 * (median(base.map((x) => Math.abs(x - typical))) || 1);
+      cap.innerHTML = far
+        ? `শেষ মান <b>${last}${u}</b> বাকিদের থেকে অনেক দূরে — একটা outlier। Mean টা তার দিকে <b>${fmt(Math.abs(gap))}</b> ঘর সরে গেছে, কিন্তু median (${fmt(md)}) প্রায় একই জায়গায়। কারণ median শুধু "মাঝে কে" দেখে, কত দূরে সেটা না।`
+        : `এখন সব মান কাছাকাছি, তাই mean (${fmt(mu)}) আর median (${fmt(md)}) প্রায় সমান। Slider টা একদম ডানে বা বামে টেনে দেখো কী হয়।`;
+    }
+    range.addEventListener('input', () => draw(false));
+    root.querySelectorAll<HTMLButtonElement>('[data-p]').forEach((b) =>
+      b.addEventListener('click', () => {
+        root.querySelectorAll('[data-p]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        load(b.dataset.p!);
+      }),
+    );
+    const q = param('data');
+    if (q) {
+      const d = parseNums(q);
+      if (d.length > 2) {
+        PRESETS.custom = { data: d, max: Math.max(...d) * 1.5, label: 'শেষ মান', unit: '' };
+        load('custom');
+        return;
+      }
+    }
+    pos = { mean: X(13.7), med: X(14) };
+    load('ages');
+  });
+</script>

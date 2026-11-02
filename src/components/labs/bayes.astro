@@ -1,0 +1,111 @@
+<div class="lab-bayes">
+  <div class="btn-row" style="margin-bottom:.8rem">
+    <button class="btn sm" data-p="picnic" aria-pressed="true">Picnic & বৃষ্টি (slide)</button>
+    <button class="btn sm" data-p="spam">Spam আর "free"</button>
+    <button class="btn sm" data-p="test">Medical test</button>
+  </div>
+  <div class="row">
+    <div><label class="f by-la">P(A)</label><input type="range" min="0.01" max="0.9" step="0.01" data-k="a" /><span class="mono by-va"></span></div>
+    <div><label class="f by-lba">P(B|A)</label><input type="range" min="0.01" max="1" step="0.01" data-k="ba" /><span class="mono by-vba"></span></div>
+    <div><label class="f by-lb">P(B)</label><input type="range" min="0.01" max="1" step="0.01" data-k="b" /><span class="mono by-vb"></span></div>
+  </div>
+  <div class="btn-row" style="margin:.4rem 0 .8rem"><button class="btn sm solid" data-play>▶ ধাপে ধাপে দেখাও</button></div>
+  <div class="by-wrap">
+    <div class="by-grid" aria-label="100 days grid"></div>
+    <div class="by-side">
+      <div class="by-legend"><span class="sw sw-b"></span><span class="by-nb">B</span></div>
+      <div class="by-legend"><span class="sw sw-a"></span><span class="by-na">A</span></div>
+      <div class="stats" style="grid-template-columns:1fr"></div>
+    </div>
+  </div>
+  <p class="cap"></p>
+</div>
+
+<style is:global>
+  .by-wrap { display: grid; grid-template-columns: minmax(0, 22rem) 1fr; gap: 1.2rem; align-items: start; }
+  .by-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+  .by-grid i { aspect-ratio: 1; border: 1px solid var(--ink-4); background: var(--paper); transition: background 0.45s, opacity 0.45s, transform 0.45s, border-color 0.45s; }
+  .by-grid i.b { background: color-mix(in srgb, var(--w5) 45%, var(--paper)); border-color: var(--w5); }
+  .by-grid i.a { background-image: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px); }
+  .by-grid i.fade { opacity: 0.12; transform: scale(0.8); }
+  .by-legend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.86rem; margin-bottom: 0.4rem; }
+  .sw { width: 1rem; height: 1rem; border: 1px solid var(--ink-4); display: inline-block; flex-shrink: 0; }
+  .sw-b { background: color-mix(in srgb, var(--w5) 45%, var(--paper)); }
+  .sw-a { background-image: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px); }
+  @media (max-width: 640px) { .by-wrap { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { fmt, sleep } from '../../scripts/stats';
+  const PRE: Record<string, { a: number; ba: number; b: number; A: string; B: string; unit: string }> = {
+    picnic: { a: 0.1, ba: 0.5, b: 0.4, A: 'বৃষ্টি হয় (A)', B: 'সকালে মেঘলা (B)', unit: 'দিন' },
+    spam: { a: 0.3, ba: 0.6, b: 0.25, A: 'Email টা spam (A)', B: 'Email এ "free" আছে (B)', unit: 'email' },
+    test: { a: 0.05, ba: 0.9, b: 0.14, A: 'রোগ আছে (A)', B: 'Test positive (B)', unit: 'জন' },
+  };
+  document.querySelectorAll<HTMLElement>('.lab-bayes').forEach((root) => {
+    const grid = root.querySelector<HTMLElement>('.by-grid')!;
+    const cells = Array.from({ length: 100 }, () => grid.appendChild(document.createElement('i')));
+    const statsEl = root.querySelector('.stats')!;
+    const cap = root.querySelector('.cap')!;
+    const rg = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!;
+    let cur = PRE.picnic;
+    let token = 0;
+
+    function compute() {
+      const a = +rg('a').value, ba = +rg('ba').value, b = +rg('b').value;
+      const joint = a * ba;
+      root.querySelector('.by-va')!.textContent = fmt(a, 2);
+      root.querySelector('.by-vba')!.textContent = fmt(ba, 2);
+      root.querySelector('.by-vb')!.textContent = fmt(b, 2);
+      return { a, ba, b, joint, post: joint / b, ok: joint <= b + 1e-9 };
+    }
+    function paint(stage: number) {
+      const { a, b, joint } = compute();
+      const nB = Math.round(b * 100), nAB = Math.min(Math.round(joint * 100), nB), nA = Math.max(Math.round(a * 100), nAB);
+      cells.forEach((c, i) => {
+        const isB = i < nB;
+        const isA = (i < nAB) || (i >= 100 - (nA - nAB));
+        c.className = [stage >= 3 && isB ? 'b' : '', stage >= 2 && isA ? 'a' : '', stage >= 4 && !isB ? 'fade' : ''].join(' ');
+      });
+      return { nA, nB, nAB };
+    }
+    function text(stage: number) {
+      const r = compute();
+      const { nA, nB, nAB } = paint(stage);
+      root.querySelector('.by-nb')!.textContent = cur.B;
+      root.querySelector('.by-na')!.textContent = cur.A;
+      root.querySelector('.by-la')!.textContent = `P(A) — ${cur.A}`;
+      root.querySelector('.by-lba')!.textContent = 'P(B|A) — A হলে B এর সম্ভাবনা';
+      root.querySelector('.by-lb')!.textContent = `P(B) — ${cur.B}`;
+      statsEl.innerHTML = `<div><small>P(A) × P(B|A)</small><strong>${fmt(r.a, 2)} × ${fmt(r.ba, 2)} = ${fmt(r.joint, 4)}</strong></div><div class="hl"><small>P(A|B)</small><strong>${r.ok ? `${fmt(r.joint, 4)} / ${fmt(r.b, 2)} = ${fmt(r.post, 4)}` : '—'}</strong></div>`;
+      const msg = [
+        `ধরো ১০০টা ${cur.unit}।`,
+        `এর মধ্যে <b>${nA}টা</b> তে A (দাগ কাটা) — এটাই আগের ধারণা, P(A) = ${fmt(r.a, 2)}।`,
+        `<b>${nB}টা</b> তে B (রঙিন)। A আর B দুইটাই আছে <b>${nAB}টা</b> তে।`,
+        r.ok ? `এখন আমরা জানি B ঘটেছে — তাই শুধু রঙিন ${nB}টা রাখলাম। এদের মধ্যে A মাত্র ${nAB}টা → P(A|B) ≈ ${nAB}/${nB} = <b>${fmt(r.post, 3)}</b> (${fmt(r.post * 100, 1)}%)।` : '<b>এই সংখ্যাগুলো সম্ভব না</b> — P(A)·P(B|A) কখনো P(B) এর চেয়ে বড় হতে পারে না। একটা slider ঠিক করো।',
+      ];
+      cap.innerHTML = msg.slice(0, stage).join(' ');
+    }
+    async function play() {
+      const my = ++token;
+      for (let s = 1; s <= 4; s++) {
+        if (my !== token) return;
+        text(s);
+        await sleep(1100);
+      }
+    }
+    function load(k: string) {
+      cur = PRE[k];
+      rg('a').value = String(cur.a); rg('ba').value = String(cur.ba); rg('b').value = String(cur.b);
+      text(4);
+    }
+    root.querySelectorAll<HTMLButtonElement>('[data-p]').forEach((b) => b.addEventListener('click', () => {
+      root.querySelectorAll('[data-p]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      token++;
+      load(b.dataset.p!);
+    }));
+    root.querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { token++; text(4); }));
+    root.querySelector('[data-play]')!.addEventListener('click', play);
+    load('picnic');
+  });
+</script>

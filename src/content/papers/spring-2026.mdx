@@ -1,0 +1,411 @@
+<Idea title="এই paper এক নজরে">
+
+Midterm · Level 3 Term 3 · 1.5 ঘণ্টা · 25 marks · সব প্রশ্ন compulsory। Q1 (CO1) data science process আর big data, Q2 (CO2) variable/scale, Q3 sampling, Q4 (CO3, 10 marks) descriptive statistics + hypothesis। প্রায় পুরো syllabus ছুঁয়ে যায় — তাই এটাকেই "model paper" ধরে practice করো।
+
+</Idea>
+
+<Q id="s26-q1a">
+
+**1. (a)** **Explain** the correct sequence of data science steps a bank would follow to predict fraudulent transactions using customer transaction histories, profiles, and device login data. Then justify why each step logically follows the previous one.
+
+Steps:
+
+- A) Evaluate the model performance using metrics like accuracy and F1-score
+- B) Collect transaction and customer data
+- C) Communicate insights to the risk management team
+- D) Clean and normalize the data
+- E) Train a machine learning model to detect fraudulent transactions
+- F) Explore the data to find trends and suspicious patterns
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+দুইটা কাজ: (১) A–F কে সঠিক order এ সাজানো, (২) প্রতিটা ধাপ কেন আগেরটার পরে আসে — সেই যুক্তি। শুধু order লিখলে অর্ধেক marks।
+
+#### কোন topic লাগবে
+
+<T id="ds-process">Data Science Process</T> — collect → clean → explore → train → evaluate → communicate।
+
+#### Answer এর কাঠামো
+
+Q1 এর মোট 5 marks (a আর b মিলিয়ে), তাই (a) তে ~½ page: প্রথম লাইনে পুরো sequence, তারপর ৬টা ছোট point (প্রতিটায় "কী" + "কেন এখানে")। শেষে এক লাইনে "process is iterative"।
+
+</Brief>
+
+<Answer>
+
+**Correct sequence: B → D → F → E → A → C**
+
+1. **B – Collect transaction and customer data.** Every analysis starts with data. The bank first gathers transaction histories, customer profiles and device login records, because without this raw material no pattern can be studied and no model can be trained.
+2. **D – Clean and normalize the data.** Raw banking data contains missing values, duplicates, inconsistent formats and features on very different scales (e.g. amount in taka vs. login count). It must be cleaned and normalized *after* collection and *before* any analysis, otherwise later results would be misleading ("garbage in, garbage out").
+3. **F – Explore the data (EDA).** Once the data is reliable, the analyst explores it to find trends and suspicious patterns, such as large transfers at 3 a.m. from a new device. Exploration needs clean data, and its findings guide which features the model should use.
+4. **E – Train a machine learning model.** Using the patterns found in EDA, a classification model (e.g. decision tree or logistic regression) is trained on labelled past transactions to separate fraudulent from genuine ones. A model can only be trained after we understand which features matter.
+5. **A – Evaluate model performance.** The trained model is tested on unseen data using accuracy and F1-score. F1-score is especially important because fraud cases are rare (imbalanced data). Evaluation must follow training, since there is nothing to evaluate before a model exists.
+6. **C – Communicate insights to the risk management team.** Only after the model is shown to perform well are the results and insights shared with the risk team, who decide on actions such as blocking cards or adding verification steps.
+
+The process is iterative: if evaluation is poor, the team may return to cleaning or exploration and repeat the cycle.
+
+</Answer>
+
+<Pitfalls>
+
+- A (evaluate) কে E (train) এর আগে বসানো — সবচেয়ে common ভুল।
+- F (explore) কে D (clean) এর আগে বসানো — নোংরা data explore করলে pattern ভুল আসে।
+- "Justify" অংশ বাদ দিয়ে শুধু order লেখা।
+
+</Pitfalls>
+
+<Q id="s26-q1b">
+
+**1. (b)** **Explain** how an Agri-Tech company could design a crop disease prediction system using real-time IoT soil sensor data and daily drone images by describing a suitable data storage architecture that allows the system to continue operating even when data formats change, and by clarifying which Big Data challenges (the 5 V's) are relevant to each data source with justification for your reasoning.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+তিনটা অংশ: (১) একটা storage architecture, (২) কেন সেটা data format বদলালেও চলবে, (৩) দুইটা source (sensor, drone) এর জন্য আলাদা আলাদা করে কোন V প্রযোজ্য, কারণসহ।
+
+#### কোন topic লাগবে
+
+<T id="big-data">Big Data, 5 V আর data lake</T> (slide এর বাইরে), আর <T id="dikw">structured বনাম unstructured data</T>।
+
+#### Answer এর কাঠামো
+
+~½–¾ page: ২–৩ লাইনে architecture (layer গুলো), ২ লাইনে schema-on-read এর যুক্তি, তারপর একটা ছোট table: Source | Relevant V | Justification।
+
+</Brief>
+
+<Answer>
+
+**Storage architecture – a data lake (lakehouse) design**
+
+1. **Ingestion layer:** IoT soil sensors stream readings (moisture, temperature, pH) continuously through a streaming pipeline; drone images are uploaded in daily batches.
+2. **Raw zone (data lake):** all data is stored in its original form in low-cost object storage, organised by source and date. No fixed schema is forced at write time.
+3. **Processed / curated zone:** cleaning jobs remove faulty sensor readings and extract features from images (e.g. leaf colour or vegetation index). The resulting structured feature tables feed the disease prediction model.
+4. **Serving layer:** the model's predictions are sent to farmers as alerts or dashboards.
+
+**Why it keeps working when formats change:** a data lake uses **schema-on-read**. Data is accepted as it arrives and its structure is applied only when it is read. If a sensor firmware adds a new field or the drone camera produces a new image format, ingestion does not break; the new files are stored, and only the processing code is updated. A metadata catalogue records each format version.
+
+**Relevant 5 V's for each source**
+
+| Source | Relevant V | Justification |
+|---|---|---|
+| IoT soil sensors | **Velocity** | Readings arrive continuously in real time and must be processed quickly to detect early stress. |
+| | **Volume** | Thousands of sensors × readings every few seconds produce a large accumulated volume. |
+| | **Veracity** | Sensors can drift, fail or give noisy values (e.g. in heavy rain), so data quality must be checked. |
+| Drone images | **Volume** | Daily high-resolution images of whole fields are very large files. |
+| | **Variety** | Images are unstructured and completely different from numeric sensor data; formats may differ by camera. |
+| | **Value** | Visual signs of disease (spots, discolouration) carry the most predictive value when combined with sensor data. |
+
+Together, the two sources create a **variety** challenge for the whole system, which is exactly why a flexible data lake is preferred over a rigid relational warehouse.
+
+</Answer>
+
+<Pitfalls>
+
+- 5 V গুলো শুধু লিস্ট করে দেওয়া, কোন source এ কোনটা খাটে সেটা না বলা।
+- "Database এ রাখব" — format বদলালে কেন চলবে সেটা না বোঝানো।
+
+</Pitfalls>
+
+<Q id="s26-q2a" lq="">
+
+**2. (a)** **Apply** your knowledge of variable types and measurement scales to classify the following variables for each patient, and record the measurement scale used for each variable.
+
+<div class="tbl-scroll">
+
+| Patient ID | Age | Weight | Blood Pressure | Blood Group | Cholesterol | Smoker | Exercise |
+|---|---|---|---|---|---|---|---|
+| P201 | 50 | 82 | 145/95 | B+ | 220 | Yes | Low |
+| P202 | 28 | 58 | 115/75 | O+ | 155 | No | High |
+
+</div>
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+৮টা variable এর প্রতিটার জন্য দুইটা জিনিস: type (qualitative / quantitative-discrete / quantitative-continuous) আর scale (nominal / ordinal / interval / ratio)।
+
+#### কোন topic লাগবে
+
+<T id="variables">Variable এর ধরন</T> আর <T id="scales">Measurement scale</T>।
+
+#### Answer এর কাঠামো
+
+একটা table — Variable | Type | Scale | Reason (এক লাইনে)। 5 marks, ৮টা row; কারণের কলামটাই marks এনে দেয়। Lab এ নিজে করে দেখো: <LL id="scale-classifier">Scale Classifier</LL>।
+
+</Brief>
+
+<Answer>
+
+| Variable | Type | Scale | Reason |
+|---|---|---|---|
+| Patient ID | Qualitative | Nominal | Only a label to identify a patient; no order or arithmetic meaning. |
+| Age | Quantitative (discrete when counted in whole years) | Ratio | Numeric with a true zero; 50 years is twice 25 years. |
+| Weight | Quantitative, continuous | Ratio | Measured (can be 58.4 kg); 0 kg means no weight. |
+| Blood Pressure | Quantitative, continuous | Ratio | Measured in mmHg (systolic/diastolic); 0 mmHg means no pressure. |
+| Blood Group | Qualitative | Nominal | Categories (B+, O+) with no natural order. |
+| Cholesterol | Quantitative, continuous | Ratio | Measured amount (mg/dL) with a true zero. |
+| Smoker | Qualitative (binary) | Nominal | Two categories, Yes/No, without order. |
+| Exercise | Qualitative | Ordinal | Categories with a natural order (Low < High) but unequal, unmeasured gaps. |
+
+*Note:* Age is sometimes treated as continuous because time is measured continuously; here it is recorded in whole years, so it is discrete. Either is acceptable with this justification.
+
+</Answer>
+
+<Pitfalls>
+
+- Patient ID কে quantitative বলা (সংখ্যা আছে বলে)।
+- Exercise কে nominal বলা — Low আর High এর ক্রম আছে।
+- Blood pressure কে interval বলা — mmHg এ শূন্য মানে আসলেই চাপ নেই।
+
+</Pitfalls>
+
+<Q id="s26-q3">
+
+**3.** Three colleagues, Turjo, Arunob, and Tanvir, are collaborating on an analytical research project concerning the Rohingya issue. From the outset, they recognized that collecting comprehensive information on the Rohingya population would be challenging. Consequently, they decided to employ sampling techniques to obtain representative data.
+
+i. Turjo proposed dividing the population into five distinct age groups: 0–20, 21–40, 41–60, 61–80, and 81 and above. From each group, participants would be selected to ensure age-based representation.
+
+ii. Tanvir suggested identifying the geographic locations in Bangladesh where Rohingyas reside, segmenting these areas into different regions, and then selecting participants from each region.
+
+iii. Arunob, however, emphasized that many Rohingyas may conceal their identity, making it difficult to identify them directly. He therefore recommended using a referral-based approach: beginning with Rohingyas known to the researchers, who would then introduce additional participants, thereby expanding the sample through successive referrals.
+
+**(a)** **Apply** appropriate sampling techniques to collect representative data on the Rohingya population for a research study by selecting one or more of the proposed methods (age-group sampling, geographic-region sampling, or referral-based sampling) and describing in practice how you would select participants while accounting for practical constraints such as accessibility and representativeness.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+তিনজনের প্রস্তাবের পেছনে কোন sampling method, সেটা চিনে নিয়ে একটা বাস্তব plan বানানো — কীভাবে participant বাছবে, আর accessibility ও representativeness এর সমস্যা কীভাবে সামলাবে।
+
+#### কোন topic লাগবে
+
+<T id="sampling">Sampling methods</T>:
+
+- Turjo = **stratified** (বয়স অনুযায়ী strata)
+- Tanvir = **cluster** (slide এর ভাষায় "geographical location based")। খেয়াল রাখো: যদি **প্রতিটা** region থেকে নাও, সেটা আসলে region-ভিত্তিক stratification এর মত; কিছু region random ভাবে বাছলে সেটা cluster।
+- Arunob = **snowball**
+
+#### Answer এর কাঠামো
+
+5 marks, ¾–১ page: (১) তিনটা method এর নাম, (২) কেন একটা একা যথেষ্ট না, (৩) মিলিয়ে একটা multi-stage plan — ধাপে ধাপে, (৪) বাস্তব সমস্যা আর সমাধান, (৫) এক লাইনের উপসংহার। এই scenario lab এ দেখো: <LL id="sampling-sim">Sampling Simulator</LL>।
+
+</Brief>
+
+<Answer>
+
+**Identifying the proposals:** Turjo's age-group approach is **stratified sampling**, Tanvir's region-based approach is **cluster (area) sampling**, and Arunob's referral approach is **snowball sampling**. No single method is enough here: stratified and cluster sampling need a list (sampling frame) of people, which exists only for registered, accessible Rohingyas, while snowball sampling reaches hidden people but is biased towards one social network. I would therefore combine all three in a **multi-stage design**.
+
+**Stage 1 – Geographic clusters (Tanvir):** List the areas where Rohingyas live (e.g. the camp areas of Cox's Bazar and Bhasan Char, and host-community areas). Treat camps or camp blocks as clusters and randomly select a number of them, so that travel, cost and permissions remain manageable while different locations are still covered.
+
+**Stage 2 – Age strata within clusters (Turjo):** Inside each selected cluster, use available registration or household lists to divide residents into the five age groups and draw a random sample from each group in proportion to its size. This guarantees that children, adults and the elderly are all represented.
+
+**Stage 3 – Referral for hidden members (Arunob):** For Rohingyas living outside camps or concealing their identity, start snowball sampling from several different "seed" participants in different areas (not just one), so that the referral chains do not all come from the same network. Track their ages and fill gaps in under-represented age groups.
+
+**Practical constraints:** obtain government/NGO permission to access camps; use Rohingya-speaking interviewers to build trust; ensure informed consent and anonymity, since respondents may fear exposure; compare the final sample's age and location distribution with known population figures and adjust (weight) if some groups are under-represented.
+
+**Conclusion:** cluster + stratified sampling provides a representative probability sample of the accessible population, while snowball sampling extends coverage to hidden members; together they balance representativeness with practical accessibility.
+
+</Answer>
+
+<Pitfalls>
+
+- শুধু একটা method বেছে বাকিগুলো উপেক্ষা করা, অথচ প্রশ্নে "one or more" আর practical constraint দুইটাই চাওয়া হয়েছে।
+- Method এর নাম না বলা (stratified / cluster / snowball)।
+- Snowball এর bias এর কথা না বলা।
+
+</Pitfalls>
+
+<Q id="s26-q4a" lq="data=51,100,56,59,160,76,54,100,90,89,81,98,0,4,0">
+
+**4.** Prior to the upcoming World Cup, Bangladesh's leading batsman, Saif Hasan, had shown remarkable consistency in One Day Internationals (ODIs). In the twelve matches before the ODI series against Australia, he had never scored fewer than fifty runs. However, in Bangladesh's final series before the World Cup, his performance declined, with scores of 0, 4, and 0.
+
+The sequence of his last fifteen ODI scores is:
+**51, 100, 56, 59, 160, 76, 54, 100, 90, 89, 81, 98, 0, 4, 0.**
+
+A Bangladeshi cricket selector believes that one or two bad innings should not overshadow his overall ability, and wants to assess his performance statistically before the World Cup.
+
+**(a)** Calculate the mean and median for Saif Hasan's 15 innings. **Analyze** the difference between these two measures in the context of his recent performance slump. Based on the distribution of the scores, which statistic provides the most reliable indicator of his "true" form for the World Cup selectors, and why?
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Mean আর median হিসাব করা, দুইটার পার্থক্যের কারণ ব্যাখ্যা করা (শেষের 0, 4, 0), আর কোনটা "আসল form" ভালো বোঝায় সেটা যুক্তিসহ বলা।
+
+#### কোন topic লাগবে
+
+<T id="central-tendency">Mean, median আর outlier এর প্রভাব</T>।
+
+#### Answer এর কাঠামো
+
+Q4 মোট 10 marks, তিন ভাগে; (a) তে ~⅓ page: হিসাব (formula → মান) + ২–৩ লাইনের analysis + সিদ্ধান্ত।
+
+*Scan note:* ৫ নম্বর score টা paper এ একটু অস্পষ্ট, **160** ধরা হয়েছে।
+
+</Brief>
+
+<Answer>
+
+**Mean:** Sum = 51 + 100 + 56 + 59 + 160 + 76 + 54 + 100 + 90 + 89 + 81 + 98 + 0 + 4 + 0 = **1018**
+
+$$\bar{x} = \frac{1018}{15} = 67.87 \text{ runs}$$
+
+**Median:** Sorted: 0, 0, 4, 51, 54, 56, 59, **76**, 81, 89, 90, 98, 100, 100, 160. With n = 15, the median is the (15 + 1)/2 = 8th value = **76 runs**.
+
+**Analysis:** The mean (67.87) is about 8 runs lower than the median (76). This gap is caused by the three most recent innings (0, 4, 0), which are far below all his other scores. Because the mean uses every value, these few very low scores pull it down sharply; without them his mean would be 84.5. The median depends only on the middle position, so the slump moves it very little.
+
+**Most reliable indicator:** The **median (76 runs)** is the better measure of his true form. The distribution is negatively skewed by a small cluster of extreme low scores, and the median is robust to such extreme values. It reflects what a "typical" Saif Hasan innings looks like — 12 of his 15 innings were 51 or more — which is exactly what the selector wants to judge.
+
+</Answer>
+
+<Pitfalls>
+
+- n = 15 এর median ভুল position থেকে নেওয়া (sort না করে ৮-তম মান নেওয়া)।
+- "Median better" বলে কারণ (robust to extreme values / skewed) না লেখা।
+
+</Pitfalls>
+
+<Q id="s26-q4b" lq="data=51,100,56,59,160,76,54,100,90,89,81,98,0,4,0">
+
+**4. (b)** Construct a boxplot for the 15 innings. Using the Interquartile Range (IQR) method, mathematically **analyze** the dataset to determine if any of the recent low scores (0, 4, 0) qualify as formal statistical outliers. Explain how the overall skewness of the distribution either supports or contradicts the selector's belief that the recent bad innings are just an anomaly.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+তিনটা কাজ: five-number summary আর box plot আঁকা; IQR rule দিয়ে 0, 4, 0 outlier কিনা প্রমাণ; skewness দিয়ে selector এর "anomaly" দাবি বিচার।
+
+#### কোন topic লাগবে
+
+<T id="quartiles">Quartile আর box plot</T>, <T id="outliers">IQR outlier rule</T>, <T id="shape">Skewness</T>।
+
+#### Answer এর কাঠামো
+
+~¾ page: quartile হিসাব → fence → সিদ্ধান্ত → label করা box plot → skewness এর ৩–৪ লাইন (support আর contradict দুই দিকই)। এই data টা lab এ: <LL id="iqr-boxplot" q="data=51,100,56,59,160,76,54,100,90,89,81,98,0,4,0">IQR + Box Plot</LL>।
+
+**Trap:** 0, 4, 0 দেখতে outlier মনে হলেও rule অনুযায়ী এরা outlier **না**।
+
+</Brief>
+
+<Answer>
+
+**Five-number summary** (sorted: 0, 0, 4, 51, 54, 56, 59, 76, 81, 89, 90, 98, 100, 100, 160)
+
+- Median (Q2) = 8th value = **76**
+- Lower half (first 7 values): 0, 0, 4, **51**, 54, 56, 59 → **Q1 = 51**
+- Upper half (last 7 values): 81, 89, 90, **98**, 100, 100, 160 → **Q3 = 98**
+- Minimum = 0, Maximum = 160
+
+**IQR method**
+
+- IQR = Q3 − Q1 = 98 − 51 = **47**
+- Lower fence = Q1 − 1.5 × IQR = 51 − 70.5 = **−19.5**
+- Upper fence = Q3 + 1.5 × IQR = 98 + 70.5 = **168.5**
+
+Every score lies between −19.5 and 168.5. The lowest scores 0, 0 and 4 are **above the lower fence**, and the highest score 160 is below the upper fence. Therefore **none of the recent low scores is a formal statistical outlier.**
+
+**Boxplot**
+
+<svg viewBox="0 0 640 140" width="100%" class="chart" role="img" aria-label="Box plot of Saif Hasan's 15 innings">
+  <line x1="40" x2="600" y1="110" y2="110" class="axis" />
+  <line x1="40" x2="40" y1="106" y2="114" class="axis" /><text x="40" y="128" text-anchor="middle">0</text>
+  <line x1="122" x2="122" y1="106" y2="114" class="axis" /><text x="122" y="128" text-anchor="middle">25</text>
+  <line x1="205" x2="205" y1="106" y2="114" class="axis" /><text x="205" y="128" text-anchor="middle">50</text>
+  <line x1="287" x2="287" y1="106" y2="114" class="axis" /><text x="287" y="128" text-anchor="middle">75</text>
+  <line x1="369" x2="369" y1="106" y2="114" class="axis" /><text x="369" y="128" text-anchor="middle">100</text>
+  <line x1="452" x2="452" y1="106" y2="114" class="axis" /><text x="452" y="128" text-anchor="middle">125</text>
+  <line x1="534" x2="534" y1="106" y2="114" class="axis" /><text x="534" y="128" text-anchor="middle">150</text>
+  <line x1="40" x2="208" y1="60" y2="60" stroke="#1e1d1a" stroke-width="1.5" />
+  <line x1="40" x2="40" y1="48" y2="72" stroke="#1e1d1a" stroke-width="1.5" />
+  <rect x="208" y="38" width="155" height="44" fill="#e7dcc6" stroke="#1e1d1a" stroke-width="1.5" />
+  <line x1="290" x2="290" y1="38" y2="82" stroke="#1e1d1a" stroke-width="3" />
+  <line x1="363" x2="567" y1="60" y2="60" stroke="#1e1d1a" stroke-width="1.5" />
+  <line x1="567" x2="567" y1="48" y2="72" stroke="#1e1d1a" stroke-width="1.5" />
+  <text x="40" y="30" text-anchor="middle">Min 0</text><text x="208" y="30" text-anchor="middle">Q1 51</text><text x="290" y="30" text-anchor="middle">Median 76</text><text x="363" y="30" text-anchor="middle">Q3 98</text><text x="567" y="30" text-anchor="middle">Max 160</text>
+</svg>
+
+(Both fences, −19.5 and 168.5, lie outside the data range, so the whiskers extend to the minimum and maximum and no point is plotted separately.)
+
+**Skewness and the selector's belief**
+
+The mean (67.87) is less than the median (76), and the left whisker (0 to 51) is long compared with the box. The distribution is therefore **negatively (left) skewed**; Pearson's coefficient Sk = 3(67.87 − 76)/43.61 ≈ −0.56.
+
+- *Supports the belief:* the left tail is created only by the three most recent innings, while the bulk of the distribution (12 of 15 scores) is concentrated between 51 and 160. His typical level remains high, so the slump looks like a short-term dip rather than his normal performance.
+- *Contradicts the belief:* the IQR test shows that 0, 4 and 0 are **not** outliers — statistically, they fall within the natural spread of his scores and cannot be dismissed as anomalies. They are also consecutive and the most recent, which may indicate a real change in form (fatigue, injury or technique) that a box plot cannot show because it ignores time order.
+
+**Conclusion:** the skewness partly supports the selector, but the data do not justify calling the slump a mere anomaly; his recent form should be monitored before the World Cup.
+
+</Answer>
+
+<Pitfalls>
+
+- Box plot এ 0, 4, 0 কে outlier হিসেবে আলাদা বিন্দু দিয়ে আঁকা।
+- Quartile বের করতে median (76) কে কোনো অর্ধেকে ঢুকিয়ে ফেলা।
+- শুধু "negatively skewed" লিখে selector এর বিশ্বাসের সাথে না মেলানো।
+
+</Pitfalls>
+
+<Q id="s26-q4c">
+
+**4. (c)** The selector believes Saif's true batting average remains strong despite recent matches, claiming his true mean is above 50. A hypothesis test is conducted (H₀: μ = 50 versus Hₐ: μ > 50) at a 5% significance level, yielding a p-value of 0.03. **Analyze** this statistical result by applying the decision rule to the null hypothesis, and explain exactly what this outcome implies for the selector's confidence in picking Saif for the World Cup.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+কোনো হিসাব না — শুধু decision rule (p বনাম α) প্রয়োগ আর ফলাফলের সঠিক মানে লেখা।
+
+#### কোন topic লাগবে
+
+<T id="hypothesis">Hypothesis testing, p-value, Type I error</T>।
+
+#### Answer এর কাঠামো
+
+~⅓ page: decision rule → তুলনা → সিদ্ধান্ত → selector এর জন্য মানে → সীমাবদ্ধতা (৫% risk, significance ≠ certainty)।
+
+</Brief>
+
+<Answer>
+
+**Decision rule:** Reject H₀ if p-value < α.
+
+Here, p = 0.03 and α = 0.05. Since **0.03 < 0.05, we reject H₀: μ = 50.**
+
+**Interpretation:** If Saif's true average were only 50, the chance of observing scores as high as his (or higher) would be just 3%. This is unlikely enough at the 5% level, so there is **statistically significant evidence that his true mean score is greater than 50**. The selector's claim is supported by the data.
+
+**Implication for the selector:** The selector can be reasonably confident (at the 95% confidence level) that Saif's long-term ability is above the 50-run benchmark, so the recent low scores do not cancel out his overall quality.
+
+However, this confidence has limits:
+
+- There is still up to a **5% risk of a Type I error** — concluding his mean is above 50 when it actually is not.
+- The test says nothing about *how much* above 50 his average is, or about his **current** form; the three consecutive recent failures are not captured by an overall average.
+- The result relies on assumptions (independent innings, roughly normal scores) that a recent slump may weaken.
+
+So the result supports selecting Saif, but the selector should combine it with fitness and recent-form assessment.
+
+</Answer>
+
+<Pitfalls>
+
+- "We accept Hₐ / H₀ is proven false" — বলবে "reject H₀, significant evidence"।
+- p = 0.03 কে "3% chance that H₀ is true" বলা — ভুল ব্যাখ্যা।
+
+</Pitfalls>

@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PAPERS } from '../../data/papers';
+import { TOPICS, topicUrl, getWeek } from '../../data/topics';
+const byTopic = TOPICS.map((t) => ({ t, qs: PAPERS.flatMap((p) => p.questions.filter((q) => q.topics.includes(t.id)).map((q) => ({ p, q }))) })).filter((x) => x.qs.length);
+---
+<Base title="Previous Questions" description="IDS midterm এর ৪টা semester এর প্রশ্ন — পুরো প্রশ্ন, breakdown আর model answer সহ।" crumbs={[{ label: 'Previous questions' }]}>
+  <div class="page">
+    <div class="col">
+      <div class="kicker">Previous questions</div>
+      <h1 class="display">আগের প্রশ্ন, ভেঙে ভেঙে</h1>
+      <p class="lead">প্রতিটা প্রশ্ন হুবহু দেওয়া আছে, তাই আলাদা করে paper খুলতে হবে না। প্রতিটার পরে: প্রশ্নটা আসলে কী চাইছে, answer এর কাঠামো, model answer, আর কোথায় marks কাটে।</p>
+      <div class="co"><span class="co-k">কীভাবে practice করবে</span><p>প্রশ্ন পড়ো → নিজে ৩–৫ মিনিট ভাবো বা খাতায় লেখো → তারপর "Model answer" খুলে মিলাও। Answer গুলো ইচ্ছা করেই বন্ধ করা থাকে।</p></div>
+
+      <ul class="tlist">
+        {PAPERS.map((p, i) => (
+          <li><a href={`/questions/${p.id}/`}>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <span><h3>{p.title} · {p.exam}</h3><p class="muted">{p.code} · {p.batch} · {p.questions.length}টা প্রশ্ন{p.note ? ` — ${p.note}` : ''}</p></span>
+            <span class="pri">{p.code}</span>
+          </a></li>
+        ))}
+      </ul>
+
+      <h2 class="kicker" style="margin:2.8rem 0 .9rem">Topic অনুযায়ী প্রশ্ন</h2>
+      <p class="muted" style="font-size:.92rem">কোন topic থেকে কতবার এসেছে — যেটা বারবার আসে, সেটা আগে পড়ো।</p>
+      <table>
+        <thead><tr><th>Topic</th><th class="n">বার</th><th>প্রশ্ন</th></tr></thead>
+        <tbody>
+          {byTopic.sort((a, b) => b.qs.length - a.qs.length).map(({ t, qs }) => (
+            <tr data-week={t.week}>
+              <td><a class="t" data-week={t.week} href={topicUrl(t)} data-tip={t.summary} data-tip-title={t.title}>{t.title}</a><br /><span class="kicker">{getWeek(t.week).label}</span></td>
+              <td class="n">{qs.length}</td>
+              <td><div class="btn-row" style="gap:.3rem">{qs.map(({ p, q }) => <a class="chip" href={`/questions/${p.id}/#${q.id}`}>{p.title.replace(' 20', ' ’')} {q.label}</a>)}</div></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Base>

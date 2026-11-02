@@ -1,0 +1,113 @@
+<div class="lab-ps">
+  <div class="seg" data-set style="margin-bottom:.8rem"><button data-v="seven" aria-pressed="true">৭টা সাধারণ ধাপ</button><button data-v="bank">Bank fraud · Spring '26 Q1(a)</button></div>
+  <p class="ps-help muted" style="font-size:.9rem;margin:0 0 .6rem">নিচের card গুলো সঠিক order এ একটা একটা করে tap করো। ভুল হলে উপরের card এ tap করে ফেরত পাঠাও।</p>
+  <ol class="ps-seq"></ol>
+  <div class="ps-pool"></div>
+  <div class="btn-row" style="margin-top:.8rem"><button class="btn sm solid" data-check disabled>Check করো</button><button class="btn sm ghost" data-shuffle>↺ আবার সাজাও</button></div>
+  <p class="cap"></p>
+</div>
+
+<style is:global>
+  .ps-seq { list-style: none; margin: 0 0 0.8rem; padding: 0; counter-reset: ps; min-height: 3rem; border-top: 1px solid var(--ink); }
+  .ps-seq li { counter-increment: ps; border-bottom: 1px solid var(--rule); }
+  .ps-pool { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.8rem; background: var(--paper-2); min-height: 3.6rem; }
+  .ps-card { display: flex; gap: 0.6rem; align-items: baseline; width: 100%; text-align: left; border: 1px solid var(--ink); background: var(--paper); padding: 0.6rem 0.75rem; cursor: pointer; font-size: 0.92rem; line-height: 1.4; }
+  .ps-pool .ps-card { width: auto; flex: 1 1 14rem; }
+  .ps-card:hover { background: var(--ink); color: var(--paper); }
+  .ps-card b { font-family: var(--mono); font-weight: 500; font-size: 0.75rem; flex-shrink: 0; }
+  .ps-seq .ps-card { border: 0; }
+  .ps-seq li::before { content: counter(ps, decimal-leading-zero); font: 500 0.7rem var(--mono); color: var(--ink-3); float: left; padding: 0.75rem 0.6rem 0 0.2rem; }
+  .ps-seq li.ok { background: color-mix(in srgb, var(--ok) 14%, var(--paper)); }
+  .ps-seq li.no { background: color-mix(in srgb, var(--pen) 12%, var(--paper)); }
+  .ps-why { font-size: 0.84rem; color: var(--ink-2); padding: 0 0.75rem 0.65rem 2.6rem; }
+</style>
+
+<script>
+  import { inkIn, motionOK } from '../../scripts/stats';
+  type Item = { id: string; tag: string; text: string; why: string };
+  const SETS: Record<string, Item[]> = {
+    seven: [
+      { id: '1', tag: '·', text: 'Business problem বোঝা — ঠিক কোন প্রশ্নের উত্তর চাই', why: 'Problem পরিষ্কার না হলে কোন data লাগবে, কোন algorithm লাগবে কিছুই ঠিক করা যায় না। তাই সবসময় প্রথম।' },
+      { id: '2', tag: '·', text: 'Data acquisition — database, log, API, web থেকে data আনা', why: 'প্রশ্ন জানার পরেই বোঝা যায় কোন data দরকার — তারপর সেটা জোগাড়।' },
+      { id: '3', tag: '·', text: 'Data preparation — clean, missing/duplicate ঠিক করা, transform', why: 'Raw data নোংরা থাকে; নোংরা data দিয়ে analysis করলে ফলও ভুল (garbage in, garbage out)।' },
+      { id: '4', tag: '·', text: 'Exploratory Data Analysis — trend আর pattern খোঁজা', why: 'পরিষ্কার data ঘেঁটে বুঝি কোন feature গুরুত্বপূর্ণ — এটা model বাছতে সাহায্য করে।' },
+      { id: '5', tag: '·', text: 'Modeling — model train, test আর evaluate', why: 'EDA থেকে পাওয়া ধারণা দিয়ে model বানাই, তারপর test data দিয়ে কতটা ভালো সেটা মাপি।' },
+      { id: '6', tag: '·', text: 'Communicate — visualize, report, সিদ্ধান্ত জানানো', why: 'Evaluate করা ফলাফল decision maker দের বোঝার মত করে দেখাতে হয়।' },
+      { id: '7', tag: '·', text: 'Deploy & maintain — বাস্তবে চালু আর নিয়মিত update', why: 'সবাই রাজি হলে model আসল system এ বসানো হয় এবং সময়ের সাথে আবার train করা হয়।' },
+    ],
+    bank: [
+      { id: 'B', tag: 'B', text: 'Collect transaction and customer data', why: 'Model বানানোর কাঁচামাল — transaction history, profile, login data আগে জোগাড় করতে হবে।' },
+      { id: 'D', tag: 'D', text: 'Clean and normalize the data', why: 'জোগাড় করা data তে missing, duplicate, ভিন্ন scale থাকে — পরিষ্কার না করলে explore বা train করা অর্থহীন।' },
+      { id: 'F', tag: 'F', text: 'Explore the data to find trends and suspicious patterns', why: 'পরিষ্কার data তেই আসল pattern দেখা যায় (যেমন রাত ৩টায় নতুন device থেকে বড় transaction) — এগুলো model এর feature হবে।' },
+      { id: 'E', tag: 'E', text: 'Train a machine learning model to detect fraudulent transactions', why: 'EDA তে পাওয়া pattern গুলো দিয়ে model শেখে fraud আর normal আলাদা করতে।' },
+      { id: 'A', tag: 'A', text: 'Evaluate the model performance using metrics like accuracy and F1-score', why: 'Train এর পরেই জানা দরকার model কতটা ঠিক — fraud data imbalanced বলে F1-score খুব জরুরি।' },
+      { id: 'C', tag: 'C', text: 'Communicate insights to the risk management team', why: 'Evaluate করে নিশ্চিত হওয়ার পরই ফলাফল risk team কে জানানো যায়, যাতে তারা action নেয়।' },
+    ],
+  };
+  document.querySelectorAll<HTMLElement>('.lab-ps').forEach((root) => {
+    const seq = root.querySelector<HTMLOListElement>('.ps-seq')!;
+    const pool = root.querySelector<HTMLElement>('.ps-pool')!;
+    const check = root.querySelector<HTMLButtonElement>('[data-check]')!;
+    const cap = root.querySelector('.cap')!;
+    let set = 'seven';
+    const card = (it: Item) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ps-card'; b.dataset.id = it.id; b.innerHTML = `<b>${it.tag}</b><span>${it.text}</span>`; return b; };
+    function flip(mutate: () => void) {
+      const cards = Array.from(root.querySelectorAll<HTMLElement>('.ps-card'));
+      const first = new Map(cards.map((c) => [c, c.getBoundingClientRect()]));
+      mutate();
+      if (!motionOK()) return;
+      cards.forEach((c) => {
+        const a = first.get(c)!, b = c.getBoundingClientRect();
+        const dx = a.left - b.left, dy = a.top - b.top;
+        if (!dx && !dy) return;
+        c.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.22,.7,.2,1)' });
+      });
+    }
+    function reset() {
+      const items = [...SETS[set]];
+      for (let i = items.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [items[i], items[j]] = [items[j], items[i]]; }
+      seq.innerHTML = '';
+      pool.innerHTML = '';
+      items.forEach((it) => pool.appendChild(card(it)));
+      check.disabled = true;
+      cap.innerHTML = set === 'bank' ? 'Spring 2026 এর Q1(a): bank কোন order এ কাজ করবে? A–F card গুলো সাজাও।' : 'Data science project এর ৭টা ধাপ এলোমেলো হয়ে গেছে — ঠিক order এ সাজাও।';
+    }
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const c = t.closest<HTMLElement>('.ps-card');
+      if (c) {
+        flip(() => {
+          if (c.parentElement === pool) { const li = document.createElement('li'); li.appendChild(c); seq.appendChild(li); }
+          else { const li = c.parentElement!; pool.appendChild(c); li.remove(); seq.querySelectorAll('li').forEach((l) => { l.classList.remove('ok', 'no'); l.querySelector('.ps-why')?.remove(); }); }
+        });
+        check.disabled = pool.children.length > 0;
+        return;
+      }
+      const s = t.closest<HTMLButtonElement>('[data-set] button');
+      if (s) { set = s.dataset.v!; root.querySelectorAll('[data-set] button').forEach((b) => b.setAttribute('aria-pressed', String(b === s))); reset(); return; }
+      if (t.closest('[data-shuffle]')) { reset(); return; }
+      if (t.closest('[data-check]')) {
+        const correct = SETS[set];
+        let ok = 0;
+        seq.querySelectorAll('li').forEach((li, i) => {
+          const id = (li.querySelector('.ps-card') as HTMLElement).dataset.id;
+          const good = id === correct[i].id;
+          if (good) ok++;
+          li.classList.toggle('ok', good);
+          li.classList.toggle('no', !good);
+          li.querySelector('.ps-why')?.remove();
+          const w = document.createElement('div');
+          w.className = 'ps-why';
+          const it = correct.find((x) => x.id === id)!;
+          w.innerHTML = good ? `✓ ${it.why}` : `✗ এই জায়গায় আসবে: <b>${correct[i].tag !== '·' ? correct[i].tag + ' — ' : ''}${correct[i].text}</b>`;
+          li.appendChild(w);
+        });
+        inkIn(seq.querySelectorAll('.ps-why'));
+        cap.innerHTML = ok === correct.length
+          ? `দারুণ! ${ok}/${correct.length} — পুরো sequence ঠিক${set === 'bank' ? ': <b>B → D → F → E → A → C</b>' : ''}। প্রতিটার নিচে "কেন" লেখা আছে — exam এ এই justification টাই লিখতে হবে।`
+          : `${ok}/${correct.length} ঠিক। লাল গুলোতে tap করে ফেরত পাঠাও আর আবার চেষ্টা করো। মূল নিয়ম: আগে data জোগাড়, তারপর পরিষ্কার, তারপর explore, তারপর model।`;
+      }
+    });
+    reset();
+  });
+</script>

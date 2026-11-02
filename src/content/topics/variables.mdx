@@ -1,0 +1,48 @@
+## Variable কী
+
+একটা dataset এর প্রতিটা column হলো একটা **variable** — এমন একটা বৈশিষ্ট্য যার মান মানুষ বা জিনিস ভেদে বদলায়। যেমন class এর student দের "বয়স", "blood group", "CGPA"।
+
+Variable প্রথমে দুই ভাগে ভাগ হয়, তারপর একটা ভাগ আবার দুই ভাগে:
+
+| Variable | উপ-ভাগ | চেনার উপায় | উদাহরণ |
+|---|---|---|---|
+| **Qualitative** (categorical) | — | মান হলো category বা গুণ | চুলের রং, gender, নাম, জায়গার নাম, blood group |
+| **Quantitative** (numerical) | **Discrete** | **গোনা** যায়, শুধু পূর্ণ সংখ্যা | বাসায় মানুষ ৪ জন, ৫টা গাড়ি |
+| | **Continuous** | **মাপা** যায়, ভগ্নাংশ হতে পারে | উচ্চতা 5.4 ফুট, ওজন 60.5 kg, দূরত্ব 11.2 km |
+
+## Quantitative: discrete বনাম continuous
+
+**Discrete** এর সবচেয়ে সহজ পরীক্ষা: "২.৮ হতে পারে?" একটা বাসায় ২.৮ জন মানুষ থাকতে পারে না — তাই মানুষের সংখ্যা discrete।
+
+**Continuous** হলে যত সূক্ষ্মভাবে মাপবে, তত বেশি দশমিক পাবে। উচ্চতা "5 ফুট 4 ইঞ্চি", millimeter এ মাপলে আরও কয়েক ভগ্নাংশ বেরোবে — মাঝখানে অসীম মান সম্ভব।
+
+<Idea title="এক লাইনের নিয়ম">
+
+**গোনো → discrete। মাপো → continuous। নাম/category → qualitative।**
+
+</Idea>
+
+## যেখানে সবাই আটকে যায়
+
+<Warn title="দেখতে সংখ্যা, আসলে qualitative">
+
+**Patient ID (P201), roll number, jersey number, phone number** — এগুলোতে সংখ্যা থাকলেও এরা শুধু নাম বা label। দুইটা roll number যোগ করার বা গড় করার কোনো মানে নেই। তাই এগুলো **qualitative**।
+
+</Warn>
+
+- **Yes / No** (যেমন Smoker) — দুইটা category, তাই qualitative। এর আরেক নাম binary variable।
+- **Low / Medium / High** — category, কিন্তু ক্রম আছে। তবুও qualitative (scale টা ordinal — পরের page এ)।
+- **বয়স** — পূর্ণ বছরে গুনলে (২৮ বছর) discrete, আর সময়ের সূক্ষ্ম মাপ হিসেবে ধরলে continuous। Exam এ যেটাই লেখো, পাশে কারণটা লিখে দাও।
+- **Blood pressure 145/95** — mmHg এ মাপা, তাই continuous quantitative (আসলে দুইটা মাপ: systolic আর diastolic)।
+
+<Example>
+
+একটা hospital এর record: রোগীর নাম (qualitative), ভর্তির দিন কতজন visitor এলো (discrete), শরীরের তাপমাত্রা 101.3°F (continuous), discharge status "সুস্থ / উন্নতি / অপরিবর্তিত" (qualitative, ক্রমসহ)।
+
+</Example>
+
+<Exam>
+
+Variable type প্রায় সবসময় <T id="scales">measurement scale</T> এর সাথে জোড়া হয়ে আসে — যেমন <QL id="s26-q2a">Spring 2026 Q2(a)</QL> এর patient table। নিজে practice করতে <LL id="scale-classifier">Scale Classifier lab</LL> খোলো।
+
+</Exam>

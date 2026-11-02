@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import { TOPICS, topicUrl, getWeek, PRI_LABEL } from '../data/topics';
+const high = TOPICS.filter((t) => t.pri === 'high');
+const mid = TOPICS.filter((t) => t.pri === 'mid');
+---
+<Base title="Start here" description="IDS midterm এর exam pattern, কোন topic কতটা important, ২ দিনের plan আর marks অনুযায়ী answer কত বড় লিখবে।" crumbs={[{ label: 'Start here' }]}>
+  <div class="page">
+    <article class="col" data-pagefind-body>
+      <div class="kicker">Start here · ৫ মিনিট</div>
+      <h1 class="display">পড়া শুরুর আগে, exam টা চিনে নাও</h1>
+      <p class="lead">গত ৪টা semester এর প্রশ্ন ঘেঁটে দেখা গেছে, IDS midterm এর ধরন প্রায় একই থাকে। আগে pattern টা বুঝলে কোথায় কতটা সময় দিবে সেটা সহজ হয়ে যায়।</p>
+
+      <div class="prose">
+        <h2>Exam এর কাঠামো</h2>
+        <p>25 marks, 1.5 ঘণ্টা, সব প্রশ্নের উত্তর দিতে হয়। Latest দুইটা paper (Spring 2026, Fall 2025) এ প্রায় fixed একটা pattern দেখা যায়:</p>
+        <table>
+          <thead><tr><th>প্রশ্ন</th><th class="n">Marks</th><th>সাধারণত কী আসে</th><th>কোথায় পড়বে</th></tr></thead>
+          <tbody>
+            <tr><td>Q1 · CO1</td><td class="n">5</td><td>একটা scenario দিয়ে data science এর steps সাজানো বা plan বানানো</td><td><a href="/w1/process/">Week 1 · Process</a></td></tr>
+            <tr><td>Q2 · CO2</td><td class="n">5</td><td>Variable type + measurement scale, অথবা sampling method চেনা</td><td><a href="/w2/measurement-scales/">Week 2</a>, <a href="/w3/sampling-methods/">Week 3</a></td></tr>
+            <tr><td>Q3</td><td class="n">5</td><td>Sampling এর scenario, অথবা IQR দিয়ে outlier</td><td><a href="/w3/">Week 3</a></td></tr>
+            <tr><td>Q4 · CO3</td><td class="n">10</td><td>Mean/median, SD, box plot, skewness, hypothesis test interpret</td><td><a href="/w3/">Week 3</a>, <a href="/w4/">4</a>, <a href="/w5/">5</a></td></tr>
+          </tbody>
+        </table>
+        <div class="co"><span class="co-k">সবচেয়ে বড় কথা</span><p>নতুন paper গুলোতে প্রায় সব প্রশ্ন <b>Apply / Analyze</b> type — একটা বাস্তব ঘটনা দিয়ে জিজ্ঞেস করে। শুধু definition মুখস্থ করলে চলবে না; concept টা কেন আর কখন খাটে সেটা বুঝতে হবে।</p></div>
+
+        <h2>কোন topic কতটা জরুরি</h2>
+        <p>প্রতিটা topic page এ একটা priority mark আছে। গত paper গুলোতে যেটা বারবার এসেছে সেটা <b>●●● High</b>।</p>
+        <h3>●●● High — এগুলো বাদ দেওয়া যাবে না</h3>
+        <ul>{high.map((t) => <li data-week={t.week}><a class="t" data-week={t.week} href={topicUrl(t)} data-tip={t.summary} data-tip-title={t.title}>{t.title}</a> <span class="muted">· {getWeek(t.week).label}</span></li>)}</ul>
+        <h3>●●○ Medium — concept বুঝে রাখো</h3>
+        <ul>{mid.map((t) => <li data-week={t.week}><a class="t" data-week={t.week} href={topicUrl(t)} data-tip={t.summary} data-tip-title={t.title}>{t.title}</a> <span class="muted">· {getWeek(t.week).label}</span></li>)}</ul>
+
+        <h2>হাতে ২ দিন থাকলে plan</h2>
+        <table>
+          <thead><tr><th>কখন</th><th>কী পড়বে</th><th>কী practice করবে</th></tr></thead>
+          <tbody>
+            <tr><td><b>Day 1</b><br /><span class="muted">~3 ঘণ্টা</span></td><td>Week 1 আর Week 2 পুরোটা। তারপর Week 3 এর sampling।</td><td>Process Sorter আর Scale Classifier lab; Spring 2026 এর Q1, Q2, Q3</td></tr>
+            <tr><td><b>Day 2 · সকাল</b></td><td>Week 3: mean-median, quartile, IQR outlier</td><td>IQR lab এ নিজের হাতে ৩–৪টা data; Fall 2025 Q3</td></tr>
+            <tr><td><b>Day 2 · দুপুর</b></td><td>Week 4: variance, correlation, skewness</td><td>Variance Table lab; Fall 2025 Q4</td></tr>
+            <tr><td><b>Day 2 · বিকাল</b></td><td>Week 5: hypothesis, z/t test, Bayes</td><td>Hypothesis Stepper; Spring 2026 Q4 পুরোটা</td></tr>
+            <tr><td><b>Day 2 · রাত</b></td><td>সব previous question, answer বন্ধ রেখে</td><td>নিজে লিখে তারপর model answer এর সাথে মিলাও</td></tr>
+            <tr><td><b>Exam এর সকাল</b></td><td><a href="/cheatsheet/">Cheat sheet</a> + <a href="/errata/">Errata</a> + <a href="/revise/">তোমার revision list</a></td><td>নতুন কিছু না, শুধু চোখ বুলানো</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Marks অনুযায়ী answer কত বড় লিখবে</h2>
+        <table>
+          <thead><tr><th class="n">Marks</th><th>কত বড়</th><th>কী থাকতে হবে</th></tr></thead>
+          <tbody>
+            <tr><td class="n">2</td><td>৪–৬ লাইন</td><td>এক লাইনের সংজ্ঞা + একটা উদাহরণ বা কারণ</td></tr>
+            <tr><td class="n">3</td><td>আধা page</td><td>৩টা পরিষ্কার point, অথবা ছোট একটা হিসাব + এক লাইনের ব্যাখ্যা</td></tr>
+            <tr><td class="n">5</td><td>¾ থেকে ১ page</td><td>এক লাইনের ভূমিকা → ধাপে ধাপে point (প্রতিটার কারণসহ) → এক লাইনের উপসংহার</td></tr>
+            <tr><td class="n">10</td><td>১.৫–২ page (কয়েক ভাগে)</td><td>প্রতিটা ভাগে formula → পুরো হিসাব → উত্তর → এক-দুই লাইনে সেটার মানে</td></tr>
+          </tbody>
+        </table>
+
+        <h2>প্রশ্নের verb গুলোর আসল মানে</h2>
+        <table>
+          <thead><tr><th>Verb</th><th>Examiner যা চায়</th></tr></thead>
+          <tbody>
+            <tr><td><b>Explain / Describe</b></td><td>কী, আর কেন — উদাহরণসহ নিজের ভাষায়</td></tr>
+            <tr><td><b>Apply</b></td><td>প্রশ্নের scenario তে concept টা বসিয়ে দেখাও (generic উত্তর দিলে marks কাটে)</td></tr>
+            <tr><td><b>Analyze / Examine</b></td><td>হিসাব করো, তারপর ফলাফলের মানে ব্যাখ্যা করো, তুলনা করো</td></tr>
+            <tr><td><b>Justify</b></td><td>প্রতিটা সিদ্ধান্তের পেছনে "কারণ" লেখো</td></tr>
+            <tr><td><b>Calculate / Determine</b></td><td>Formula → মান বসানো → উত্তর, সব step দেখিয়ে</td></tr>
+            <tr><td><b>Construct</b></td><td>আঁকো (যেমন box plot) — label সহ</td></tr>
+          </tbody>
+        </table>
+
+        <h2>এই site টা কীভাবে ব্যবহার করবে</h2>
+        <ul>
+          <li><b>Underline করা শব্দে</b> hover বা tap করলে ছোট্ট preview আসে — page না ছেড়েই মানে দেখে নিতে পারবে।</li>
+          <li>প্রতিটা topic এর শেষে <b>"বুঝেছি"</b> চাপলে cover এ progress বাড়বে; <b>"⚑ পরে revise করব"</b> চাপলে সেটা তোমার revision list এ যাবে।</li>
+          <li>উপরের <b>Size / Leading / Width</b> দিয়ে পড়ার আরাম অনুযায়ী লেখা ঠিক করে নাও। Keyboard এ <code>/</code> চাপলে search।</li>
+          <li>যেখানে <span style="font-family:var(--hand);color:var(--pen)">হাতের লেখায় লাল কালি</span> দেখবে, সেখানে slide এ ভুল ছিল — ওটা ঠিক করা version।</li>
+        </ul>
+        <p style="margin-top:2rem"><a class="btn solid" href="/w1/">Week 1 থেকে শুরু করো →</a></p>
+      </div>
+    </article>
+  </div>
+</Base>

@@ -1,0 +1,18 @@
+---
+import { getLab } from '../data/topics';
+interface Props { id: string; embed?: boolean }
+const { id, embed = false } = Astro.props;
+const lab = getLab(id);
+const mods = import.meta.glob('./labs/*.astro', { eager: true }) as Record<string, { default: any }>;
+const mod = mods[`./labs/${id}.astro`];
+if (!mod) throw new Error(`Lab component missing: ${id}`);
+const C = mod.default;
+---
+<section class="lab" data-week={lab.week} data-lab={id}>
+  <div class="lab-h">
+    <span class="kicker">⚗ Lab · {lab.title}</span>
+    {embed ? <a href={`/labs/${id}/`}>Full page →</a> : <span class="kicker muted">Interactive</span>}
+  </div>
+  <p class="lab-q">{lab.question}</p>
+  <div class="lab-b"><C /></div>
+</section>

@@ -1,0 +1,107 @@
+<div class="lab-sc">
+  <div class="sc-top"><span class="kicker sc-prog"></span><span class="kicker sc-score"></span></div>
+  <div class="sc-card">
+    <span class="kicker sc-src"></span>
+    <h3 class="sc-name"></h3>
+    <p class="sc-ex muted"></p>
+    <label class="f">১. Variable এর ধরন</label>
+    <div class="seg" data-g="type"><button data-v="qual">Qualitative</button><button data-v="disc">Quantitative · Discrete</button><button data-v="cont">Quantitative · Continuous</button></div>
+    <label class="f" style="margin-top:.8rem">২. Measurement scale</label>
+    <div class="seg" data-g="scale"><button data-v="N">Nominal</button><button data-v="O">Ordinal</button><button data-v="I">Interval</button><button data-v="R">Ratio</button></div>
+    <p class="feedback"></p>
+    <div class="btn-row"><button class="btn sm solid" data-check disabled>Check</button><button class="btn sm" data-next hidden>পরেরটা →</button></div>
+  </div>
+  <div class="sc-sum" hidden></div>
+</div>
+
+<style is:global>
+  .sc-top { display: flex; justify-content: space-between; margin-bottom: 0.6rem; }
+  .sc-card { border: 1px solid var(--ink); padding: 1rem 1.1rem 1.1rem; background: var(--paper); }
+  .sc-name { font-size: 1.5rem; font-weight: 450; margin: 0.3rem 0 0.2rem; }
+  .sc-ex { margin: 0 0 1rem; font-size: 0.9rem; }
+  .sc-card .seg button.right { background: var(--ok); color: var(--paper); }
+  .sc-card .seg button.wrong { background: var(--pen); color: var(--paper); }
+  .sc-sum table { margin-top: 0.6rem; }
+</style>
+
+<script>
+  import { inkIn } from '../../scripts/stats';
+  type V = { name: string; ex: string; src: string; type: string[]; scale: string[]; why: string };
+  const T: Record<string, string> = { qual: 'Qualitative', disc: 'Discrete', cont: 'Continuous' };
+  const S: Record<string, string> = { N: 'Nominal', O: 'Ordinal', I: 'Interval', R: 'Ratio' };
+  const VARS: V[] = [
+    { name: 'Patient ID', ex: 'P201, P202', src: 'Spring 2026 · Q2(a)', type: ['qual'], scale: ['N'], why: 'ID শুধু একটা label — P202 কে P201 এর "বড়" বলা যায় না, যোগ-বিয়োগও অর্থহীন।' },
+    { name: 'Age', ex: '50, 28 (বছর)', src: 'Spring 2026 · Q2(a)', type: ['disc', 'cont'], scale: ['R'], why: 'সংখ্যা, আর 0 বছর মানে আসল শূন্য → Ratio। পূর্ণ বছরে গুনলে discrete; আসলে বয়স সময়ের মাপ, তাই continuous বললেও ঠিক — exam এ যেটা লিখবে তার কারণ লিখে দিও।' },
+    { name: 'Weight', ex: '82, 58 (kg)', src: 'Spring 2026 · Q2(a)', type: ['cont'], scale: ['R'], why: 'মাপা যায়, ভগ্নাংশ হয় (58.4 kg) → continuous। 0 kg = ওজন নেই, আর 80 kg হলো 40 kg এর দ্বিগুণ → Ratio।' },
+    { name: 'Blood Pressure', ex: '145/95, 115/75 (mmHg)', src: 'Spring 2026 · Q2(a)', type: ['cont'], scale: ['R'], why: 'চাপ মাপা হয় mmHg এ — continuous। 0 mmHg মানে কোনো চাপ নেই, তাই Ratio। (আসলে দুইটা মান: systolic আর diastolic।)' },
+    { name: 'Blood Group', ex: 'B+, O+', src: 'Spring 2026 · Q2(a)', type: ['qual'], scale: ['N'], why: 'Category, কোনো ক্রম নেই — B+ কে O+ এর চেয়ে বড় বা ছোট বলা যায় না।' },
+    { name: 'Cholesterol', ex: '220, 155 (mg/dL)', src: 'Spring 2026 · Q2(a)', type: ['cont'], scale: ['R'], why: 'রক্তে পরিমাণ মাপা হয়, ভগ্নাংশ হতে পারে; 0 মানে একদম নেই → Ratio।' },
+    { name: 'Smoker', ex: 'Yes, No', src: 'Spring 2026 · Q2(a)', type: ['qual'], scale: ['N'], why: 'দুইটা category (binary)। Yes/No এর মধ্যে কোনো ক্রম নেই → Nominal।' },
+    { name: 'Exercise', ex: 'Low, High', src: 'Spring 2026 · Q2(a)', type: ['qual'], scale: ['O'], why: 'Category, কিন্তু ক্রম আছে: Low < High। তবে দূরত্ব মাপা যায় না → Ordinal।' },
+    { name: 'Temperature', ex: '30°C, 15°C', src: 'Slide · interval example', type: ['cont'], scale: ['I'], why: 'সমান ব্যবধান আছে, কিন্তু 0°C মানে "তাপ নেই" না। তাই 30°C কে 15°C এর দ্বিগুণ গরম বলা যায় না → Interval।' },
+    { name: 'Restaurant review', ex: 'very good, good, fair, bad', src: 'Slide · ordinal example', type: ['qual'], scale: ['O'], why: 'ক্রম আছে, কিন্তু "very good" আর "good" এর মধ্যের দূরত্ব মাপা যায় না → Ordinal।' },
+    { name: 'বাসায় মানুষের সংখ্যা', ex: '4, 5', src: 'Slide · discrete example', type: ['disc'], scale: ['R'], why: 'গোনা যায়, 2.8 জন হয় না → discrete। 0 জন মানে কেউ নেই → Ratio।' },
+    { name: 'Jersey number', ex: '10, 75', src: 'Bonus', type: ['qual'], scale: ['N'], why: 'দেখতে সংখ্যা, কিন্তু আসলে নাম — 10 নম্বর জার্সি 5 নম্বরের দ্বিগুণ কিছু না → Nominal।' },
+    { name: 'Monthly income', ex: '25000, 40000 (৳)', src: 'Bonus', type: ['cont'], scale: ['R'], why: 'টাকার পরিমাণ, 0 = কোনো আয় নেই, 40k হলো 20k এর দ্বিগুণ → Ratio।' },
+  ];
+  document.querySelectorAll<HTMLElement>('.lab-sc').forEach((root) => {
+    let idx = 0, score = 0;
+    const sel: Record<string, string | null> = { type: null, scale: null };
+    const results: boolean[] = [];
+    const $ = <E extends Element>(s: string) => root.querySelector<E>(s)!;
+    const card = $<HTMLElement>('.sc-card');
+    function show() {
+      const v = VARS[idx];
+      sel.type = sel.scale = null;
+      $('.sc-prog').textContent = `Variable ${idx + 1} / ${VARS.length}`;
+      $('.sc-score').textContent = `Score ${score}`;
+      $('.sc-src').textContent = v.src;
+      $('.sc-name').textContent = v.name;
+      $('.sc-ex').textContent = `যেমন: ${v.ex}`;
+      root.querySelectorAll('.seg button').forEach((b) => { b.setAttribute('aria-pressed', 'false'); b.classList.remove('right', 'wrong'); (b as HTMLButtonElement).disabled = false; });
+      $('.feedback').textContent = '';
+      $('.feedback').className = 'feedback';
+      $<HTMLButtonElement>('[data-check]').disabled = true;
+      $<HTMLButtonElement>('[data-check]').hidden = false;
+      $<HTMLButtonElement>('[data-next]').hidden = true;
+      inkIn([card]);
+    }
+    function summary() {
+      card.hidden = true;
+      const sum = $<HTMLElement>('.sc-sum');
+      sum.hidden = false;
+      sum.innerHTML = `<div class="co"><span class="co-k">শেষ!</span><p>Score: <b>${score} / ${VARS.length}</b>. নিচে সবগুলোর সঠিক উত্তর — Spring 2026 Q2(a) এর table টা এখান থেকে সরাসরি লিখতে পারবে।</p></div><table><thead><tr><th>Variable</th><th>Type</th><th>Scale</th><th></th></tr></thead><tbody>${VARS.map((v, i) => `<tr><td>${v.name}</td><td>${v.type.map((t) => T[t]).join(' / ')}</td><td>${v.scale.map((s) => S[s]).join(' / ')}</td><td>${results[i] ? '✓' : '✗'}</td></tr>`).join('')}</tbody></table><button class="btn sm" data-restart style="margin-top:.8rem">↺ আবার শুরু</button>`;
+      inkIn(sum.querySelectorAll('tr'));
+    }
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const b = t.closest<HTMLButtonElement>('.seg button');
+      if (b && !b.disabled) {
+        const g = b.parentElement!.dataset.g!;
+        sel[g] = b.dataset.v!;
+        b.parentElement!.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        $<HTMLButtonElement>('[data-check]').disabled = !(sel.type && sel.scale);
+        return;
+      }
+      if (t.closest('[data-check]')) {
+        const v = VARS[idx];
+        const okT = v.type.includes(sel.type!), okS = v.scale.includes(sel.scale!);
+        root.querySelectorAll<HTMLButtonElement>('[data-g="type"] button').forEach((x) => { x.disabled = true; if (v.type.includes(x.dataset.v!)) x.classList.add('right'); else if (x.dataset.v === sel.type) x.classList.add('wrong'); });
+        root.querySelectorAll<HTMLButtonElement>('[data-g="scale"] button').forEach((x) => { x.disabled = true; if (v.scale.includes(x.dataset.v!)) x.classList.add('right'); else if (x.dataset.v === sel.scale) x.classList.add('wrong'); });
+        const good = okT && okS;
+        results[idx] = good;
+        if (good) score++;
+        const fb = $<HTMLElement>('.feedback');
+        fb.className = `feedback ${good ? 'good' : 'bad'}`;
+        fb.innerHTML = `${good ? '✓ ঠিক!' : '✗ পুরোপুরি না।'} ${v.why}`;
+        $('.sc-score').textContent = `Score ${score}`;
+        $<HTMLButtonElement>('[data-check]').hidden = true;
+        $<HTMLButtonElement>('[data-next]').hidden = false;
+        return;
+      }
+      if (t.closest('[data-next]')) { idx++; idx < VARS.length ? show() : summary(); return; }
+      if (t.closest('[data-restart]')) { idx = 0; score = 0; results.length = 0; card.hidden = false; $<HTMLElement>('.sc-sum').hidden = true; show(); }
+    });
+    show();
+  });
+</script>

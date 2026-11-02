@@ -1,0 +1,54 @@
+## Bell curve
+
+বাস্তবের data দেখতে নানা রকম হয়। কিন্তু অনেক সময় data এর histogram আঁকলে একটা **ঘণ্টার (bell) মত** আকার আসে — মাঝে উঁচু, দুই পাশে সমানভাবে ঢালু হয়ে নামে। Data এর distribution এমন bell-shaped হলে তাকে বলে **normal distribution**।
+
+## Normal distribution এর বৈশিষ্ট্য
+
+- **Symmetric** — মাঝখান থেকে দুই পাশে ঠিক 50% করে data
+- একদম perfect normal এ **mean = median = mode**, তিনটাই ঠিক মাঝখানে
+- দুই পাশের লেজ ধীরে ধীরে সরু হয়ে যায়, কখনো একদম শূন্যে নামে না
+- পুরো আকারটা মাত্র দুইটা সংখ্যা দিয়ে ঠিক হয়: **mean (μ)** — কোথায় বসবে, আর **SD (σ)** — কতটা ছড়ানো
+
+## বাস্তবে কোথায় দেখা যায়
+
+Slide এর উদাহরণ: নবজাতকের ওজন, মানুষের উচ্চতা, IQ, blood pressure, পরীক্ষার ফল, আর যেকোনো মাপজোখের ভুলের পরিমাণ।
+
+<Errata id="income-normal" />
+
+## Empirical rule: 68–95–99.7
+
+Normal distribution এর সবচেয়ে কাজের নিয়ম:
+
+<Diagram name="empirical" caption="Mean থেকে ±1σ, ±2σ, ±3σ এর মধ্যে কত শতাংশ data" />
+
+- Mean ± **1 SD** এর মধ্যে প্রায় **68%** data
+- Mean ± **2 SD** এর মধ্যে প্রায় **95%** data
+- Mean ± **3 SD** এর মধ্যে প্রায় **99.7%** data
+
+<Example title="ক্লাসের নম্বর">
+
+একটা বড় class এর নম্বর normal, গড় 70, SD 10।
+
+- প্রায় 68% student পেয়েছে **60 থেকে 80**
+- প্রায় 95% পেয়েছে **50 থেকে 90**
+- প্রায় 99.7% পেয়েছে **40 থেকে 100**
+
+তাই কেউ 35 পেলে সেটা খুবই অস্বাভাবিক — mean থেকে 3.5 SD নিচে।
+
+</Example>
+
+## কত SD দূরে: z-score এর ধারণা
+
+একটা মান mean থেকে কত SD দূরে, সেটা মাপার সংখ্যা হলো z-score:
+
+$$z = \frac{x - \mu}{\sigma}$$
+
+উপরের উদাহরণে 90 পেলে z = (90 − 70)/10 = 2, মানে mean থেকে 2 SD উপরে। Week 5 এর <T id="z-t-tests">z-test</T> এ এই ধারণাই sample mean এর উপর খাটানো হয়।
+
+Shape নিয়ে আরও খেলতে চাইলে <LL id="shape">Shape Lab</LL> এর "68–95–99.7" tab খোলো।
+
+<Exam>
+
+সরাসরি বড় প্রশ্ন কম, কিন্তু hypothesis test আর skewness এর ব্যাখ্যায় লাগে: "data normal হলে mean = median, কিন্তু এখানে mean < median, তাই data normal না, negatively skewed" — এমন লাইন <QL id="s26-q4b">Spring 2026 Q4(b)</QL> এর answer কে শক্ত করে। পরের page: <T id="shape">Skewness আর Kurtosis</T>।
+
+</Exam>

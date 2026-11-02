@@ -1,0 +1,105 @@
+## দুই পরিবার
+
+<Diagram name="sampling-tree" caption="৮টা method, দুই পরিবারে" />
+
+- **Probability sampling** — population এর **প্রত্যেকের** বাছাই হওয়ার একটা জানা সম্ভাবনা থাকে। বাছাই করে একটা random mechanism (lottery, random number), researcher না।
+- **Non-probability sampling** — কোনো probability mechanism নেই; **researcher এর বিচার বা সুবিধাই নিয়ম**।
+
+Probability method এ bias কম আর ফলাফল পুরো population এ generalize করা যায়। Non-probability দ্রুত আর সস্তা, কিন্তু biased হওয়ার ঝুঁকি বেশি।
+
+## Probability sampling
+
+### ১. Simple random sampling
+
+সবচেয়ে মৌলিক method। Population থেকে **probability mechanism** দিয়ে নির্দিষ্ট সংখ্যক sample বাছাই — **সবার সুযোগ সমান**।
+
+- উদাহরণ: **lottery** — ঝুড়ির প্রতিটা ticket এর ওঠার সুযোগ সমান। Computer এ random number generate করেও করা যায়।
+- কখন: পুরো population এর একটা list আছে, আর population মোটামুটি একরকম।
+
+### ২. Stratified sampling
+
+Population কে আগে **একই রকম বৈশিষ্ট্যের group** এ ভাগ করা হয় — এই group গুলোকে বলে **strata** (একটা হলে stratum)। তারপর **প্রতিটা group থেকে আলাদা করে** random sample।
+
+- Slide এর উদাহরণ: class এর student দের গড় বয়স জানতে ছেলে আর মেয়ে দুইটা group বানিয়ে, প্রতিটা থেকে আলাদা sample।
+- কখন: population এ আলাদা আলাদা group আছে আর **সব group এর প্রতিনিধি** চাই — যেমন বয়স, department, অভিজ্ঞতা অনুযায়ী।
+
+### ৩. Cluster sampling
+
+**এলাকাভিত্তিক (geographical) sampling।** Population কে এলাকা ধরে cluster এ ভাগ করে, কিছু cluster random ভাবে বাছা হয়। যেমন বাংলাদেশে জেলা-উপজেলা-ইউনিয়ন ধরে sample নেওয়া।
+
+- **One-stage cluster** — বাছাই করা cluster এর **সবাইকে** নেওয়া। যেমন ঢাকার একটা ward বাছলে সেই ward এর সবার data।
+- **Two-stage cluster** — বাছাই করা cluster এর ভেতর থেকে আবার **simple random** এ কিছুজন। যেমন প্রতিটা ward থেকে random 100 জন।
+- কখন: population অনেক বড় এলাকায় ছড়ানো, পুরো list নেই, কিন্তু এলাকার list আছে।
+
+### ৪. Systematic sampling
+
+একটা **নির্দিষ্ট sequence** মেনে — প্রতি 2, 3, 4 বা k-তম জন।
+
+- কীভাবে: k = N ÷ n বের করো, 1 থেকে k এর মধ্যে random একটা শুরু বাছো, তারপর প্রতি k-তম।
+- উদাহরণ: ঢাকার একটা ward এর 1000 পরিবার থেকে 100টা চাই → k = 10, শুরু 7 হলে 7, 17, 27…
+- কখন: একটা ordered list আছে, দ্রুত বাছাই দরকার।
+
+## Non-probability sampling
+
+### ৫. Judgmental (purposive) sampling
+
+Researcher **নিজের বিচারে** sample বাছেন — যাদের তিনি সবচেয়ে উপযুক্ত মনে করেন। যেমন নতুন একটা নীতির ব্যাপারে শুধু অভিজ্ঞ expert দের মতামত নেওয়া।
+
+### ৬. Snowball sampling
+
+যাদের **খুঁজে পাওয়া কঠিন**, তাদের জন্য। একজন sample পরের জনকে refer করে, সে আবার পরের জনকে — বরফের বলের মত বড় হতে থাকে।
+
+- Slide এর উদাহরণ: HIV রোগী বা মাদকাসক্ত মানুষ — সাধারণত পরিচয় লুকিয়ে রাখেন, কোনো list নেই।
+- কখন: **hidden বা hard-to-reach population**।
+
+### ৭. Convenience sampling
+
+**হাতের কাছে যাকে পাওয়া যায়।** যেমন নতুন পণ্যের feedback নিতে বাজারে সেই মুহূর্তে যেসব ক্রেতা আছেন, তাদের জিজ্ঞেস করা। দ্রুত, সস্তা, কিন্তু সবচেয়ে বেশি biased।
+
+### ৮. Quota sampling
+
+Population এর **অনুপাত (quota)** মেনে sample, কিন্তু quota এর ভেতরে বাছাই random না।
+
+- উদাহরণ: population এ 60% পুরুষ আর 40% নারী হলে sample এও একই অনুপাত রাখা — যাকে প্রথমে পাওয়া যায় তাকে দিয়ে quota পূরণ।
+
+<Errata id="quota-pct" />
+
+## যেগুলো সবচেয়ে বেশি গুলিয়ে যায়
+
+| | Stratified | Cluster |
+|---|---|---|
+| Group এর ভেতরে | **একরকম** মানুষ (homogeneous) | **মিশ্র** মানুষ, পুরো population এর ছোট সংস্করণ |
+| কোন group থেকে নেওয়া হয় | **সব** group থেকে | **কয়েকটা** random group থেকে |
+| মূল সুবিধা | সব group এর প্রতিনিধিত্ব | খরচ আর ভ্রমণ কম |
+| উদাহরণ | বয়সের group অনুযায়ী | জেলা/ward অনুযায়ী |
+
+**Quota বনাম stratified:** দুইটাতেই অনুপাত মানা হয়। কিন্তু stratified এ group এর ভেতর থেকে **random**, quota তে **researcher এর সুবিধামত**। তাই stratified হলো probability, quota হলো non-probability।
+
+## কোন অবস্থায় কোনটা
+
+| অবস্থা | Method |
+|---|---|
+| সবার list আছে, সবার সমান সুযোগ চাই | Simple random |
+| আলাদা group আছে, সবার প্রতিনিধি চাই | Stratified |
+| বিশাল এলাকায় ছড়ানো, list নেই | Cluster |
+| Ordered list থেকে দ্রুত | Systematic |
+| লুকানো, খুঁজে পাওয়া কঠিন population | Snowball |
+| Expert দের মতামত | Judgmental |
+| দ্রুত pilot survey | Convenience |
+| অনুপাত রাখতে হবে কিন্তু random সম্ভব না | Quota |
+
+বাস্তবে প্রায়ই **একাধিক method মিলিয়ে** (multi-stage) ব্যবহার হয় — যেমন আগে cluster দিয়ে এলাকা বাছাই, তারপর ভেতরে stratified।
+
+<LabEmbed id="sampling-sim" />
+
+<Exam>
+
+প্রায় প্রতি semester এ আসে, সবসময় scenario দিয়ে:
+
+- <QL id="s26-q3">Spring 2026 Q3</QL> — Rohingya গবেষণা: বয়সের group (stratified), এলাকা (cluster), referral (snowball) — এদের মিলিয়ে plan।
+- <QL id="f25-q2">Fall 2025 Q2</QL> — A, B, C তিনটা approach এর **নাম আগে লিখতে হবে** (judgmental, stratified, systematic), তারপর best টা বেছে justify।
+- <QL id="f24-q1b">Fall 2024 Q1(b)</QL> আর <QL id="s24-q1b">Spring 2024 Q1(b)</QL> — university আর retail store এর জন্য stratified।
+
+Answer এর formula: **method এর নাম → কীভাবে করবে (step) → কেন এই scenario তে মানানসই → সীমাবদ্ধতা।**
+
+</Exam>

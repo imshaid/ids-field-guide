@@ -1,0 +1,235 @@
+<div class="lab-ss">
+  <div class="seg ss-methods" style="margin-bottom:.7rem">
+    <button data-m="srs" aria-pressed="true">Simple random</button><button data-m="sys">Systematic</button><button data-m="str">Stratified</button><button data-m="clu">Cluster</button><button data-m="snow">Snowball</button><button data-m="conv">Convenience</button><button data-m="judg">Judgmental</button><button data-m="quota">Quota</button>
+  </div>
+  <div class="btn-row" style="margin-bottom:.7rem">
+    <button class="btn sm solid" data-act="play">▶ Play</button>
+    <button class="btn sm" data-act="step">Step ⏭</button>
+    <button class="btn sm ghost" data-act="reset">↺ Reset</button>
+    <span class="kicker ss-fam" style="align-self:center"></span>
+  </div>
+  <svg class="chart ss-svg" viewBox="0 0 640 330" aria-label="Population and sample"></svg>
+  <p class="cap ss-cap">একটা method বেছে <b>Play</b> চাপো (বা <b>Step</b> দিয়ে এক এক ধাপ)।</p>
+  <div class="ss-rep"></div>
+</div>
+
+<style is:global>
+  .ss-svg .p { transition: transform 0.75s cubic-bezier(0.22, 0.7, 0.2, 1), opacity 0.4s, stroke-width 0.3s; }
+  .ss-svg .p.dim { opacity: 0.25; }
+  .ss-svg .p.on { stroke: var(--ink); stroke-width: 3; }
+  .ss-svg .fly { transition: transform 0.7s cubic-bezier(0.22, 0.7, 0.2, 1); }
+  .ss-svg .link { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 60; stroke-dashoffset: 60; transition: stroke-dashoffset 0.6s ease; }
+  .ss-svg .link.drawn { stroke-dashoffset: 0; }
+  .ss-svg .region { fill: none; stroke: var(--ink-4); stroke-dasharray: 4 4; opacity: 0; transition: opacity 0.4s, stroke 0.3s, stroke-width 0.3s; }
+  .ss-svg .region.show { opacity: 1; }
+  .ss-svg .region.pick { stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: none; }
+  .ss-rep { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; margin-top: 0.9rem; }
+  .ss-rep h4 { font: 500 0.64rem var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 0.4rem; }
+  .ss-bar { display: grid; grid-template-columns: 4.6rem 1fr 3rem; gap: 0.5rem; align-items: center; font-size: 0.8rem; margin: 0.25rem 0; }
+  .ss-bar .bar { height: 9px; }
+  .ss-verdict { padding: 0.7rem 0.9rem; border: 1px solid var(--ink); font-size: 0.9rem; }
+</style>
+
+<script>
+  import { rng, sleep, motionOK } from '../../scripts/stats';
+  const NS = 'http://www.w3.org/2000/svg';
+  const COLS = 12, ROWS = 10, N = 120, n = 12;
+  const GX = (c: number) => 34 + c * 29, GY = (r: number) => 44 + r * 27;
+  const SLOT = (i: number) => [462 + (i % 4) * 42, 78 + Math.floor(i / 4) * 42];
+  const STRATA = [
+    { k: 'A', label: 'A · 18–30', color: 'var(--w1)' },
+    { k: 'B', label: 'B · 31–50', color: 'var(--w2)' },
+    { k: 'C', label: 'C · 51+', color: 'var(--w3)' },
+  ];
+  const MIX = [[0.62, 0.28, 0.1], [0.3, 0.45, 0.25], [0.25, 0.45, 0.3], [0.2, 0.4, 0.4]];
+  type Person = { i: number; c: number; r: number; x: number; y: number; s: number; reg: number; hidden: boolean; node: SVGCircleElement };
+
+  document.querySelectorAll<HTMLElement>('.lab-ss').forEach((root) => {
+    const svg = root.querySelector<SVGSVGElement>('svg')!;
+    const cap = root.querySelector('.ss-cap')!;
+    const rep = root.querySelector('.ss-rep')!;
+    const fam = root.querySelector('.ss-fam')!;
+    let method = 'srs';
+    let people: Person[] = [];
+    let picked: number[] = [];
+    let runId = 0;
+    let stepMode = false;
+    let gateRes: (() => void) | null = null;
+    let running = false;
+    const mk = (tag: string, a: Record<string, any>, p: Element = svg) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, String(a[k])); p.appendChild(e); return e as any; };
+
+    function build() {
+      svg.innerHTML = '';
+      const R = rng(7);
+      mk('text', { x: 34, y: 20 }).textContent = 'Population · N = 120';
+      mk('text', { x: 450, y: 52 }).textContent = 'Sample · n = 12';
+      for (let i = 0; i < n; i++) { const [x, y] = SLOT(i); mk('rect', { x: x - 16, y: y - 16, width: 32, height: 32, fill: 'none', stroke: 'var(--rule)', 'stroke-dasharray': '3 3' }); }
+      const regions = [[0, 0], [6, 0], [0, 5], [6, 5]].map(([c, r], k) => {
+        const g = mk('rect', { x: GX(c) - 14, y: GY(r) - 13, width: 6 * 29 - 1, height: 5 * 27 - 1, class: 'region', 'data-reg': k });
+        return g;
+      });
+      regions.forEach((g: Element, k: number) => mk('text', { x: Number(g.getAttribute('x')) + 4, y: Number(g.getAttribute('y')) - 3, class: 'region', 'data-reglbl': k, style: 'font-size:10px' }).textContent = `এলাকা ${k + 1}`);
+      people = [];
+      for (let i = 0; i < N; i++) {
+        const c = i % COLS, r = Math.floor(i / COLS);
+        const reg = (c < 6 ? 0 : 1) + (r < 5 ? 0 : 2);
+        const u = R();
+        const s = u < MIX[reg][0] ? 0 : u < MIX[reg][0] + MIX[reg][1] ? 1 : 2;
+        const hidden = R() < 0.14;
+        const node = mk('circle', { cx: GX(c), cy: GY(r), r: 8.5, fill: STRATA[s].color, stroke: hidden ? 'var(--ink-3)' : 'none', 'stroke-dasharray': hidden ? '2 2' : '', class: 'p' });
+        people.push({ i, c, r, x: GX(c), y: GY(r), s, reg, hidden, node });
+      }
+      mk('g', { 'data-links': 1 });
+      picked = [];
+      renderRep(false);
+    }
+    const say = (h: string) => { cap.innerHTML = h; if (motionOK()) { cap.classList.remove('ink-in'); void (cap as HTMLElement).offsetWidth; cap.classList.add('ink-in'); } };
+    async function gate(ms = 420) {
+      const my = runId;
+      if (stepMode) await new Promise<void>((r) => (gateRes = r));
+      else await sleep(ms);
+      if (my !== runId) throw new Error('abort');
+    }
+    async function pick(i: number, ms = 300) {
+      const p = people[i];
+      const slot = SLOT(picked.length);
+      picked.push(i);
+      p.node.classList.add('on');
+      const ghost = mk('circle', { cx: p.x, cy: p.y, r: 8.5, fill: STRATA[p.s].color, stroke: 'var(--ink)', 'stroke-width': 1.5, class: 'fly' });
+      const t = p.node.style.transform || '';
+      const m = t.match(/translate\(([-\d.]+)px, ([-\d.]+)px\)/);
+      const ox = m ? +m[1] : 0, oy = m ? +m[2] : 0;
+      ghost.style.transform = `translate(${ox}px, ${oy}px)`;
+      requestAnimationFrame(() => requestAnimationFrame(() => (ghost.style.transform = `translate(${slot[0] - p.x}px, ${slot[1] - p.y}px)`)));
+      renderRep(false);
+      await gate(ms);
+    }
+    function link(a: number, b: number) {
+      const g = svg.querySelector('[data-links]')!;
+      const A = people[a], B = people[b];
+      const l = mk('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'link' }, g);
+      requestAnimationFrame(() => requestAnimationFrame(() => l.classList.add('drawn')));
+    }
+    const shuffle = (a: number[], R: () => number) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const regionsEl = () => svg.querySelectorAll<SVGElement>('[data-reg], [data-reglbl]');
+
+    const METHODS: Record<string, { fam: string; run: (R: () => number) => Promise<void> }> = {
+      srs: { fam: 'Probability', run: async (R) => {
+        say('<b>Simple random:</b> ১২০ জনের প্রত্যেকের একটা করে lottery ticket — সবার বাছাই হওয়ার সুযোগ সমান (1/120 করে)। Random ভাবে ১২টা ticket তুলছি…');
+        await gate(700);
+        for (const i of shuffle([...Array(N).keys()], R).slice(0, n)) await pick(i);
+        say('শেষ! কে আসবে সেটা researcher ঠিক করেননি, chance ঠিক করেছে — তাই sample এ কোনো পক্ষপাত (bias) ঢোকার সুযোগ কম। নিচে দেখো group গুলোর অনুপাত population এর কাছাকাছি কিনা।');
+      } },
+      sys: { fam: 'Probability', run: async (R) => {
+        const k = N / n; const start = 1 + Math.floor(R() * k);
+        say(`<b>Systematic:</b> আগে interval বের করি: k = N / n = 120 / 12 = <b>${k}</b>। তারপর 1 থেকে ${k} এর মধ্যে random একটা শুরু: <b>${start}</b>। এরপর প্রতি ${k}-তম জন।`);
+        await gate(900);
+        for (let j = 0; j < n; j++) { const idx = start - 1 + j * k; say(`List এর <b>${idx + 1}</b> নম্বর জন (${start} + ${j} × ${k})`); await pick(idx, 380); }
+        say(`Sample: ${start}, ${start + k}, ${start + 2 * k}, … — একটা নির্দিষ্ট sequence। সহজ আর দ্রুত, কিন্তু list এ যদি কোনো লুকানো pattern থাকে (যেমন প্রতি ${k} জনে একই ধরনের মানুষ) তাহলে bias হতে পারে।`);
+      } },
+      str: { fam: 'Probability', run: async (R) => {
+        say('<b>Stratified:</b> প্রথমে সবাইকে একই রকম বৈশিষ্ট্যের group এ (strata) ভাগ করি — এখানে বয়সের group A, B, C।');
+        await gate(700);
+        const groups = [0, 1, 2].map((s) => people.filter((p) => p.s === s));
+        groups.forEach((g, s) => g.forEach((p, j) => { const c = j % 12, r = Math.floor(j / 12); const tx = GX(c), ty = 44 + [0, 0, 0].reduce((a, _, q) => a + (q < s ? Math.ceil(groups[q].length / 12) * 22 + 14 : 0), 0) + r * 22; p.node.style.transform = `translate(${tx - p.x}px, ${ty - p.y}px)`; }));
+        await gate(1100);
+        const sizes = groups.map((g) => (g.length / N) * n);
+        const base = sizes.map(Math.floor); let rem = n - base.reduce((a, b) => a + b, 0);
+        sizes.map((v, i) => [v - Math.floor(v), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (rem > 0) { base[i]++; rem--; } });
+        say(`প্রতিটা group থেকে তার অনুপাত অনুযায়ী <b>random</b>: A ${groups[0].length} জন → ${base[0]}, B ${groups[1].length} জন → ${base[1]}, C ${groups[2].length} জন → ${base[2]}।`);
+        await gate(900);
+        for (let s = 0; s < 3; s++) for (const p of shuffle([...groups[s]], R).slice(0, base[s])) await pick(p.i, 280);
+        say('প্রতিটা বয়সের group ঠিক তার অনুপাতে sample এ আছে — কোনো group বাদ পড়ার সুযোগ নেই। "সব group এর প্রতিনিধি চাই" টাইপ প্রশ্নে এটাই best।');
+      } },
+      clu: { fam: 'Probability', run: async (R) => {
+        regionsEl().forEach((r) => r.classList.add('show'));
+        say('<b>Cluster:</b> এলাকা ধরে population কে ৪টা cluster এ ভাগ করি (যেমন ৪টা ward বা upazila)। পুরো দেশের list লাগে না, শুধু এলাকার list।');
+        await gate(900);
+        const chosen = shuffle([0, 1, 2, 3], R).slice(0, 2);
+        chosen.forEach((k) => svg.querySelector(`[data-reg="${k}"]`)!.classList.add('pick'));
+        say(`Random ভাবে ২টা cluster বাছলাম: <b>এলাকা ${chosen[0] + 1}</b> আর <b>এলাকা ${chosen[1] + 1}</b>। বাকি এলাকায় আর যেতেই হবে না — খরচ আর সময় বাঁচে।`);
+        await gate(900);
+        people.filter((p) => !chosen.includes(p.reg)).forEach((p) => p.node.classList.add('dim'));
+        say('<b>Two-stage:</b> এখন প্রতিটা বাছাই করা cluster এর ভেতর থেকে simple random এ ৬ জন করে। (One-stage হলে পুরো cluster এর সবাইকে নিতাম।)');
+        await gate(800);
+        for (const k of chosen) for (const p of shuffle(people.filter((x) => x.reg === k), R).slice(0, 6)) await pick(p.i, 260);
+        say('Sample সব আসছে ২টা এলাকা থেকে — সস্তা আর practical, কিন্তু যদি এলাকাগুলোর মানুষ আলাদা রকম হয়, তাহলে বাদ পড়া এলাকার বৈশিষ্ট্য sample এ নেই।');
+      } },
+      snow: { fam: 'Non-probability', run: async (R) => {
+        const hidden = people.filter((p) => p.hidden);
+        people.filter((p) => !p.hidden).forEach((p) => p.node.classList.add('dim'));
+        say(`<b>Snowball:</b> ধরো দাগ-কাটা বৃত্তের মানুষগুলো (${hidden.length} জন) পরিচয় লুকিয়ে রাখে — কোনো list নেই। আমরা চিনি শুধু একজনকে।`);
+        await gate(900);
+        const start = hidden[Math.floor(R() * hidden.length)];
+        await pick(start.i, 500);
+        const queue = [start.i];
+        const d = (a: Person, b: Person) => Math.hypot(a.x - b.x, a.y - b.y) + (b.hidden ? 0 : 60);
+        while (picked.length < n && queue.length) {
+          const cur = people[queue.shift()!];
+          const cand = people.filter((p) => !picked.includes(p.i)).sort((a, b) => d(cur, a) - d(cur, b)).slice(0, 2);
+          for (const p of cand) { if (picked.length >= n) break; link(cur.i, p.i); say(`${picked.length}. জন তার চেনা আরেকজনকে refer করলো → sample বাড়ছে, বরফের বলের মত।`); await pick(p.i, 380); queue.push(p.i); }
+        }
+        people.forEach((p) => p.node.classList.remove('dim'));
+        say('লুকানো population এ পৌঁছানোর একমাত্র practical উপায় এটা (যেমন Rohingya বা ড্রাগ আসক্ত মানুষ)। কিন্তু খেয়াল করো — সবাই একে অপরের কাছাকাছি, একই নেটওয়ার্কের। তাই bias থাকে।');
+      } },
+      conv: { fam: 'Non-probability', run: async () => {
+        mk('path', { d: 'M8,26 l8,-8 l8,8 z', fill: 'var(--pen)' });
+        mk('text', { x: 28, y: 32, fill: 'var(--pen)', style: 'font-size:10px' }).textContent = 'researcher';
+        say('<b>Convenience:</b> Researcher বাম-উপরের কোণায় দাঁড়িয়ে আছেন। হাতের কাছে যাকে পাচ্ছেন, তাকেই জিজ্ঞেস করছেন…');
+        await gate(800);
+        const order = [...people].sort((a, b) => Math.hypot(a.x, a.y) - Math.hypot(b.x, b.y)).slice(0, n);
+        for (const p of order) await pick(p.i, 250);
+        say('দ্রুত আর সস্তা, কিন্তু সব sample এক কোণা থেকে — দেখো নিচে বয়সের group গুলোর অনুপাত population এর থেকে কত আলাদা। এটাই bias।');
+      } },
+      judg: { fam: 'Non-probability', run: async () => {
+        say('<b>Judgmental:</b> Researcher ভাবলেন, "বয়স্করাই (group C) সবচেয়ে অভিজ্ঞ, ওদের মতামতই আসল।" তাই নিজের বিচারে শুধু তাদের বাছলেন।');
+        await gate(900);
+        for (const p of people.filter((x) => x.s === 2).slice(0, n)) await pick(p.i, 260);
+        say('Expert দের মতামত দরকার হলে কাজে লাগে, কিন্তু কোনো probability নেই — researcher এর পছন্দই নিয়ম। A আর B group এর কেউ নেই, তাই পুরো population কে represent করে না।');
+      } },
+      quota: { fam: 'Non-probability', run: async () => {
+        const counts = [0, 1, 2].map((s) => people.filter((p) => p.s === s).length);
+        const q = counts.map((c) => Math.round((c / N) * n));
+        while (q.reduce((a, b) => a + b, 0) > n) q[q.indexOf(Math.max(...q))]--;
+        while (q.reduce((a, b) => a + b, 0) < n) q[q.indexOf(Math.min(...q))]++;
+        say(`<b>Quota:</b> Population এ A, B, C এর অনুপাত মেনে quota ঠিক করি: A ${q[0]}, B ${q[1]}, C ${q[2]}। কিন্তু random না — সামনে যাকে পাই, quota খালি থাকলে নিয়ে নিই।`);
+        await gate(900);
+        const got = [0, 0, 0];
+        for (const p of people) { if (picked.length >= n) break; if (got[p.s] < q[p.s]) { got[p.s]++; say(`Quota: A ${got[0]}/${q[0]} · B ${got[1]}/${q[1]} · C ${got[2]}/${q[2]}`); await pick(p.i, 240); } }
+        say('অনুপাত দেখতে ঠিক আছে (stratified এর মত), কিন্তু প্রতিটা group এর ভেতরে যাদের নেওয়া হলো তারা সবাই "সামনের সারির" — random না। তাই এটা non-probability।');
+      } },
+    };
+
+    function renderRep(final: boolean) {
+      const pop = [0, 1, 2].map((s) => people.filter((p) => p.s === s).length / N);
+      const smp = [0, 1, 2].map((s) => (picked.length ? picked.filter((i) => people[i].s === s).length / picked.length : 0));
+      const regs = new Set(picked.map((i) => people[i].reg)).size;
+      const diff = pop.reduce((a, v, i) => a + Math.abs(v - smp[i]), 0) / 2;
+      const verdict = !picked.length ? '' : diff < 0.12 ? 'Sample এর বয়সের মিশ্রণ population এর বেশ কাছাকাছি — ভালো representation।' : diff < 0.25 ? 'কিছুটা গরমিল আছে — কোনো group বেশি, কোনোটা কম।' : 'অনেক গরমিল — sample population কে ঠিকমতো represent করছে না (biased)।';
+      rep.innerHTML = `<div><h4>বয়সের group: population বনাম sample</h4>${STRATA.map((st, i) => `<div class="ss-bar" style="--acc:${st.color}"><span>${st.label}</span><span><div class="bar"><i style="--p:${pop[i] * 100}%"></i></div><div class="bar" style="margin-top:2px;background:var(--paper-2)"><i style="--p:${smp[i] * 100}%;background:${st.color}"></i></div></span><span class="mono">${Math.round(pop[i] * 100)}→${Math.round(smp[i] * 100)}%</span></div>`).join('')}<p class="muted" style="font-size:.75rem;margin:.3rem 0 0">উপরের দাগ = population, নিচের ভরা = sample</p></div>
+      <div><h4>Coverage</h4><p style="margin:0 0 .5rem;font-size:.9rem">Picked: <b>${picked.length}/12</b> · এলাকা covered: <b>${regs}/4</b></p>${final || picked.length === n ? `<div class="ss-verdict">${verdict}</div>` : ''}</div>`;
+    }
+
+    async function run() {
+      if (running) return;
+      running = true;
+      const my = ++runId;
+      build();
+      fam.textContent = METHODS[method].fam + ' sampling';
+      try { await METHODS[method].run(rng(Date.now() % 100000)); if (my === runId) renderRep(true); } catch {}
+      if (my === runId) running = false;
+    }
+    function reset() { runId++; running = false; gateRes = null; build(); say('একটা method বেছে <b>Play</b> চাপো (বা <b>Step</b> দিয়ে এক এক ধাপ)।'); fam.textContent = METHODS[method].fam + ' sampling'; }
+
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const m = t.closest<HTMLButtonElement>('[data-m]');
+      if (m) { method = m.dataset.m!; root.querySelectorAll('[data-m]').forEach((b) => b.setAttribute('aria-pressed', String(b === m))); reset(); return; }
+      const a = t.closest<HTMLButtonElement>('[data-act]')?.dataset.act;
+      if (a === 'play') { stepMode = false; if (gateRes) { const g = gateRes; gateRes = null; g(); } else run(); }
+      if (a === 'step') { stepMode = true; if (gateRes) { const g = gateRes; gateRes = null; g(); } else run(); }
+      if (a === 'reset') reset();
+    });
+    reset();
+  });
+</script>

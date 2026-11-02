@@ -1,0 +1,50 @@
+<Warn title="Bonus — এবারের slide এ নেই">
+
+<QL id="f24-q2c">Fall 2024 Q2(c)</QL> এ এসেছিল। <T id="correlation">Correlation</T> বুঝলে এটা খুব সহজ।
+
+</Warn>
+
+## Idea টা কী
+
+Correlation বলে দুইটা variable কতটা একসাথে চলে। **Linear regression** আরেক ধাপ এগিয়ে একটা **সরলরেখা** টানে, যেটা দিয়ে নতুন x এর জন্য y **predict** করা যায়।
+
+$$\hat{y} = a + b\,x$$
+
+- **b (slope)** — x এক একক বাড়লে y গড়ে কতটা বাড়ে
+- **a (intercept)** — x = 0 হলে y এর মান
+- **ŷ** — predicted y
+
+## সবচেয়ে মানানসই রেখা কোনটা
+
+অসংখ্য রেখা টানা যায়। Regression সেই রেখাটা বাছে যেটার জন্য **প্রতিটা বিন্দুর ভুলের (y − ŷ) বর্গের যোগফল সবচেয়ে কম** — এর নাম **least squares** method।
+
+<Formula title="Slope আর intercept">
+
+$$b = \frac{\sum (x - \bar{x})(y - \bar{y})}{\sum (x - \bar{x})^2} \qquad a = \bar{y} - b\,\bar{x}$$
+
+</Formula>
+
+খেয়াল করো, b এর উপরের অংশটা correlation এর উপরের অংশের মতই।
+
+## Fall 2024 এর উদাহরণ
+
+| Training hours (x) | 2 | 3 | 5 | 7 | 8 | 9 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|
+| Performance (y) | 50 | 55 | 65 | 70 | 80 | 90 | 95 | 105 |
+
+1. x̄ = 57/8 = **7.125**, ȳ = 610/8 = **76.25**
+2. Σ(x − x̄)(y − ȳ) = **488.75**, Σ(x − x̄)² = **90.875**
+3. b = 488.75 / 90.875 = **5.378**
+4. a = 76.25 − 5.378 × 7.125 = **37.93**
+5. Model: **ŷ = 37.93 + 5.378x**
+6. ৬ ঘণ্টা training: ŷ = 37.93 + 5.378 × 6 = **70.20**
+
+মানে প্রতি এক ঘণ্টা বেশি training এ score গড়ে প্রায় **5.4** বাড়ে। (এখানে r = 0.989, তাই রেখাটা data র সাথে খুব ভালোভাবে মেলে।)
+
+<Warn title="সীমার বাইরে predict করো না">
+
+Data তে x ছিল 2 থেকে 12 ঘণ্টা। 6 ঘণ্টা এর ভেতরে, তাই ঠিক আছে। কিন্তু 50 ঘণ্টা দিলে model 307 score বলবে — যেটা অসম্ভব। Data র range এর বাইরে predict করাকে extrapolation বলে, এটা ঝুঁকিপূর্ণ।
+
+</Warn>
+
+<LL id="correlation" q="">Correlation lab</LL> এ "Training vs score" চেপে "Regression line" on করলে রেখাটা আঁকা দেখবে।

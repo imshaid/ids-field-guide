@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+import { WEEKS, LABS, getWeek, weekTopics, topicUrl, PRI_LABEL } from '../../data/topics';
+import { PAPERS } from '../../data/papers';
+
+export function getStaticPaths() {
+  return WEEKS.map((w) => ({ params: { week: w.id } }));
+}
+const w = getWeek(Astro.params.week!);
+const topics = weekTopics(w.id);
+const ids = new Set(topics.map((t) => t.id));
+const labs = LABS.filter((l) => l.week === w.id);
+const qs = PAPERS.flatMap((p) => p.questions.filter((q) => q.topics.some((t) => ids.has(t))).map((q) => ({ p, q })));
+const i = WEEKS.findIndex((x) => x.id === w.id);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<Base title={`${w.label}: ${w.title}`} description={w.blurb} week={w.id} crumbs={[{ label: w.label }]}>
+  <div class="page">
+    <div class="col">
+      <div class="kicker"><span class="dot"></span>Chapter · {w.label}</div>
+      <h1 class="display">{w.title}</h1>
+      <p class="lead">{w.blurb}</p>
+      <div class="meta">
+        <span>{topics.length} pages</span>
+        <span>{topics.reduce((a, t) => a + t.mins, 0)} min reading</span>
+        <span><span data-progress-label>0/{topics.length}</span> বুঝেছ</span>
+      </div>
+      <div class="bar" style="margin:.8rem 0 2rem"><i data-progress={topics.map((t) => t.id).join(',')}></i></div>
+
+      <ul class="tlist">
+        {topics.map((t, n) => (
+          <li><a href={topicUrl(t)}>
+            <span class="num">{pad(n + 1)}</span>
+            <span><h3><span class="done-mark" data-done-mark={t.id}>✓</span> {t.title}</h3><p class="muted">{t.summary}</p></span>
+            <span class={`pri ${t.pri}`}>{PRI_LABEL[t.pri]}<br />{t.mins} min</span>
+          </a></li>
+        ))}
+      </ul>
+
+      {labs.length > 0 && (<>
+        <h2 class="kicker" style="margin:2.6rem 0 .8rem">এই week এর lab</h2>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))">
+          {labs.map((l) => <a class="card" href={`/labs/${l.id}/`}><span class="kicker">⚗ Lab</span><h3>{l.title}</h3><p>{l.summary}</p></a>)}
+        </div>
+      </>)}
+
+      {qs.length > 0 && (<>
+        <h2 class="kicker" style="margin:2.6rem 0 .8rem">এই week থেকে আসা প্রশ্ন · {qs.length}</h2>
+        <ul class="qlinks">{qs.map(({ p, q }) => <li><a href={`/questions/${p.id}/#${q.id}`}><span>{q.title}</span><span class="chip">{p.title} · {q.label}</span></a></li>)}</ul>
+      </>)}
+    </div>
+  </div>
+  <nav class="rfoot" aria-label="Chapters">
+    {i > 0 ? <a href={`/${WEEKS[i - 1].id}/`}><small>← আগের chapter</small>{WEEKS[i - 1].label}: {WEEKS[i - 1].title}</a> : <a href="/start/"><small>← শুরু</small>Start here</a>}
+    {i < WEEKS.length - 1 ? <a href={`/${WEEKS[i + 1].id}/`}><small>পরের chapter →</small>{WEEKS[i + 1].label}: {WEEKS[i + 1].title}</a> : <a href="/questions/"><small>এবার →</small>Previous questions</a>}
+  </nav>
+</Base>

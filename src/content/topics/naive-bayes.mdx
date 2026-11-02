@@ -1,0 +1,57 @@
+<Warn title="Bonus — এবারের slide এ নেই">
+
+পুরনো course code (CSE315) এর দুইটা paper এ এসেছে। তোমার class এ পড়ানো হয়ে থাকলে এই page টা খুব কাজের, না হলে শুধু চোখ বুলিয়ে নাও।
+
+</Warn>
+
+## Idea টা কী
+
+<T id="bayes">Bayes theorem</T> দিয়ে আমরা একটা ঘটনার probability update করতে পারি। **Naive Bayes classifier** এটাকে classification এ লাগায়: একটা item (email, প্রাণী, রোগী) এর কিছু feature দেখে বলে সেটা কোন **class** এর।
+
+$$P(\text{Class} \mid \text{features}) \propto P(\text{Class}) \times P(x_1 \mid \text{Class}) \times P(x_2 \mid \text{Class}) \times \dots$$
+
+## "Naive" কেন
+
+Classifier টা ধরে নেয় **class জানা থাকলে প্রতিটা feature একে অপরের থেকে স্বাধীন (independent)।** যেমন spam email এ "Money" শব্দ থাকা আর "Win" শব্দ থাকার মধ্যে কোনো সম্পর্ক নেই — বাস্তবে প্রায়ই সত্যি না, তাই একে "naive" (সরল, বোকা-সোজা) বলে। এই সরলীকরণের জন্যই হিসাবটা শুধু গুণফল হয়ে যায়, আর এত দ্রুত কাজ করে।
+
+| | Generalized (full) Bayes | Naive Bayes |
+|---|---|---|
+| Feature গুলোর সম্পর্ক | সব feature এর **একসাথে** probability লাগে: P(x₁, x₂, … \| C) | প্রতিটা feature **আলাদা** ধরে গুণ: P(x₁\|C) × P(x₂\|C) × … |
+| Data লাগে | অনেক বেশি (সব combination এর জন্য) | কম |
+| হিসাব | জটিল | সহজ, দ্রুত |
+
+## ৩টা ধাপ
+
+1. **Prior** — প্রতিটা class কত শতাংশ: P(C) = class এর row সংখ্যা ÷ মোট row
+2. **Likelihood** — প্রতিটা class এর ভেতরে, প্রতিটা feature এর মান কতবার এসেছে: P(xᵢ \| C) = (C তে xᵢ কতবার) ÷ (C এর মোট row)
+3. **Score** — প্রতিটা class এর জন্য prior × সব likelihood গুণ করো। **যার score বড়, সেই class টাই prediction।** (চাইলে score গুলোকে তাদের যোগফল দিয়ে ভাগ করে আসল probability বের করা যায়।)
+
+<Example title="Spring 2024 Q3 · Pet করা যাবে?">
+
+১৪টা প্রাণীর data — Yes 8টা, No 6টা। Test: (Cow, Medium, Black)।
+
+- Yes: P(Yes) = 8/14; Cow 3/8, Medium 2/8, Black 3/8 → score = 8/14 × 3/8 × 2/8 × 3/8 ≈ **0.0201**
+- No: P(No) = 6/14; Cow 2/6, Medium 2/6, Black 1/6 → score = 6/14 × 2/6 × 2/6 × 1/6 ≈ **0.0079**
+
+0.0201 > 0.0079 → prediction: **Yes, pet করা যাবে**। (Normalize করলে P(Yes) ≈ 72%)
+
+</Example>
+
+<Warn title="শূন্যের সমস্যা (zero frequency)">
+
+কোনো class এ একটা feature একবারও না এলে likelihood 0 হয়, পুরো গুণফল 0 হয়ে যায় — বাকি সব প্রমাণ মুছে যায়। সমাধান: **Laplace smoothing** — প্রতিটা count এ 1 যোগ করো (আর denominator এ সম্ভাব্য মানের সংখ্যা যোগ করো)। প্রশ্নে না বললে সাধারণ হিসাবই করো, শুধু এক লাইনে উল্লেখ করো।
+
+</Warn>
+
+## কেন ভালো, কোথায় ব্যবহার
+
+- **দ্রুত** আর **কম data** তেও ভালো কাজ করে
+- **অনেক feature** (যেমন হাজার হাজার শব্দ) সহজে সামলায়
+- নতুন data এলে সহজে update করা যায়
+- ব্যবহার: **spam filter**, sentiment analysis (review positive/negative), খবরের category ঠিক করা, রোগের প্রাথমিক diagnosis, recommendation
+
+<Exam>
+
+পুরো solution: <QL id="f24-q3a">Fall 2024 Q3(a)</QL> (generalized বনাম naive), <QL id="f24-q3b">Q3(b)</QL> (কেন ভালো), <QL id="f24-q3c">Q3(c)</QL> (spam হিসাব) আর <QL id="s24-q3">Spring 2024 Q3</QL> (pet)।
+
+</Exam>

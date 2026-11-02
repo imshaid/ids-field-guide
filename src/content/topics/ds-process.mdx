@@ -1,0 +1,90 @@
+## এক নজরে পুরো পথ
+
+যেকোনো data science project মোটামুটি একই রাস্তায় হাঁটে। Slide এর simplilearn এর ছবিগুলোতে ৭টা ধাপ আছে (যদিও ৪ আর ৬ নম্বরের ছবি slide এ বাদ পড়ে গেছে — নিচে আমরা পুরোটাই দেখছি)।
+
+<Diagram name="process7" caption="Data science এর ৭টা ধাপ — দরকার হলে পেছনে ফেরা যায়" />
+
+পুরো page জুড়ে একটা উদাহরণ ধরে রাখি: **একটা bank জানতে চায় কোন card transaction fraud।**
+
+## ধাপ ১ · Business problem বোঝা
+
+সব শুরু হয় একটা প্রশ্ন বা business objective দিয়ে। একজন ভালো data scientist প্রথমে বারবার জিজ্ঞেস করে — "কেন? কেন? কেন?" — যতক্ষণ না সমস্যাটা একদম পরিষ্কার হয়।
+
+Bank এর ক্ষেত্রে: "আমরা কি fraud হওয়ার আগে আটকাতে চাই, নাকি পরে ধরতে চাই? ভুল করে ভালো customer এর card block হলে কতটা ক্ষতি?"
+
+<Idea title="সবচেয়ে জরুরি ধাপ কেন">
+
+Slide (Shearer, 2000) বলছে এটাই সম্ভবত **সবচেয়ে গুরুত্বপূর্ণ** ধাপ। Problem টা ঠিকমতো লেখা না থাকলে কোন dataset লাগবে, কোন algorithm বাছতে হবে — কিছুই ঠিক করা যায় না।
+
+</Idea>
+
+## ধাপ ২ · Data acquisition (data জোগাড়)
+
+প্রশ্ন জানার পর বোঝা যায় কোন data লাগবে, তারপর সেটা আনা। উৎস হতে পারে web server, log file, database, API, বা online repository।
+
+Bank: transaction history, customer profile, কোন device থেকে login করেছে।
+
+## ধাপ ৩ · Data preparation (পরিষ্কার আর রূপান্তর)
+
+বাস্তবের data প্রায় সবসময় নোংরা থাকে। এই ধাপে দুইটা কাজ:
+
+- **Data cleaning** — ভুল data type ঠিক করা, বানান ভুল attribute ঠিক করা, missing আর duplicate value সামলানো।
+- **Transformation** — data কে model এর উপযোগী রূপে আনা, যেমন সব amount কে একই scale এ আনা (normalize)।
+
+এটা না করলে পরের সব ধাপ ভুল হবে — "garbage in, garbage out"।
+
+## ধাপ ৪ · Exploratory Data Analysis (EDA)
+
+পরিষ্কার data ঘেঁটে দেখা — কোন trend আছে, কোন pattern সন্দেহজনক, কোন variable গুলো একসাথে বদলায়। এখানে graph, mean-median, <T id="correlation">correlation</T> এর মত জিনিস কাজে লাগে।
+
+Bank: দেখা গেল বেশিরভাগ fraud হয় রাত ২–৪টায়, নতুন device থেকে, বড় amount এ। এগুলোই model এর জন্য সবচেয়ে কাজের feature।
+
+## ধাপ ৫ · Modeling (model বানানো, train আর evaluate)
+
+এখন data কে **training data** আর **test data** তে ভাগ করে:
+
+1. Business problem এর সাথে মানানসই model বাছাই (যেমন KNN, Naive Bayes, decision tree)
+2. Training data দিয়ে model **train**
+3. Test data দিয়ে **evaluate** — accuracy, F1-score এর মত metric দিয়ে
+4. সবচেয়ে ভালো perform করা model টা রাখা (Python, R, SAS এর মত tool দিয়ে)
+
+<Warn title="Train এর পরেই evaluate">
+
+Train আর evaluate আলাদা ধাপ, আর evaluate সবসময় train এর **পরে** আসে — যা train ই হয়নি তার performance মাপা যায় না। Fraud এর মত কাজে F1-score খুব জরুরি, কারণ fraud খুবই কম ঘটে (data imbalanced) — শুধু accuracy দেখলে ঠকতে হয়।
+
+</Warn>
+
+## ধাপ ৬ · Communicate (জানানো)
+
+সবচেয়ে ভালো model ও কোনো কাজের না যদি decision maker রা না বোঝে। Visualization, report আর সহজ ভাষায় insight দিয়ে ফলাফল জানাতে হয়।
+
+Bank: risk management team কে জানানো — "model ৯২% fraud ধরছে, রাতে নতুন device এর বড় transaction এ extra verification দিন।"
+
+## ধাপ ৭ · Deploy & maintain
+
+Model টা আসল system এ বসানো হয় আর নিয়মিত নজর রাখা হয় — কারণ সময়ের সাথে fraud এর ধরন বদলায়, তখন model আবার train করতে হয়।
+
+## Textbook এর ভাষায় একই process
+
+Slide এর আরেকটা ছবিতে একই জিনিস অন্যভাবে দেখানো:
+
+| পর্যায় | কী হয় |
+|---|---|
+| 1. Prior knowledge | Business understanding + data understanding |
+| 2. Preparation | Data prepare করা |
+| 3. Modeling | Training data দিয়ে algorithm চালিয়ে model বানানো |
+| 4. Application | Test data দিয়ে model প্রয়োগ, performance evaluation, তারপর deployment |
+| 5. Knowledge | Knowledge আর action — সিদ্ধান্ত নেওয়া |
+
+আর খেয়াল রাখো: process টা **iterative** — কোনো ধাপে সমস্যা পেলে আগের ধাপে ফিরে গিয়ে assumption, approach বদলানো খুবই স্বাভাবিক।
+
+<LabEmbed id="process-sorter" />
+
+<Exam>
+
+দুই রকমভাবে আসে:
+
+- **Step গুলো সাজাও আর justify করো** — <QL id="s26-q1a">Spring 2026 Q1(a)</QL>: bank fraud এর A–F step। সঠিক order **B → D → F → E → A → C** (collect → clean → explore → train → evaluate → communicate)। প্রতিটা ধাপের পাশে "কেন আগেরটার পরে আসে" লিখতে হবে।
+- **একটা plan বানাও** — <QL id="f25-q1">Fall 2025 Q1</QL>: CEO বলছেন "customer দের ভালো বুঝতে চাই"। এখানে ৭টা ধাপ ওই company এর ভাষায় লিখতে হবে, generic না।
+
+</Exam>

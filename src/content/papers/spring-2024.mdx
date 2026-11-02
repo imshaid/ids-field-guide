@@ -1,0 +1,323 @@
+<Idea title="এই paper এক নজরে">
+
+Mid Semester Examination · Course code তখন **CSE315** · Level 3 Term 1 · 1.5 ঘণ্টা · 25 marks। Hypothesis test (z-table দেওয়া), sampling strategy, outlier, correlation আর Naive Bayes। Scan কিছু জায়গায় ঝাপসা — সেগুলো নিচে চিহ্নিত।
+
+</Idea>
+
+<Q id="s24-q1a">
+
+**1. (a)** A technology company claims that the average time it takes its software engineers to resolve a specific type of coding issue is 120 minutes. The company's manager decided to test this claim by collecting samples from 25 software engineers who recently worked on the same type of coding issue. The average time to resolve the issue in the sample was found to be 115 minutes, with a standard deviation of 10 minutes. It is assumed that the time to resolve coding issues follows a normal distribution.
+
+Test the company's claim at a 98% confidence level (α = 0.02). Formulate the null and alternative hypotheses, perform the hypothesis test, and interpret the results. **Determine** whether there is sufficient evidence to reject the company's claim about the average resolution time for this coding issue.
+
+<div class="tbl-scroll">
+
+| z | .00 | .01 | .02 | .03 | .04 | .05 | .06 | .07 | .08 | .09 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| −2.3 | .01072 | .01044 | .01017 | .00990 | .00964 | .00939 | .00914 | .00889 | .00866 | .00842 |
+| −2.4 | .00820 | .00798 | .00776 | .00755 | .00734 | .00714 | .00695 | .00676 | .00657 | .00639 |
+| −2.5 | .00621 | .00604 | .00587 | .00570 | .00554 | .00539 | .00523 | .00508 | .00494 | .00480 |
+
+</div>
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+পুরো ৪-ধাপের hypothesis test, two-tailed (দাবি "= 120")। z-table দেওয়া আছে, তাই examiner z-test আশা করছেন।
+
+#### কোন topic লাগবে
+
+<T id="hypothesis">Hypothesis testing</T>, <T id="z-t-tests">z-test হাতে-কলমে</T>।
+
+#### Answer এর কাঠামো
+
+5 marks, ~¾ page: Step 1–4 আলাদা করে, table থেকে মান পড়া দেখিয়ে, শেষে প্রশ্নের ভাষায় সিদ্ধান্ত। Lab: <LL id="hypothesis" q="preset=s24">এই সংখ্যা বসানো আছে</LL>।
+
+</Brief>
+
+<Answer>
+
+**Step 1 – Hypotheses**
+
+- H₀: μ = 120 minutes (the company's claim)
+- Hₐ: μ ≠ 120 minutes → **two-tailed test**, α = 0.02
+
+**Step 2 – Distribution**
+
+The resolution time is normally distributed, and the z-table is provided, so we use the **z-test** with the given standard deviation (σ ≈ 10).
+
+**Step 3 – Test statistic and p-value**
+
+$$z = \frac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} = \frac{115 - 120}{10/\sqrt{25}} = \frac{-5}{2} = -2.50$$
+
+From the table, P(Z < −2.50) = 0.00621. For a two-tailed test:
+
+$$p = 2 \times 0.00621 = 0.01242$$
+
+(Equivalently, the critical values for α = 0.02 are ±2.326; |z| = 2.50 > 2.326.)
+
+**Step 4 – Decision**
+
+Since p = 0.0124 < α = 0.02, we **reject H₀**.
+
+**Interpretation:** at the 98% confidence level there is sufficient evidence that the average resolution time is **not** 120 minutes; the sample suggests engineers actually resolve this issue faster (around 115 minutes). The company's claim is not supported.
+
+*Note:* since the 10-minute SD comes from the sample, a t-test (df = 24) is technically more exact; it gives p ≈ 0.0197, which is still below 0.02, so the conclusion is the same.
+
+</Answer>
+
+<Pitfalls>
+
+- One-tailed ধরে p = 0.00621 নেওয়া — দাবিটা "=", তাই two-tailed, p দ্বিগুণ।
+- "Accept H₀/H₁" লেখা।
+
+</Pitfalls>
+
+<Q id="s24-q1b">
+
+**1. (b)** As a market researcher employed by a retail company aiming to evaluate customer satisfaction in its diverse store locations, which span urban to suburban areas, your task is to develop an effective sampling strategy. The management places specific emphasis on comprehending customer satisfaction levels across these varied store locations. **Outline** your proposed sampling strategy, taking into account factors such as geographical location, store size, and customer demographics. **Justify** your selection of a sampling method by providing reasons for its appropriateness in this context.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+তিনটা factor (location, store size, demographics) মাথায় রেখে একটা strategy outline, তারপর justification।
+
+#### কোন topic লাগবে
+
+<T id="sampling">Stratified + multi-stage sampling</T>।
+
+#### Answer এর কাঠামো
+
+3 marks, ~আধা page: strata ঠিক করা → store বাছাই → customer বাছাই → demographics check → ২–৩টা justification।
+
+</Brief>
+
+<Answer>
+
+**Proposed strategy: stratified multi-stage sampling**
+
+1. **Stratify stores** by geographical location (urban / suburban) and store size (small / medium / large), giving strata such as "urban-large" or "suburban-small".
+2. **Select stores randomly** from each stratum, in proportion to the number of stores (or customers) in that stratum.
+3. **Select customers within each chosen store systematically**, e.g. every 10th customer at checkout, spread across weekdays, weekends and different times of day.
+4. **Check demographics** (age, gender, income group) of respondents against the company's customer profile and adjust or weight the sample if any group is under-represented.
+
+**Justification**
+
+- Stratification guarantees that every type of location and store size is represented, which is exactly management's focus.
+- Customers within the same stratum have similar shopping conditions, so estimates within strata are precise and comparisons between strata are fair.
+- Random/systematic selection within strata keeps it a probability method, reducing selection bias and allowing results to be generalised to all stores.
+
+</Answer>
+
+<Q id="s24-q2a" lq="data=78,85,92,96,82,88,75,98,82,85,104,89,95,90,86,83,80,94,87,79,82,93,87,98,81,85,87,91,84,79,88,97,86,82,99,83,86,110,84,89">
+
+**2. (a)** Suppose you are a teacher and have collected exam scores from your class of 40 students. The scores are as follows:
+
+**78, 85, 92, 96, 82, 88, 75, 98, 82, 85, 104, 89, 95, 90, 86, 83, 80, 94, 87, 79, 82, 93, 87, 98, 81, 85, 87, 91, 84, 79, 88, 97, 86, 82, 99, 83, 86, 110, 84, 89**
+
+I. Employ suitable statistical techniques to pinpoint any potential outliers within the dataset of exam scores. Clearly articulate the criteria or method employed for the identification of outliers.
+
+II. **Analyze** how the existence of outliers may impact measures such as the [mean] and standard deviation of the exam scores.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+(I) IQR method দিয়ে outlier — method টা স্পষ্ট লিখতে হবে; (II) outlier থাকলে আর না থাকলে mean, SD কতটা বদলায়।
+
+*Scan note:* সংখ্যাগুলোর উপর হাতের দাগ আছে, কিন্তু পড়া মান গুনে ঠিক **৪০টা** হয় — প্রশ্নের সাথে মেলে। (II) এর একটা শব্দ কাটা পড়েছে, প্রসঙ্গ অনুযায়ী "mean"।
+
+#### কোন topic লাগবে
+
+<T id="outliers">IQR outlier</T>, <T id="variance">SD</T>।
+
+#### Answer এর কাঠামো
+
+2.5 + 2.5 marks: (I) sort → Q1/Q3 → fence → outlier; (II) with/without তুলনা + ব্যাখ্যা। Lab: <LL id="iqr-boxplot" q="data=78,85,92,96,82,88,75,98,82,85,104,89,95,90,86,83,80,94,87,79,82,93,87,98,81,85,87,91,84,79,88,97,86,82,99,83,86,110,84,89">৪০টা মান বসানো</LL>।
+
+</Brief>
+
+<Answer>
+
+**I. Method: 1.5 × IQR rule** — a value is an outlier if it is below Q1 − 1.5 × IQR or above Q3 + 1.5 × IQR.
+
+Sorted scores (n = 40): 75, 78, 79, 79, 80, 81, 82, 82, 82, 82, 83, 83, 84, 84, 85, 85, 85, 86, 86, 86 | 87, 87, 87, 88, 88, 89, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 98, 99, 104, 110
+
+- Median = (20th + 21st)/2 = (86 + 87)/2 = 86.5
+- Q1 = median of the lower 20 = (10th + 11th)/2 = (82 + 83)/2 = **82.5**
+- Q3 = median of the upper 20 = (30th + 31st)/2 = (92 + 93)/2 = **92.5**
+- IQR = 92.5 − 82.5 = **10**
+- Lower fence = 82.5 − 15 = **67.5**; Upper fence = 92.5 + 15 = **107.5**
+
+No score is below 67.5. **110 is above 107.5, so 110 is an outlier.** (104 is high but still inside the fence.)
+
+**II. Impact of the outlier**
+
+| Measure | With 110 (n = 40) | Without 110 (n = 39) |
+|---|---|---|
+| Mean | 87.98 | 87.41 |
+| Median | 86.5 | 86 |
+| Standard deviation | 7.44 | 6.61 |
+
+- The outlier **pulls the mean upward** (by about 0.6 marks), because the mean includes every value. With only one extreme value in 40 the shift is small, but in a smaller class it would be larger.
+- It **inflates the standard deviation** noticeably (7.44 vs 6.61), because squared deviations give very large weight to a value far from the mean; the class looks more spread out than it really is.
+- The **median hardly changes**, so the median and IQR are more reliable summaries when outliers are present.
+
+</Answer>
+
+<Q id="s24-q2b" lq="x=10,8,12,13,12,12,15,16&y=150,120,100,220,240,200,150,110">
+
+**2. (b)** Suppose you have collected data on the monthly sales (in thousands of dollars) and advertising expenses (in thousands of dollars) for a sample of 20 retail stores over the past year. The dataset is as follows:
+
+| Store | Monthly Sales | Advertising Expenses |
+|---|---|---|
+| 1 | 150 | 10 |
+| 2 | 120 | 8 |
+| 3 | 100 | 12 |
+| 4 | 220 | 13 |
+| 5 | 240 | 12 |
+| 6 | 200 | 12 |
+| 7 | 150 | 15 |
+| 8 | 110 | 16 |
+
+**Determine** the correlation coefficient between monthly sales and advertising expenses. Explain the significance of the result in relation to the strength and direction of the association between these two variables.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Pearson r হিসাব, তারপর শক্তি (strength) আর দিক (direction) ব্যাখ্যা।
+
+**প্রশ্নে গরমিল:** "20 retail stores" লেখা, কিন্তু table এ **৮টা** store। ৮টা দিয়েই হিসাব করো আর এক লাইনে উল্লেখ করো।
+
+#### কোন topic লাগবে
+
+<T id="correlation">Covariance আর correlation</T>।
+
+#### Answer এর কাঠামো
+
+4 marks, ~¾ page: mean → deviation table → তিনটা যোগফল → r → interpretation। ফলাফল প্রায় **শূন্য** — এটাই এই প্রশ্নের মজা। Lab: <LL id="correlation" q="x=10,8,12,13,12,12,15,16&y=150,120,100,220,240,200,150,110">এই data দিয়ে</LL>।
+
+</Brief>
+
+<Answer>
+
+*(The question mentions 20 stores, but data for 8 stores are given; all 8 are used.)*
+
+Let x = advertising expense, y = monthly sales.
+
+x̄ = 98/8 = **12.25**, ȳ = 1290/8 = **161.25**
+
+| Store | x | y | x − x̄ | y − ȳ | (x − x̄)(y − ȳ) | (x − x̄)² | (y − ȳ)² |
+|---|---|---|---|---|---|---|---|
+| 1 | 10 | 150 | −2.25 | −11.25 | 25.31 | 5.06 | 126.56 |
+| 2 | 8 | 120 | −4.25 | −41.25 | 175.31 | 18.06 | 1701.56 |
+| 3 | 12 | 100 | −0.25 | −61.25 | 15.31 | 0.06 | 3751.56 |
+| 4 | 13 | 220 | 0.75 | 58.75 | 44.06 | 0.56 | 3451.56 |
+| 5 | 12 | 240 | −0.25 | 78.75 | −19.69 | 0.06 | 6201.56 |
+| 6 | 12 | 200 | −0.25 | 38.75 | −9.69 | 0.06 | 1501.56 |
+| 7 | 15 | 150 | 2.75 | −11.25 | −30.94 | 7.56 | 126.56 |
+| 8 | 16 | 110 | 3.75 | −51.25 | −192.19 | 14.06 | 2626.56 |
+| **Σ** | | | | | **7.50** | **45.50** | **19487.50** |
+
+$$r = \frac{7.5}{\sqrt{45.5 \times 19487.5}} = \frac{7.5}{941.65} \approx 0.008$$
+
+**Interpretation**
+
+- **Direction:** the sign is positive, but the value is so close to zero that the direction is meaningless.
+- **Strength:** r ≈ 0.008 indicates **virtually no linear relationship** between advertising expense and monthly sales in this sample. For example, stores 3, 5 and 6 spend the same (12) but sell 100, 240 and 200.
+- **Significance:** increasing advertising spending does not appear to be associated with higher sales for these stores; other factors (location, store size, product mix) probably drive sales. With only 8 stores the result is not reliable enough for strong conclusions, and r measures only *linear* association, so a non-linear relationship cannot be ruled out.
+
+</Answer>
+
+<Q id="s24-q3">
+
+**3.** Let's consider the following dataset to predict whether we can pet an animal or not. All the features have equal importance.
+
+<div class="tbl-scroll">
+
+| # | Animals | Size of Animal | Body Color | Can we Pet them |
+|---|---|---|---|---|
+| 0 | Dog | Medium | Black | Yes |
+| 1 | Dog | Big | White | No |
+| 2 | Rat | Small | White | Yes |
+| 3 | Cow | Big | White | Yes |
+| 4 | Cow | Small | Brown | No |
+| 5 | Cow | Big | Black | Yes |
+| 6 | Rat | Big | Brown | No |
+| 7 | Dog | Small | Brown | Yes |
+| 8 | Dog | Medium | Brown | Yes |
+| 9 | Cow | Medium | White | No |
+| 10 | Dog | Small | Black | Yes |
+| 11 | Rat | Medium | Black | No |
+| 12 | Rat | Small | Brown | No |
+| 13 | Cow | Big | White | Yes |
+
+</div>
+
+**Calculate** the prediction for the following test dataset, test = (Cow, Medium, Black) to predict the animal will be pet or not.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Naive Bayes দিয়ে একটা prediction — "All the features have equal importance" মানে feature গুলো আলাদা আলাদা (independent) ধরে গুণ করা যাবে।
+
+#### কোন topic লাগবে
+
+<T id="naive-bayes">Naive Bayes</T> (bonus), <T id="bayes">Bayes theorem</T>।
+
+#### Answer এর কাঠামো
+
+8 marks, ~১ page: prior → প্রতিটা class এর জন্য তিনটা likelihood → score → তুলনা → (normalize) → সিদ্ধান্ত। প্রতিটা ভগ্নাংশ কোথা থেকে এলো (কোন row গুলো) দেখালে full marks।
+
+</Brief>
+
+<Answer>
+
+**Step 1 – Priors** (14 animals)
+
+Yes: rows 0, 2, 3, 5, 7, 8, 10, 13 → 8; No: rows 1, 4, 6, 9, 11, 12 → 6.
+
+$$P(\text{Yes}) = \frac{8}{14}, \qquad P(\text{No}) = \frac{6}{14}$$
+
+**Step 2 – Likelihoods for the test features**
+
+| Feature | Given Yes | Given No |
+|---|---|---|
+| Animal = Cow | 3/8 (rows 3, 5, 13) | 2/6 (rows 4, 9) |
+| Size = Medium | 2/8 (rows 0, 8) | 2/6 (rows 9, 11) |
+| Color = Black | 3/8 (rows 0, 5, 10) | 1/6 (row 11) |
+
+**Step 3 – Scores (Naive Bayes, features assumed independent)**
+
+$$P(\text{Yes} \mid x) \propto \frac{8}{14} \times \frac{3}{8} \times \frac{2}{8} \times \frac{3}{8} = 0.0201$$
+
+$$P(\text{No} \mid x) \propto \frac{6}{14} \times \frac{2}{6} \times \frac{2}{6} \times \frac{1}{6} = 0.0079$$
+
+**Step 4 – Normalise and decide**
+
+$$P(\text{Yes} \mid x) = \frac{0.0201}{0.0201 + 0.0079} \approx 0.72, \qquad P(\text{No} \mid x) \approx 0.28$$
+
+Since 0.0201 > 0.0079, the test animal **(Cow, Medium, Black) is predicted as "Yes" — it can be petted** (probability ≈ 72%).
+
+</Answer>
+
+<Pitfalls>
+
+- Row 0 থেকে গোনা শুরু হয়েছে — মোট ১৪টা, ১৩টা না।
+- Prior বাদ দিয়ে শুধু likelihood গুণ করা।
+
+</Pitfalls>

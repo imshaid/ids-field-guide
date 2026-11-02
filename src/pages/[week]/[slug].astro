@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro';
+import katex from 'katex';
+import { TOPICS, getTopic, getWeek, getLab, topicUrl, weekTopics, neighbors, PRI_LABEL } from '../../data/topics';
+import { questionsForTopic } from '../../data/papers';
+import { mdxComponents } from '../../components/mdx';
+
+export function getStaticPaths() {
+  return TOPICS.map((t) => ({ params: { week: t.week, slug: t.slug }, props: { id: t.id } }));
+}
+const { id } = Astro.props as { id: string };
+const t = getTopic(id);
+const w = getWeek(t.week);
+const mods = import.meta.glob('../../content/topics/*.mdx', { eager: true }) as Record<string, any>;
+const mod = mods[`../../content/topics/${id}.mdx`];
+if (!mod) throw new Error(`Missing topic content: ${id}.mdx`);
+const Content = mod.default;
+const list = weekTopics(t.week);
+const idx = list.findIndex((x) => x.id === id);
+const { prev, next } = neighbors(id);
+const qs = questionsForTopic(id);
+const usedBy = TOPICS.filter((x) => x.prereq?.includes(id));
+const lab = t.lab ? getLab(t.lab) : undefined;
+const fx = (t.formulas ?? []).map((f) => ({ label: f.label, html: katex.renderToString(f.tex, { throwOnError: true }) }));
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<Base title={t.title} description={t.summary} week={t.week} topicId={t.id} crumbs={[{ label: w.label, href: `/${w.id}/` }, { label: t.kicker }]}>
+  <div class="with-panel">
+    <div>
+      <div class="page">
+        <article class="col" data-pagefind-body data-pagefind-meta={`week:${w.label}`}>
+          <header>
+            <div class="kicker"><span class="dot"></span>{w.label} · {pad(idx + 1)}/{pad(list.length)} · {t.kicker}</div>
+            <h1 class="display">{t.title}</h1>
+            <p class="lead">{t.summary}</p>
+            <div class="meta">
+              <span>{t.mins} min read</span>
+              <span class={`pri ${t.pri}`}>Exam priority {PRI_LABEL[t.pri]}</span>
+              {t.prereq && t.prereq.length > 0 && (
+                <span>আগে পড়ো: {t.prereq.map((p, i) => { const pt = getTopic(p); return <>{i > 0 && ', '}<a class="t" data-week={pt.week} href={topicUrl(pt)} data-tip={pt.summary} data-tip-title={pt.title}>{pt.title}</a></>; })}</span>
+              )}
+            </div>
+          </header>
+          <div class="prose"><Content components={mdxComponents} /></div>
+          <section class="t-end" data-pagefind-ignore>
+            <div class="btn-row">
+              <button class="btn" type="button" data-done={t.id}>বুঝেছি — mark করো</button>
+              <button class="btn ghost" type="button" data-flag={t.id}>⚑ পরে revise করব</button>
+            </div>
+            {qs.length > 0 && (<>
+              <h2>এই topic থেকে exam এ এসেছে</h2>
+              <ul class="qlinks">{qs.map((x) => <li><a href={x.url}><span>{x.q.title}</span><span class="chip">{x.paper.title} · {x.q.label}</span></a></li>)}</ul>
+            </>)}
+            {usedBy.length > 0 && (<>
+              <h2>এরপর এটা কোথায় লাগে</h2>
+              <ul class="qlinks">{usedBy.map((u) => <li data-week={u.week}><a href={topicUrl(u)}><span>{u.title}</span><span class="chip acc">{getWeek(u.week).label}</span></a></li>)}</ul>
+            </>)}
+          </section>
+        </article>
+      </div>
+      <nav class="rfoot" aria-label="Previous and next">
+        {prev ? <a href={topicUrl(prev)}><small>← আগের page</small>{prev.title}</a> : <a class="ph" href="/" aria-hidden="true" tabindex="-1">.</a>}
+        {next ? <a href={topicUrl(next)}><small>পরের page →</small>{next.title}</a> : <a href="/questions/"><small>শেষ! এবার →</small>Previous questions</a>}
+      </nav>
+      <div class="pagecount">{w.label} · {t.kicker} — page {idx + 1} of {list.length}</div>
+    </div>
+
+    <aside class="panel" aria-label="At a glance" data-pagefind-ignore>
+      <div class="p-sec">
+        <span class="p-k"><span class="accent"></span>এক নজরে</span>
+        <ul>{t.glance.map((g) => <li>{g}</li>)}</ul>
+      </div>
+      {fx.length > 0 && (
+        <div class="p-sec">
+          <span class="p-k">Formula</span>
+          {fx.map((f) => <div class="p-formula"><small>{f.label}</small><Fragment set:html={f.html} /></div>)}
+        </div>
+      )}
+      {lab && (
+        <div class="p-sec">
+          <span class="p-k">Lab এ নিজে করে দেখো</span>
+          <a class="p-link" href={`/labs/${lab.id}/`}><span>⚗ {lab.title}</span><span>open</span></a>
+        </div>
+      )}
+      {qs.length > 0 && (
+        <div class="p-sec">
+          <span class="p-k">Exam এ এসেছে · {qs.length}</span>
+          {qs.map((x) => <a class="p-link" href={x.url}><span>{x.q.title}</span><span>{x.paper.title.replace(/(\w+) (\d+)/, '$1 ’$2').replace('20', '')}</span></a>)}
+        </div>
+      )}
+      <div class="p-sec">
+        <span class="p-k">{w.label} এর সব page</span>
+        {list.map((x, i) => <a class="p-link" href={topicUrl(x)} aria-current={x.id === id ? 'page' : undefined}><span>{x.id === id ? '▸ ' : ''}{x.title}</span><span>{pad(i + 1)}</span></a>)}
+      </div>
+    </aside>
+  </div>
+</Base>

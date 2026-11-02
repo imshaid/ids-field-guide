@@ -1,0 +1,21 @@
+---
+interface Props { name: string; size?: number }
+const { name, size = 20 } = Astro.props;
+const paths: Record<string, string> = {
+  book: 'M3 4.5h5.5A1.5 1.5 0 0 1 10 6v10.2a1 1 0 0 0-1-1H3zM17 4.5h-5.5A1.5 1.5 0 0 0 10 6v10.2a1 1 0 0 1 1-1h6z',
+  search: 'M8.6 3.2a5.4 5.4 0 1 1 0 10.8 5.4 5.4 0 0 1 0-10.8zM12.6 12.6l4.4 4.4',
+  paper: 'M5 2.8h7.2L15.5 6v11.2H5zM12 2.8V6.2h3.4M7.6 9h5M7.6 11.8h5M7.6 14.6h3',
+  flask: 'M7.8 2.8h4.4M8.8 2.8v5.1l-4.6 7.8a1 1 0 0 0 .86 1.5h9.9a1 1 0 0 0 .86-1.5l-4.6-7.8V2.8M6.3 12.6h7.4',
+  card: 'M2.8 5h14.4v10H2.8zM5.6 8.6h8.8M5.6 11.4h5.4',
+  flag: 'M5 17.5V3M5 3.6h9.6l-2.3 3.6 2.3 3.6H5',
+  plane: 'M17.4 3 2.6 9.1l5.3 1.9 1.9 5.5 2.4-3.4 3.8 2.8zM7.9 11l9.5-8',
+  arrow: 'M4 10h12M11.5 5.5 16 10l-4.5 4.5',
+  back: 'M16 10H4M8.5 5.5 4 10l4.5 4.5',
+  check: 'M4 10.4 8 14.2 16 5.8',
+  copy: 'M7 7h9.5v9.5H7zM13 7V3.5H3.5V13H7',
+};
+const d = paths[name];
+---
+{name === 'toc' ? <span aria-hidden="true" style="font-size:1.25rem">§</span> :
+ name === 'aa' ? <span aria-hidden="true" style="font-size:.98rem;letter-spacing:-.02em">Aa</span> :
+ <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d={d} /></svg>}

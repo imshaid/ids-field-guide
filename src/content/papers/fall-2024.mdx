@@ -1,0 +1,372 @@
+<Idea title="এই paper এক নজরে">
+
+Mid Examination · Course code তখন ছিল **CSE315** · Level 3 Term 1 · 1.5 ঘণ্টা · 25 marks। এখানে pandas, linear regression আর Naive Bayes এসেছে — এবারের Week 1–5 এর slide এ এগুলো নেই। Class এ পড়ানো না হলে Q1 আর Q2(b) কে priority দাও; বাকিগুলো <T id="naive-bayes">Bonus</T> হিসেবে।
+
+</Idea>
+
+<Q id="f24-q1a">
+
+**1. (a)** A telecom company has gathered information on customer age, contract type, monthly charges, and customer complaints in an effort to reduce retention rates. In summary, **describe** how the company can use these variables to predict which customers are most likely to leave.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Customer churn (চলে যাওয়া) predict করার একটা সংক্ষিপ্ত পদ্ধতি — variable গুলো কীভাবে কাজে লাগবে। (প্রশ্নে "reduce retention rates" লেখা, আসলে বোঝানো হয়েছে churn কমানো বা retention বাড়ানো।)
+
+#### কোন topic লাগবে
+
+<T id="why-ds">Classification task</T>, <T id="ds-process">Process</T>।
+
+#### Answer এর কাঠামো
+
+মাত্র 2 marks: ৫–৬ লাইন। Classification বলা + প্রতিটা variable এর ভূমিকা এক লাইনে + model দিয়ে কী করবে।
+
+</Brief>
+
+<Answer>
+
+This is a **classification** problem (churn vs. stay). The company should label past customers as "left" or "stayed", then use the four variables as predictors:
+
+- **Contract type:** month-to-month customers usually leave more easily than those on long contracts.
+- **Monthly charges:** high charges increase the risk of switching to a competitor.
+- **Complaints:** customers with more complaints are less satisfied and more likely to leave.
+- **Age:** different age groups show different loyalty patterns.
+
+After cleaning and encoding the categorical variables, a model (e.g. logistic regression or a decision tree) is trained on past data and evaluated. It then gives each current customer a churn probability, so the company can target high-risk customers with retention offers.
+
+</Answer>
+
+<Q id="f24-q1b">
+
+**1. (b)** A university wants to conduct a survey to understand student satisfaction across all departments. Since surveying every student is not feasible, they decide to use sampling techniques. **Explain** which sampling method (e.g., random sampling, stratified sampling, or systematic sampling) would be most appropriate for this scenario and why.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+একটা method বেছে কারণ বলা। মূল শব্দ: "**across all departments**" — সব department এর প্রতিনিধিত্ব লাগবে।
+
+#### কোন topic লাগবে
+
+<T id="sampling">Stratified sampling</T>।
+
+#### Answer এর কাঠামো
+
+3 marks, ~আধা page: method এর নাম → কীভাবে করবে → ২–৩টা কারণ → অন্যগুলো কেন কম উপযুক্ত (এক লাইন)।
+
+</Brief>
+
+<Answer>
+
+**Stratified random sampling** is the most appropriate method.
+
+**How:** treat each department as a stratum, then randomly select students from every department in proportion to its size (e.g. if CSE has 20% of all students, 20% of the sample comes from CSE).
+
+**Why:**
+
+1. Satisfaction can differ strongly between departments, and the goal is to understand satisfaction *across all* of them; stratification guarantees every department is represented.
+2. Proportional allocation keeps the sample representative of the whole university.
+3. Students within a department share similar experiences (homogeneous strata), so estimates are more precise than with simple random sampling of the same size.
+
+Simple random or systematic sampling might, by chance, include very few students from small departments, giving a biased picture.
+
+</Answer>
+
+<Q id="f24-q2a">
+
+**2. (a)** Given the following dictionary of employee data:
+
+```python
+employee_data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [25, 30, 35, 40],
+    'Department': ['HR', 'Finance', 'IT', 'Marketing'],
+    'Salary': [50000, 60000, 70000, 80000]
+}
+```
+
+i. Write Python code to convert this dictionary into a Pandas DataFrame.
+ii. Display the first two rows of the DataFrame.
+iii. Write code to find the average salary of the employees.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+তিনটা ছোট code — 1 mark করে।
+
+#### কোন topic লাগবে
+
+<T id="pandas">Pandas basics</T> (bonus)।
+
+</Brief>
+
+<Answer>
+
+```python
+import pandas as pd
+
+employee_data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [25, 30, 35, 40],
+    'Department': ['HR', 'Finance', 'IT', 'Marketing'],
+    'Salary': [50000, 60000, 70000, 80000]
+}
+
+# i. Convert the dictionary into a DataFrame
+df = pd.DataFrame(employee_data)
+
+# ii. Display the first two rows
+print(df.head(2))
+
+# iii. Average salary
+avg_salary = df['Salary'].mean()
+print("Average salary:", avg_salary)   # 65000.0
+```
+
+</Answer>
+
+<Q id="f24-q2b" lq="data=8,9,91,100,96,5,39,2,34,25,28,22,54,68,80,11,74,28,13,6">
+
+**2. (b)** Given the following list of ages for a group of people:
+
+**8, 9, 91, 100, 96, 5, 39, 2, 34, 25, 28, 22, 54, 68, 80, 11, 74, 28, 13, 6**
+
+**Calculate** the first quartile (Q1) and third quartile (Q3) of the data. Use the 1.5 IQR (Interquartile Range) method to **identify** any outliers.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Q1, Q3, IQR, fence, outlier — পুরো IQR method।
+
+#### কোন topic লাগবে
+
+<T id="outliers">IQR method দিয়ে outlier</T>।
+
+#### Answer এর কাঠামো
+
+3 marks: sort → median/halves → Q1, Q3 → IQR → fences → সিদ্ধান্ত। *Scan note:* paper এর সংখ্যাগুলোর উপর হাতের দাগ আছে; উপরের ২০টা মান পড়া হয়েছে। Lab: <LL id="iqr-boxplot" q="data=8,9,91,100,96,5,39,2,34,25,28,22,54,68,80,11,74,28,13,6">এই data দিয়ে চালাও</LL>।
+
+</Brief>
+
+<Answer>
+
+**Sorted (n = 20):** 2, 5, 6, 8, 9, 11, 13, 22, 25, 28 | 28, 34, 39, 54, 68, 74, 80, 91, 96, 100
+
+- Median = (10th + 11th)/2 = (28 + 28)/2 = 28
+- Lower half (first 10): 2, 5, 6, 8, **9, 11**, 13, 22, 25, 28 → **Q1 = (9 + 11)/2 = 10**
+- Upper half (last 10): 28, 34, 39, 54, **68, 74**, 80, 91, 96, 100 → **Q3 = (68 + 74)/2 = 71**
+- **IQR** = 71 − 10 = **61**
+- Lower fence = 10 − 1.5 × 61 = 10 − 91.5 = **−81.5**
+- Upper fence = 71 + 1.5 × 61 = 71 + 91.5 = **162.5**
+
+Every age lies between −81.5 and 162.5 (minimum 2, maximum 100). Therefore there are **no outliers** in this data set; the large spread simply reflects a wide age range in the group.
+
+</Answer>
+
+<Q id="f24-q2c" lq="x=2,3,5,7,8,9,11,12&y=50,55,65,70,80,90,95,105">
+
+**2. (c)** A company collects the following data on the number of hours employees spend on training and their corresponding performance scores:
+
+| Hours of Training | 2 | 3 | 5 | 7 | 8 | 9 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|
+| Performance Score | 50 | 55 | 65 | 70 | 80 | 90 | 95 | 105 |
+
+i. **Explain** how you would apply linear regression to model the relationship between the hours of training and performance score.
+ii. Based on this model, **describe** how you can predict the performance score for an employee who spends 6 hours on training.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+(i) regression এর ধারণা আর ধাপ, (ii) model বানিয়ে x = 6 এর জন্য predict। "Describe" লেখা থাকলেও হিসাব করে দেখালে full marks নিশ্চিত।
+
+#### কোন topic লাগবে
+
+<T id="regression">Linear regression</T> (bonus), <T id="correlation">Correlation</T>।
+
+#### Answer এর কাঠামো
+
+4 marks, ~¾ page: model এর form → b আর a এর formula → হিসাব → ŷ(6) → এক লাইনে interpretation।
+
+</Brief>
+
+<Answer>
+
+**i. Applying linear regression**
+
+Training hours (x) is the independent variable and performance score (y) is the dependent variable. We fit the line **ŷ = a + bx** using the least-squares method, which minimises the sum of squared errors between actual and predicted scores:
+
+$$b = \frac{\sum (x - \bar{x})(y - \bar{y})}{\sum (x - \bar{x})^2}, \qquad a = \bar{y} - b\bar{x}$$
+
+- x̄ = 57/8 = 7.125, ȳ = 610/8 = 76.25
+- Σ(x − x̄)(y − ȳ) = 488.75, Σ(x − x̄)² = 90.875
+- b = 488.75 / 90.875 = **5.378**
+- a = 76.25 − 5.378 × 7.125 = **37.93**
+
+**Model: ŷ = 37.93 + 5.378x.** Each additional hour of training is associated with an increase of about 5.4 points in performance. The correlation is very strong (r ≈ 0.99), so the linear model fits the data well.
+
+**ii. Prediction for 6 hours**
+
+ŷ = 37.93 + 5.378 × 6 = 37.93 + 32.27 = **70.2**
+
+An employee with 6 hours of training is expected to score about **70**. This prediction is reliable because 6 hours lies inside the observed range (2–12 hours).
+
+</Answer>
+
+<Q id="f24-q3a">
+
+**3. (a)** What is the difference between the generalized Bayes rule and the naïve Bayes rule? **Describe** the meaning of the term "naïve" for the Naive Bayes classifier.
+
+</Q>
+
+<Brief>
+
+#### কোন topic লাগবে
+
+<T id="naive-bayes">Naive Bayes</T> (bonus)।
+
+#### Answer এর কাঠামো
+
+2 marks: পার্থক্য ২–৩ লাইনে (সব feature একসাথে বনাম আলাদা আলাদা), "naive" এর মানে ১–২ লাইনে।
+
+</Brief>
+
+<Answer>
+
+The **generalized Bayes rule** computes P(C | x₁, …, xₙ) ∝ P(C) · P(x₁, x₂, …, xₙ | C), which requires the **joint** probability of all features together for each class. This needs a huge amount of data, because every combination of feature values must be estimated.
+
+The **naive Bayes rule** assumes the features are conditionally independent given the class, so the joint likelihood becomes a simple product: P(C | x) ∝ P(C) · Π P(xᵢ | C).
+
+**"Naive"** refers to this simplifying assumption that, once the class is known, each feature is independent of every other feature. It is rarely true in reality (e.g. the words "free" and "win" often appear together in spam), but it makes the classifier fast and still surprisingly accurate.
+
+</Answer>
+
+<Q id="f24-q3b">
+
+**3. (b)** **Explain** why Naive Bayes is a good option and how its assumptions and features match the situation. Talk about real-world applications where Naive Bayes is often utilized.
+
+</Q>
+
+<Brief>
+
+#### Answer এর কাঠামো
+
+3 marks: ৩টা সুবিধা (কেন ভালো), assumption কীভাবে এই ধরনের কাজে খাটে, ৩–৪টা application।
+
+</Brief>
+
+<Answer>
+
+**Why it is a good option**
+
+1. **Simple and fast:** training only requires counting frequencies, so it works well even on large data sets and in real time.
+2. **Works with small training data:** because each feature's likelihood is estimated separately, it needs fewer examples than models that learn feature interactions.
+3. **Handles many features:** it scales easily to thousands of features (e.g. every word in a vocabulary).
+
+**How the assumptions match the situation:** in tasks like spam detection, each word acts as a separate piece of evidence. Treating words as independent is not perfectly true, but each word still pushes the probability towards spam or not spam, so the classification decision is usually correct even when the exact probabilities are not.
+
+**Real-world applications:** email **spam filtering**, **sentiment analysis** of reviews and social-media posts, **news/document categorisation**, medical diagnosis support (predicting disease from symptoms), and recommendation systems.
+
+</Answer>
+
+<Q id="f24-q3c">
+
+**3. (c)** You are given a randomly selected dataset of ten email messages to build a Naive Bayes classifier to identify whether an email is spam or not based on the occurrence of certain words, including Money, Free, and Win.
+
+<div class="tbl-scroll">
+
+| Email | "Money" (Yes=1, No=0) | "Free" (Yes=1, No=0) | "Win" (Yes=1, No=0) | Label (Spam=1, Not Spam=0) |
+|---|---|---|---|---|
+| 1 | 1 | 1 | 0 | 1 |
+| 2 | 0 | 1 | 0 | 0 |
+| 3 | 1 | 0 | 0 | 1 |
+| 4 | 0 | 0 | 0 | 0 |
+| 5 | 1 | 1 | 1 | 1 |
+| 6 | 0 | 0 | 1 | 0 |
+| 7 | 0 | 1 | 1 | 1 |
+| 8 | 0 | 1 | 1 | 0 |
+| 9 | 1 | 1 | 1 | 1 |
+| 10 | 0 | 0 | 0 | 0 |
+| 11 | 0 | 0 | 0 | 0 |
+| 12 | 1 | 1 | 1 | 1 |
+| 13 | 1 | 0 | 0 | 0 |
+| 14 | 1 | 0 | 0 | 1 |
+| 15 | 1 | 1 | 0 | 1 |
+
+</div>
+
+A vector of words represents each email. Each email is labeled as either spam (1) or not spam (0).
+
+i. **Determine** the prior probability of each label (spam or not spam).
+ii. **Determine** the Likelihood of each attribute (Money, Free, and Win).
+iii. **Calculate** the probability that a new email containing the words Money, Win, but not free is spam or not spam.
+
+</Q>
+
+<Brief>
+
+#### প্রশ্নটা আসলে কী চাইছে
+
+Naive Bayes এর তিন ধাপ — prior, likelihood, তারপর নতুন email (Money = 1, Free = 0, Win = 1) এর classification।
+
+**প্রশ্নে গরমিল:** লেখা "ten email messages", কিন্তু table এ **১৫টা** row। Exam এ এক লাইনে লিখে দাও যে table এর ১৫টা ধরেই হিসাব করছ।
+
+#### Answer এর কাঠামো
+
+5 marks: (i) ২ লাইন, (ii) একটা likelihood table, (iii) দুইটা score → তুলনা → normalize → সিদ্ধান্ত।
+
+</Brief>
+
+<Answer>
+
+*(The question says ten emails, but the table contains 15; all 15 are used.)*
+
+**i. Prior probabilities**
+
+Spam emails: 1, 3, 5, 7, 9, 12, 14, 15 → 8; Not spam: 7.
+
+$$P(\text{Spam}) = \frac{8}{15} = 0.533, \qquad P(\text{Not spam}) = \frac{7}{15} = 0.467$$
+
+**ii. Likelihoods**
+
+| Word | P(word = 1 \| Spam) | P(word = 1 \| Not spam) |
+|---|---|---|
+| Money | 7/8 = 0.875 | 1/7 = 0.143 |
+| Free | 6/8 = 0.750 | 2/7 = 0.286 |
+| Win | 4/8 = 0.500 | 2/7 = 0.286 |
+
+(Absence probabilities are the complements, e.g. P(Free = 0 | Spam) = 2/8 = 0.25 and P(Free = 0 | Not spam) = 5/7 = 0.714.)
+
+**iii. New email: Money = 1, Free = 0, Win = 1**
+
+$$\text{Spam score} = \frac{8}{15} \times \frac{7}{8} \times \frac{2}{8} \times \frac{4}{8} = 0.0583$$
+
+$$\text{Not-spam score} = \frac{7}{15} \times \frac{1}{7} \times \frac{5}{7} \times \frac{2}{7} = 0.0136$$
+
+Normalising:
+
+$$P(\text{Spam} \mid x) = \frac{0.0583}{0.0583 + 0.0136} = 0.81, \qquad P(\text{Not spam} \mid x) = 0.19$$
+
+Since 0.81 > 0.19, the new email is classified as **Spam**.
+
+</Answer>
+
+<Pitfalls>
+
+- "Not free" কে উপেক্ষা করে শুধু Money আর Win এর likelihood গুণ করা — Free = 0 এর likelihood (2/8 আর 5/7) ও লাগবে।
+- Prior দিয়ে গুণ করতে ভুলে যাওয়া।
+
+</Pitfalls>

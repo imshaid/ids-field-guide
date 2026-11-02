@@ -1,0 +1,213 @@
+---
+interface Props { name: string; caption?: string }
+const { name, caption } = Astro.props;
+
+// --- curve helpers (computed at build time) ---
+const phi = (x: number) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+const Phi = (x: number) => 0.5 * (1 + erf(x / Math.SQRT2));
+function erf(x: number) {
+  const s = Math.sign(x); x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+function curve(f: (x: number) => number, x0: number, x1: number, W: number, H: number, ox: number, oy: number, ymax: number) {
+  const pts: string[] = [];
+  const N = 90;
+  for (let i = 0; i <= N; i++) {
+    const x = x0 + ((x1 - x0) * i) / N;
+    const px = ox + (W * i) / N;
+    const py = oy + H - (H * f(x)) / ymax;
+    pts.push(`${i ? 'L' : 'M'}${px.toFixed(1)},${py.toFixed(1)}`);
+  }
+  return pts.join('');
+}
+function stats(f: (x: number) => number, x0: number, x1: number) {
+  const N = 2000; let s = 0, m = 0, best = -1, mode = 0; const xs: number[] = []; const cs: number[] = [];
+  for (let i = 0; i <= N; i++) { const x = x0 + ((x1 - x0) * i) / N; const y = f(x); s += y; m += x * y; xs.push(x); cs.push(s); if (y > best) { best = y; mode = x; } }
+  const mean = m / s; const half = s / 2; const med = xs[cs.findIndex((c) => c >= half)];
+  return { mean, med, mode };
+}
+const sk = (a: number) => (x: number) => 2 * phi(x) * Phi(a * x);
+const skewSets = [
+  { a: -5, label: 'Negative skew', note: 'লম্বা লেজ বামে' },
+  { a: 0, label: 'Symmetric', note: 'দুই পাশ সমান' },
+  { a: 5, label: 'Positive skew', note: 'লম্বা লেজ ডানে' },
+].map((s, i) => {
+  const f = sk(s.a); const ox = 20 + i * 215; const W = 190, H = 110, oy = 30;
+  const st = stats(f, -3.2, 3.2); const X = (x: number) => ox + ((x + 3.2) / 6.4) * W;
+  return { ...s, d: curve(f, -3.2, 3.2, W, H, ox, oy, 0.85), ox, W, H, oy, mean: X(st.mean), med: X(st.med), mode: X(st.mode) };
+});
+const kurt = [
+  { cls: 'k1', label: 'Leptokurtic', f: (x: number) => 0.5 * Math.exp(-Math.abs(x) * 1.0) * 1.0 },
+  { cls: 'k2', label: 'Mesokurtic (normal)', f: (x: number) => phi(x) },
+  { cls: 'k3', label: 'Platykurtic', f: (x: number) => 0.27 * Math.exp(-Math.pow(Math.abs(x) / 1.9, 4)) },
+].map((k) => ({ ...k, d: curve(k.f, -4, 4, 560, 150, 40, 20, 0.52) }));
+const normalD = curve(phi, -3.6, 3.6, 560, 170, 40, 20, 0.42);
+const NX = (z: number) => 40 + ((z + 3.6) / 7.2) * 560;
+---
+<figure class={`dg dg-${name}`}>
+{name === 'ai-ml-ds' && (
+  <svg viewBox="0 0 640 300" role="img" aria-label="AI, Machine Learning আর Data Science এর সম্পর্ক">
+    <circle cx="230" cy="150" r="135" class="f-paper s-ink" />
+    <circle cx="250" cy="185" r="85" class="f-w1 s-ink" />
+    <rect x="285" y="95" width="320" height="180" class="f-w3 s-ink" style="fill-opacity:.35" />
+    <text x="150" y="45" class="t-b">Artificial Intelligence</text>
+    <text x="120" y="80">Vision · Robotics · Planning</text>
+    <text x="195" y="150" class="t-b">Machine Learning</text>
+    <text x="190" y="180">kNN · Decision tree</text>
+    <text x="190" y="200">Naive Bayes · Deep learning</text>
+    <text x="470" y="120" class="t-b">Data Science</text>
+    <text x="440" y="160">Statistics · Visualization</text>
+    <text x="440" y="185">Data preparation</text>
+    <text x="440" y="210">Experimentation</text>
+    <text x="440" y="235">Business understanding</text>
+  </svg>
+)}
+{name === 'process7' && (
+  <svg viewBox="0 0 640 250" role="img" aria-label="Data science এর ৭টা ধাপ">
+    {['Business\nproblem', 'Data\nacquisition', 'Data\npreparation', 'Explore\n(EDA)', 'Model\n& evaluate', 'Communicate\nresults', 'Deploy &\nmaintain'].map((s, i) => {
+      const x = 12 + i * 89; const y = i % 2 ? 120 : 40;
+      return (<g>
+        <rect x={x} y={y} width="80" height="62" class={i === 0 ? 'f-ink' : 'f-paper s-ink'} />
+        <text x={x + 8} y={y + 16} class={i === 0 ? 't-inv t-s' : 't-s'}>{String(i + 1).padStart(2, '0')}</text>
+        {s.split('\n').map((l, j) => <text x={x + 8} y={y + 35 + j * 15} class={i === 0 ? 't-inv' : ''}>{l}</text>)}
+        {i < 6 && <path d={`M${x + 80},${y + 31} L${x + 89},${i % 2 ? y - 27 : y + 111}`} class="s-ink" marker-end="url(#ah)" />}
+      </g>);
+    })}
+    <path d="M590,190 C 590,235 50,235 50,108" class="s-mute dash" marker-end="url(#ah)" />
+    <text x="250" y="244" class="t-s">দরকার হলে আগের ধাপে ফেরা যায় — process টা iterative</text>
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-inkonly" /></marker></defs>
+  </svg>
+)}
+{name === 'dikw' && (
+  <svg viewBox="0 0 640 280" role="img" aria-label="DIKW pyramid">
+    <polygon points="160,260 480,260 430,200 210,200" class="f-w1" style="fill-opacity:.35" />
+    <polygon points="210,198 430,198 382,140 258,140" class="f-w1" style="fill-opacity:.55" />
+    <polygon points="258,138 382,138 340,80 300,80" class="f-w1" style="fill-opacity:.8" />
+    <polygon points="300,78 340,78 320,30" class="f-ink" />
+    <text x="290" y="236" class="t-b">DATA</text><text x="268" y="175" class="t-b">INFORMATION</text><text x="282" y="116" class="t-b">KNOWLEDGE</text>
+    <text x="335" y="58" class="t-b">WISDOM</text>
+    <text x="490" y="236">"100"</text><text x="440" y="175">"100 miles"</text><text x="392" y="116">"100 miles অনেক দূর"</text><text x="395" y="45">"হেঁটে না, গাড়িতে যাও"</text>
+    <text x="20" y="236" class="t-s">Raw fact</text><text x="20" y="175" class="t-s">+ context</text><text x="20" y="116" class="t-s">+ meaning</text><text x="20" y="58" class="t-s">+ judgment</text>
+  </svg>
+)}
+{name === 'venn' && (
+  <svg viewBox="0 0 640 330" role="img" aria-label="Data science venn diagram">
+    <circle cx="260" cy="125" r="105" class="f-w4" style="fill-opacity:.32" />
+    <circle cx="380" cy="125" r="105" class="f-w2" style="fill-opacity:.32" />
+    <circle cx="320" cy="215" r="105" class="f-w1" style="fill-opacity:.32" />
+    <text x="185" y="100" class="t-b">Computer</text><text x="185" y="116" class="t-b">Science</text>
+    <text x="400" y="100" class="t-b">Maths &amp;</text><text x="400" y="116" class="t-b">Statistics</text>
+    <text x="268" y="292" class="t-b">Business / Domain</text><text x="295" y="308" class="t-b">expertise</text>
+    <text x="290" y="88" class="t-s">Machine</text><text x="290" y="101" class="t-s">learning</text>
+    <text x="214" y="210" class="t-s">Traditional</text><text x="214" y="223" class="t-s">software</text>
+    <text x="372" y="210" class="t-s">Data</text><text x="372" y="223" class="t-s">analysis</text>
+    <rect x="281" y="138" width="78" height="38" class="f-ink" /><text x="290" y="154" class="t-inv t-s">DATA</text><text x="290" y="168" class="t-inv t-s">SCIENCE</text>
+  </svg>
+)}
+{name === 'sampling-tree' && (
+  <svg viewBox="0 0 640 250" role="img" aria-label="Sampling methods tree">
+    <rect x="250" y="10" width="140" height="34" class="f-ink" /><text x="268" y="32" class="t-inv t-b">Sampling methods</text>
+    <path d="M320,44 V64 H160 V84 M320,64 H480 V84" class="s-ink" />
+    <rect x="70" y="84" width="180" height="34" class="f-w3" style="fill-opacity:.45" /><text x="82" y="105" class="t-b">Probability (random)</text>
+    <rect x="390" y="84" width="200" height="34" class="f-paper s-ink" /><text x="402" y="105" class="t-b">Non-probability (বিচার)</text>
+    {['Simple random', 'Stratified', 'Cluster (1/2-stage)', 'Systematic'].map((s, i) => (<g><path d={`M90,118 V${140 + i * 27} H104`} class="s-mute" /><text x="110" y={145 + i * 27}>{s}</text></g>))}
+    {['Judgmental', 'Snowball', 'Convenience', 'Quota'].map((s, i) => (<g><path d={`M410,118 V${140 + i * 27} H424`} class="s-mute" /><text x="430" y={145 + i * 27}>{s}</text></g>))}
+  </svg>
+)}
+{name === 'pop-sample' && (
+  <svg viewBox="0 0 640 220" role="img" aria-label="Population থেকে sample">
+    <circle cx="170" cy="110" r="95" class="f-paper s-ink" />
+    {Array.from({ length: 46 }, (_, i) => { const a = i * 2.4; const r = 12 + (i * 37) % 78; const x = 170 + Math.cos(a) * r; const y = 110 + Math.sin(a) * r; const pick = i % 7 === 0; return <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" class={pick ? 'f-ink' : ['f-w1', 'f-w2', 'f-w3', 'f-w4'][i % 4]} />; })}
+    <circle cx="470" cy="110" r="55" class="f-paper s-ink dash" />
+    {Array.from({ length: 7 }, (_, i) => <circle cx={(445 + (i % 4) * 17).toFixed(0)} cy={(98 + Math.floor(i / 4) * 22).toFixed(0)} r="5" class="f-ink" />)}
+    <path d="M270,110 H405" class="s-ink" marker-end="url(#ah2)" />
+    <text x="290" y="100" class="t-s">sampling</text>
+    <text x="120" y="215" class="t-b">Population (N)</text><text x="430" y="190" class="t-b">Sample (n)</text>
+    <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-inkonly" /></marker></defs>
+  </svg>
+)}
+{name === 'boxplot' && (
+  <svg viewBox="0 0 640 200" role="img" aria-label="Box plot এর অংশগুলো">
+    <path d="M70,95 H200 M430,95 H540" class="s-ink" />
+    <path d="M70,80 V110 M540,80 V110" class="s-ink" />
+    <rect x="200" y="65" width="230" height="60" class="f-w3 s-ink" style="fill-opacity:.35" />
+    <path d="M300,65 V125" class="s-ink thick" />
+    <circle cx="600" cy="95" r="6" class="f-pen" />
+    {[[70, 'Min'], [200, 'Q1'], [300, 'Median (Q2)'], [430, 'Q3'], [540, 'Max (fence এর ভেতরে)'], [600, 'Outlier']].map(([x, l], i) => <text x={Number(x) - 10} y={i % 2 ? 160 : 45} class="t-s">{l}</text>)}
+    <path d="M200,140 H430" class="s-mute" /><text x="250" y="182" class="t-s">IQR = Q3 − Q1 (মাঝের 50%)</text>
+  </svg>
+)}
+{name === 'skew' && (
+  <svg viewBox="0 0 660 200" role="img" aria-label="Negative, symmetric আর positive skew">
+    {skewSets.map((s) => (<g>
+      <path d={s.d} class="s-ink thick f-none" />
+      <path d={`M${s.mode},${s.oy} V${s.oy + s.H}`} class="s-mute dash" />
+      <path d={`M${s.med},${s.oy + 25} V${s.oy + s.H}`} class="s-w3" />
+      <path d={`M${s.mean},${s.oy + 45} V${s.oy + s.H}`} class="s-pen" />
+      <path d={`M${s.ox},${s.oy + s.H} H${s.ox + s.W}`} class="s-ink" />
+      <text x={s.ox} y={s.oy + s.H + 22} class="t-b">{s.label}</text>
+      <text x={s.ox} y={s.oy + s.H + 38} class="t-s">{s.note}</text>
+    </g>))}
+    <text x="20" y="16" class="t-s">— — mode   <tspan class="c-w3">│ median</tspan>   <tspan class="c-pen">│ mean</tspan></text>
+  </svg>
+)}
+{name === 'kurtosis' && (
+  <svg viewBox="0 0 640 210" role="img" aria-label="Kurtosis এর তিন রকম">
+    {kurt.map((k) => <path d={k.d} class={`f-none ${k.cls}`} />)}
+    <path d="M40,170 H600" class="s-ink" />
+    <text x="330" y="38" class="t-s c-pen">← Leptokurtic: সরু চূড়া, ভারী লেজ</text>
+    <text x="420" y="120" class="t-s">Mesokurtic (normal)</text>
+    <text x="450" y="150" class="t-s c-w1">Platykurtic: চ্যাপ্টা</text>
+  </svg>
+)}
+{name === 'empirical' && (
+  <svg viewBox="0 0 640 230" role="img" aria-label="68-95-99.7 rule">
+    <path d={`${normalD} L600,190 L40,190 Z`} class="f-w4" style="fill-opacity:.18" />
+    <path d={normalD} class="s-ink thick f-none" />
+    {[-3, -2, -1, 0, 1, 2, 3].map((z) => (<g><path d={`M${NX(z)},40 V190`} class={z === 0 ? 's-ink' : 's-mute dash'} /><text x={NX(z) - 12} y="208" class="t-s">{z === 0 ? 'μ' : `${z > 0 ? '+' : ''}${z}σ`}</text></g>))}
+    <path d={`M${NX(-1)},120 H${NX(1)}`} class="s-ink" /><text x={NX(-0.25)} y="114" class="t-b">68%</text>
+    <path d={`M${NX(-2)},150 H${NX(2)}`} class="s-ink" /><text x={NX(-0.25)} y="146" class="t-b">95%</text>
+    <path d={`M${NX(-3)},178 H${NX(3)}`} class="s-ink" /><text x={NX(-0.3)} y="174" class="t-b">99.7%</text>
+  </svg>
+)}
+{name === 'decision' && (
+  <svg viewBox="0 0 640 170" role="img" aria-label="p-value দিয়ে decision">
+    <rect x="20" y="55" width="150" height="50" class="f-ink" /><text x="34" y="76" class="t-inv t-b">p-value বের করো</text><text x="34" y="93" class="t-inv t-s">table / software</text>
+    <path d="M170,80 H220" class="s-ink" marker-end="url(#ah3)" />
+    <polygon points="300,30 380,80 300,130 220,80" class="f-paper s-ink" /><text x="268" y="84" class="t-b">p &lt; α ?</text>
+    <path d="M380,80 H420 V40 H440 M420,80 V120 H440" class="s-ink" />
+    <rect x="440" y="18" width="185" height="44" class="f-pen" /><text x="452" y="37" class="t-inv t-b">হ্যাঁ → Reject H0</text><text x="452" y="53" class="t-inv t-s">Ha এর পক্ষে প্রমাণ আছে</text>
+    <rect x="440" y="98" width="185" height="44" class="f-paper s-ink" /><text x="452" y="117" class="t-b">না → Fail to reject H0</text><text x="452" y="133" class="t-s">যথেষ্ট প্রমাণ নেই</text>
+    <text x="388" y="70" class="t-s">yes</text><text x="388" y="112" class="t-s">no</text>
+    <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-inkonly" /></marker></defs>
+  </svg>
+)}
+{caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .dg { margin: 1.6em 0; padding: 0.9rem 0.6rem 0.5rem; border: 1px solid var(--rule); background: color-mix(in srgb, var(--paper) 65%, white); }
+  .dg svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 500 0.66rem/1.4 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 0.6rem 0.4rem 0.2rem; border-top: 1px solid var(--rule-2); margin-top: 0.6rem; }
+  text { font: 500 12px var(--mono); fill: var(--ink-2); }
+  .t-b { font-weight: 600; fill: var(--ink); font-size: 12.5px; }
+  .t-s { font-size: 11px; }
+  .t-inv { fill: var(--paper); }
+  .c-w3 { fill: #8a6f37; } .c-pen { fill: var(--pen); } .c-w1 { fill: #4f6a86; }
+  .f-paper { fill: var(--paper); } .f-ink { fill: var(--ink); } .f-inkonly { fill: var(--ink); }
+  .f-w1 { fill: var(--w1); } .f-w2 { fill: var(--w2); } .f-w3 { fill: var(--w3); } .f-w4 { fill: var(--w4); } .f-pen { fill: var(--pen); }
+  .f-none { fill: none; }
+  .s-ink { stroke: var(--ink); stroke-width: 1.3; fill: none; }
+  .f-paper.s-ink, .f-w3.s-ink, .f-w1.s-ink { fill-opacity: inherit; }
+  rect.f-paper.s-ink, circle.f-paper.s-ink, polygon.f-paper.s-ink { fill: var(--paper); }
+  rect.f-w3.s-ink { fill: var(--w3); }
+  circle.f-w1.s-ink { fill: var(--w1); fill-opacity: .4; }
+  .s-mute { stroke: var(--ink-4); stroke-width: 1; fill: none; }
+  .s-w3 { stroke: #8a6f37; stroke-width: 2; }
+  .s-pen { stroke: var(--pen); stroke-width: 2; }
+  .thick { stroke-width: 2.2; }
+  .dash { stroke-dasharray: 4 4; }
+  .k1 { stroke: var(--pen); stroke-width: 2; } .k2 { stroke: var(--ink); stroke-width: 2.2; } .k3 { stroke: var(--w1); stroke-width: 2.4; }
+</style>

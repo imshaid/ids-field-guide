@@ -1,0 +1,63 @@
+## Skewness — কোন দিকে হেলে আছে
+
+<T id="normal">Normal distribution</T> symmetric — দুই পাশে সমান data। যখন একপাশে লম্বা একটা লেজ তৈরি হয়, curve আর symmetric থাকে না। **Skewness হলো এই অসমতার মাপ।**
+
+<Diagram name="skew" caption="তিন রকম আকার — mean (লাল), median, mode এর অবস্থান খেয়াল করো" />
+
+| Skewness | ধরন | লেজ কোথায় | Order |
+|---|---|---|---|
+| < 0 | **Negatively skewed** (left-skewed) | **বামে** লম্বা লেজ | mean < median < mode |
+| = 0 | Symmetric (no skew) | দুই পাশ সমান | mean = median = mode |
+| > 0 | **Positively skewed** (right-skewed) | **ডানে** লম্বা লেজ | mode < median < mean |
+
+<Idea title="মনে রাখার একমাত্র নিয়ম">
+
+**লেজ যেদিকে, skew সেদিকে — আর mean ও লেজের দিকে টানা খায়।** কারণ mean সব মানের যোগফল দিয়ে হিসাব হয়, তাই লেজের extreme মানগুলো mean কে নিজের দিকে টানে; median শুধু মাঝের অবস্থান দেখে, তাই কম সরে।
+
+</Idea>
+
+<Errata id="skew-direction" />
+
+### উদাহরণ
+
+- **Positive skew:** পরিবারের আয় — বেশিরভাগের আয় কম-মাঝারি, অল্প কয়েকজন কোটিপতি ডান দিকে লম্বা লেজ তৈরি করে। Coffee shop এ অপেক্ষার সময় — বেশিরভাগ কয়েক মিনিট, মাঝে মাঝে জটিল order এ অনেক দেরি।
+- **Symmetric:** ছক্কার প্রতিটা সংখ্যার সম্ভাবনা সমান; প্রাপ্তবয়স্কদের উচ্চতা প্রায় symmetric।
+- **Negative skew:** সহজ পরীক্ষা — বেশিরভাগ high পায়, অল্প কয়েকজন খুব কম পায়, লেজ বামে।
+
+<Errata id="test-skew" />
+
+### সংখ্যা দিয়ে মাপা
+
+Mean আর median জানা থাকলে Pearson এর skewness coefficient দিয়ে সহজে মাপা যায়:
+
+$$Sk = \frac{3(\bar{x} - \text{Median})}{s}$$
+
+Mean < median হলে Sk negative, mean > median হলে positive।
+
+## Kurtosis — চূড়া কতটা সরু
+
+Symmetric হলেও একটা curve বেশি সূচালো বা বেশি চ্যাপ্টা হতে পারে। **Kurtosis মাপে curve এর চূড়া কতটা সরু আর লেজ কতটা ভারী।**
+
+<Diagram name="kurtosis" caption="একই center, ভিন্ন আকার" />
+
+| ধরন | আকার | Kurtosis | Excess kurtosis |
+|---|---|---|---|
+| **Leptokurtic** | সরু, উঁচু চূড়া; **ভারী লেজ** | > 3 | > 0 |
+| **Mesokurtic** | Normal bell | = 3 | = 0 |
+| **Platykurtic** | চ্যাপ্টা চূড়া; হালকা লেজ | < 3 | < 0 |
+
+<Errata id="kurtosis-3" />
+
+### উদাহরণ (slide থেকে)
+
+- **Mesokurtic:** প্রাপ্তবয়স্কদের উচ্চতা — perfect bell, লেজ ধীরে ধীরে নামে।
+- **Leptokurtic:** খুব কঠিন course এর exam score — বেশিরভাগ একটা মানের কাছে, কিন্তু খুব বেশি আর খুব কম score ও normal এর চেয়ে বেশি আসে (লেজ ভারী)।
+- **Platykurtic:** অনেক teller আছে এমন bank এ অপেক্ষার সময় — বেশিরভাগ মাঝারি সময় অপেক্ষা করে, extreme কম।
+
+<LabEmbed id="shape" />
+
+<Exam>
+
+<QL id="s26-q4b">Spring 2026 Q4(b)</QL> এর শেষ অংশ: "overall skewness selector এর বিশ্বাসকে support করে নাকি contradict করে?" Saif এর data তে mean (67.87) < median (76), তাই **negatively skewed** — বাম দিকের লেজটা শুধু শেষ তিনটা innings (0, 4, 0) দিয়ে তৈরি, বাকি ১২টা ইনিংস উপরের দিকে জড়ো। এটা "সাময়িক slump" এর পক্ষে যায়। কিন্তু IQR rule এ এরা outlier না আর তিনটাই একদম সাম্প্রতিক — তাই পুরোপুরি "anomaly" বলে উড়িয়ে দেওয়াও যায় না। দুই দিকই লিখলে full marks।
+
+</Exam>

@@ -1,0 +1,80 @@
+## কেন data science লাগে
+
+একটা প্রশ্ন দিয়ে শুরু করি: তোমার গাড়ি নিজে নিজে চালিয়ে তোমাকে বাসায় পৌঁছে দিচ্ছে — সম্ভব? Tesla, Waymo, Baidu এর self-driving car ঠিক এটাই করছে। গাড়িটা আগে লক্ষ লক্ষ ঘণ্টার রাস্তার data দেখে শিখেছে কখন থামতে হয়, কখন ঘুরতে হয়। Slide এর দাবি, এমন গাড়ি বছরে ২০ লাখের বেশি দুর্ঘটনাজনিত মৃত্যু কমাতে পারে।
+
+আরেকটা চেনা সমস্যা: শেষ মুহূর্তে flight delay বা cancel। Slide এ এর তিনটা কারণ দেওয়া —
+
+- দরকারি **data না থাকা**, তাই আগে থেকে বোঝা যায় না
+- **Route planning** ভুল, তাই যাত্রী ঠিক সময়ে ঠিক flight পায় না
+- কোন plane বা equipment কিনবে, সেই **সিদ্ধান্ত ভুল**
+
+Data science থাকলে airline আগে থেকেই delay predict করতে পারে, direct না connecting flight দিবে ঠিক করতে পারে, booking pattern দেখে offer দিতে পারে। FedEx এর মত logistics company একইভাবে বের করে কোন route এ, কোন সময়ে, কোন যানবাহনে পাঠালে সবচেয়ে কম খরচ।
+
+<Idea title="Data science মূলত তিনটা কাজের জন্য লাগে">
+
+1. **Better decision making** — A করবো না B?
+2. **Predictive analysis** — এরপর কী হবে?
+3. **Pattern discovery** — data তে কি লুকানো কোনো তথ্য আছে?
+
+</Idea>
+
+<Example title="Online এ furniture কেনা">
+
+তুমি নতুন office এর জন্য online এ furniture কিনবে। মাথায় একটা ছোট্ট decision chain চলে: website টা কি furniture বেচে? → rating কি ৫ এ ৪ এর বেশি? → discount কি ২০% এর বেশি? সব "হ্যাঁ" হলে কিনবে। এই যে data দেখে ধাপে ধাপে সিদ্ধান্ত — এটাই data science এর মূল চিন্তা। (এই গঠনটার নাম decision tree, পরে ML এ দেখবে।)
+
+</Example>
+
+## Data science আসলে কী
+
+**Data science হলো data থেকে value বের করার technique গুলোর একটা সমষ্টি।** এই technique গুলো data এর ভেতরের কাজের pattern, connection আর relationship খুঁজে বের করে। যেকোনো প্রতিষ্ঠান যে data সংগ্রহ, জমা আর process করে, তার জন্য এটা এখন জরুরি tool।
+
+কয়েকটা জিনিস মনে রাখো:
+
+- Data খুব ছোট হতে পারে (কয়েকটা সংখ্যার list), আবার বিশাল হতে পারে — লক্ষ লক্ষ observation আর হাজার হাজার variable এর একটা matrix।
+- এর আরও কিছু নাম আছে: **knowledge discovery, machine learning, predictive analytics, data mining**।
+- এটা একা চলে না — database, data engineering, visualization, data analysis, experimentation আর business intelligence (BI) এর সাথে মিলেমিশে কাজ করে।
+
+## AI, ML আর Data Science এর সম্পর্ক
+
+<Diagram name="ai-ml-ds" caption="AI সবচেয়ে বড় বৃত্ত; ML তার ভেতরে; data science ML এর একটা অংশ আর তার বাইরের অনেক কিছু নিয়ে" />
+
+- **AI** — machine কে "বুদ্ধিমান" কাজ করানো: দেখা, কথা বোঝা, robot চালানো, plan করা।
+- **Machine Learning** — AI এর একটা অংশ, যেখানে machine নিয়ম মুখস্থ না করে **data থেকে শেখে** (kNN, decision tree, Naive Bayes, deep learning)।
+- **Data science** — ML ব্যবহার করে, কিন্তু এর বাইরেও statistics, data preparation, visualization, experimentation সব করে।
+
+তাই ML হলো data science এর একটা tool, পুরো data science না। আবার সব AI ও data science না — যেমন robotics বা planning।
+
+## Model মানে কী
+
+Data science এর কেন্দ্রে থাকে **model**। ধারণাটা সহজ:
+
+1. পুরনো data এ input (**X**) আর তার সঠিক output (**y**) দুইটাই জানা।
+2. Machine learning algorithm এগুলো দেখে একটা **representative model** বানায় — X আর y এর মধ্যের সম্পর্কের একটা নিয়ম।
+3. নতুন একটা X দিলে model সেই নিয়ম দিয়ে **predicted output ŷ** দেয়।
+
+<Example>
+
+একটা bank এর কাছে আগের ১০ লাখ transaction আছে, প্রতিটার পাশে লেখা কোনটা fraud ছিল (y)। Model এগুলো দেখে শেখে fraud দেখতে কেমন হয়। কাল রাতে নতুন একটা transaction এলে (X) model বলে দেয় — "এটা সম্ভবত fraud" (ŷ)।
+
+</Example>
+
+## Data science এর কাজের ধরন (tasks)
+
+| Task | এক কথায় | উদাহরণ |
+|---|---|---|
+| Classification | কোন group এ পড়বে | Email spam কি না |
+| Regression | একটা সংখ্যা predict | ফ্ল্যাটের দাম |
+| Clustering | একরকম জিনিস একসাথে করা | Customer দের group |
+| Association analysis | কী কী একসাথে কেনা হয় | রুটি কিনলে মাখন |
+| Anomaly detection | অস্বাভাবিক কিছু ধরা | Card fraud |
+| Recommendation engine | কী পছন্দ হতে পারে | YouTube এর পরের video |
+| Time series forecasting | সময়ের সাথে কী হবে | আগামী মাসের sales |
+| Text mining | লেখা থেকে তথ্য | Review positive না negative |
+| Feature selection | কোন variable জরুরি | Churn এ কোন factor বেশি দায়ী |
+| Deep learning | বড় neural network | ছবি থেকে রোগ চেনা |
+
+<Exam>
+
+সাধারণত সরাসরি "define data science" আসে না, আসে scenario। যেমন <QL id="f24-q1a">Fall 2024 Q1(a)</QL> এ একটা telecom company কোন customer চলে যাবে (churn) সেটা predict করতে চায় — এটা একটা **classification** task। Answer এ বলতে হবে কোন variable (বয়স, contract, bill, complaint) কীভাবে কাজে লাগবে। পুরো process টা পরের page এ: <T id="ds-process">Data Science Process</T>।
+
+</Exam>

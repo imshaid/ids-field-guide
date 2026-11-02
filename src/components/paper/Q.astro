@@ -1,0 +1,16 @@
+---
+import { findQuestion } from '../../data/papers';
+import { getTopic, topicUrl, getLab } from '../../data/topics';
+interface Props { id: string; lq?: string }
+const { id, lq } = Astro.props;
+const { paper, q } = findQuestion(id);
+const lab = q.lab ? getLab(q.lab) : undefined;
+---
+<section class="qp" id={id}>
+  <div class="qp-h"><span>{paper.title} · {paper.code} · {q.label}</span><span>Marks {q.marks}{q.co ? ` · ${q.co}` : ''}</span></div>
+  <div class="qp-b"><slot /></div>
+  <div class="qp-tools" data-pagefind-ignore>
+    {q.topics.map((t) => { const tp = getTopic(t); return <a class="chip" data-week={tp.week} href={topicUrl(tp)}>↗ {tp.title}</a>; })}
+    {lab && <a class="chip acc" data-week={lab.week} href={`/labs/${lab.id}/${lq ? '?' + lq : ''}`}>⚗ {lq ? 'এই data দিয়ে' : 'Lab'}: {lab.title}</a>}
+  </div>
+</section>

@@ -1,0 +1,7 @@
+---
+import { getLab } from '../data/topics';
+interface Props { id: string; q?: string }
+const lab = getLab(Astro.props.id);
+const q = Astro.props.q;
+---
+<a class="t" data-week={lab.week} href={`/labs/${lab.id}/${q ? '?' + q : ''}`} data-tip={lab.summary} data-tip-title={`Lab · ${lab.title}`}><slot /></a>
