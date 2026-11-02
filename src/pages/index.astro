@@ -40,12 +40,12 @@ const nQ = PAPERS.reduce((a, p) => a + p.questions.length, 0);
       </section>
 
       <section class="grid shelf" aria-label="Tools">
-        <a class="card" href="/questions/"><span class="kicker">Previous questions</span><h3>{PAPERS.length} paper · {nQ}টা প্রশ্ন</h3><p>পুরো প্রশ্ন, ভেঙে বোঝানো, model answer আর কোথায় marks কাটে।</p></a>
-        <a class="card" href="/labs/"><span class="kicker">Labs</span><h3>{LABS.length}টা interactive lab</h3><p>Sampling simulator থেকে hypothesis stepper — নিজে চালিয়ে বোঝো।</p></a>
-        <a class="card" href="/cheatsheet/"><span class="kicker">Cheat sheet</span><h3>এক page এ সব formula</h3><p>Exam এর আগের রাতে শেষবার চোখ বুলানোর জন্য, print-friendly।</p></a>
-        <a class="card" href="/errata/"><span class="kicker">Errata</span><h3>Slide এর {ERRATA.length}টা ভুল</h3><p>মুখস্থ করার আগে দেখে নাও কোনগুলো ভুল ছাপা।</p></a>
-        <a class="card" href="/glossary/"><span class="kicker">Glossary</span><h3>{GLOSSARY.length}টা term, A–Z</h3><p>এক লাইনের সংজ্ঞা, সাথে পুরো page এর link।</p></a>
-        <a class="card" href="/revise/"><span class="kicker">My revision list</span><h3>তোমার flag করা topic</h3><p>যেগুলো "পরে revise করব" দিয়েছ, সব এক জায়গায়।</p></a>
+        <a class="card" data-week="w4" href="/questions/"><span class="kicker"><span class="dot"></span>Previous questions</span><h3>{PAPERS.length} paper · {nQ}টা প্রশ্ন</h3><p>পুরো প্রশ্ন, ভেঙে বোঝানো, model answer আর কোথায় marks কাটে।</p></a>
+        <a class="card" data-week="w2" href="/labs/"><span class="kicker"><span class="dot"></span>Labs</span><h3>{LABS.length}টা interactive lab</h3><p>Sampling simulator থেকে hypothesis stepper — নিজে চালিয়ে বোঝো।</p></a>
+        <a class="card" data-week="w3" href="/cheatsheet/"><span class="kicker"><span class="dot"></span>Cheat sheet</span><h3>এক page এ সব formula</h3><p>Exam এর আগের রাতে শেষবার চোখ বুলানোর জন্য, print-friendly।</p></a>
+        <a class="card" data-week="pen" href="/errata/"><span class="kicker"><span class="dot"></span>Errata</span><h3>Slide এর {ERRATA.length}টা ভুল</h3><p>মুখস্থ করার আগে দেখে নাও কোনগুলো ভুল ছাপা।</p></a>
+        <a class="card" data-week="w5" href="/glossary/"><span class="kicker"><span class="dot"></span>Glossary</span><h3>{GLOSSARY.length}টা term, A–Z</h3><p>এক লাইনের সংজ্ঞা, সাথে পুরো page এর link।</p></a>
+        <a class="card" data-week="w1" href="/revise/"><span class="kicker"><span class="dot"></span>My revision list</span><h3>তোমার flag করা topic</h3><p>যেগুলো "পরে revise করব" দিয়েছ, সব এক জায়গায়।</p></a>
       </section>
 
       <p class="pagecount">{TOPICS.length} pages · {LABS.length} labs · {nQ} questions</p>
@@ -74,10 +74,11 @@ const nQ = PAPERS.reduce((a, p) => a + p.questions.length, 0);
   .cover-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 1.6rem 0 1rem; }
   .cd { padding: 0.7rem 0.8rem; font-size: 0.7rem; }
   .books { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1.6rem 0 2.4rem; }
-  .book { display: flex; flex-direction: column; gap: 0.4rem; padding: 1.1rem 1.25rem 1rem; border: 1px solid var(--ink-4); border-top: 6px solid var(--acc); border-radius: var(--r); text-decoration: none; background: var(--sheet); min-height: 13rem; transition: background .2s, border-color .2s; }
+  .book { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 0.4rem; padding: 1.5rem 1.25rem 1rem; border: 1px solid color-mix(in srgb, var(--acc) 50%, var(--paper)); border-radius: var(--r); text-decoration: none; background: color-mix(in srgb, var(--acc) 11%, var(--sheet)); min-height: 13rem; transition: background .2s, border-color .2s; }
+  .book::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 10px; background: radial-gradient(circle, color-mix(in srgb, var(--acc) 70%, var(--ink)) 0.9px, transparent 1.25px) 0 0 / 4px 4px, color-mix(in srgb, var(--acc) 62%, var(--paper)); }
   .book h2 { font-size: 1.35rem; font-weight: 480; line-height: 1.2; }
   .book p { margin: 0; font-size: 0.9rem; color: var(--ink-2); flex: 1; }
   .book-foot { font-size: 0.72rem; color: var(--ink-3); }
-  .book:hover { background: var(--tint); border-color: var(--ink); border-top-color: var(--acc); }
-  .shelf { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin-bottom: 2.4rem; }
+  .book:hover { background: color-mix(in srgb, var(--acc) 20%, var(--sheet)); border-color: color-mix(in srgb, var(--acc) 70%, var(--ink)); }
+  .shelf { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin-bottom: 2.4rem; }
 </style>

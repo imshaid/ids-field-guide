@@ -19,6 +19,9 @@ const path = Astro.url.pathname;
 const cur = (p: string) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : undefined;
 const railPaths = ['/questions/', '/labs/', '/cheatsheet/', '/revise/'];
 const inContents = path !== '/' && !railPaths.some((p) => path.startsWith(p));
+// Section colour for pages that are not tied to a week.
+const SECTION: [string, string][] = [['/questions', 'w4'], ['/labs', 'w2'], ['/cheatsheet', 'w3'], ['/errata', 'pen'], ['/glossary', 'w5'], ['/revise', 'w1'], ['/start', 'w1'], ['/404', 'pen']];
+const acc = week ?? SECTION.find(([p]) => path.startsWith(p))?.[1];
 const ogImage = new URL('/og.png', SITE.url).href;
 ---
 <!doctype html>
@@ -58,7 +61,7 @@ const ogImage = new URL('/og.png', SITE.url).href;
       })();
     </script>
   </head>
-  <body data-week={week} data-topic={topicId}>
+  <body data-week={acc} data-topic={topicId}>
     <a class="skip" href="#main">Skip to content</a>
     <div class="shell">
       <nav class="rail" aria-label="Main navigation">
@@ -72,7 +75,7 @@ const ogImage = new URL('/og.png', SITE.url).href;
         <a href="/revise/" class="desk" data-label="My revision list" aria-current={cur('/revise/')} aria-label="Revision list"><Icon name="flag" /></a>
         <span class="sep desk"></span>
         <button type="button" data-open="dlg-prefs" data-label="Reader settings" aria-label="Reader settings"><Icon name="aa" /></button>
-        <a href={SITE.telegram} class="desk" target="_blank" rel="noopener" data-label="Telegram group" aria-label="Twilight Crows on Telegram"><Icon name="plane" /></a>
+        <a href={SITE.telegram} class="desk tg" target="_blank" rel="noopener" data-label="Telegram group" aria-label="Twilight Crows on Telegram"><Icon name="plane" /></a>
       </nav>
 
       <div class="main-area">
@@ -96,7 +99,7 @@ const ogImage = new URL('/og.png', SITE.url).href;
             <span class="kicker">{SITE.name} · {SITE.edition}</span>
             <p>Shared with the {SITE.community} community. Spotted a mistake or stuck on a topic? Ask in the group.</p>
           </div>
-          <a class="btn ghost" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join on Telegram</a>
+          <a class="btn tg" href={SITE.telegram} target="_blank" rel="noopener"><Icon name="plane" size={16} /> Join on Telegram</a>
           <small>{SITE.course} · {SITE.uni}. The course slides belong to the course teachers; the explanations, diagrams and labs here are original.</small>
         </footer>
       </div>

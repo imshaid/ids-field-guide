@@ -451,3 +451,93 @@ html[data-motion='off']::view-transition-old(root), html[data-motion='off']::vie
   a { text-decoration: none; }
   .co, .formula, .pen { break-inside: avoid; }
 }
+
+/* ---------- colour e-ink layer (Kaleido-style: muted colour, dotted fills) ---------- */
+:root {
+  --w1: #5f86a8; --w2: #6c9a7b; --w3: #bf9850; --w4: #b8735c; --w5: #8b73a0; --wb: #7d8f86;
+  --pen: #a14f40;
+  --tg: #3b6c93;
+  --acc-ink: color-mix(in srgb, var(--acc) 62%, var(--ink));
+}
+[data-week='pen'] { --acc: var(--pen); }
+/* derived colours must be re-computed wherever --acc changes */
+[data-week] {
+  --tint: color-mix(in srgb, var(--acc) 14%, var(--paper));
+  --tint-2: color-mix(in srgb, var(--acc) 30%, var(--paper));
+  --acc-ink: color-mix(in srgb, var(--acc) 62%, var(--ink));
+}
+::selection { background: color-mix(in srgb, var(--acc) 38%, var(--paper)); color: var(--ink); }
+.kicker .dot { border-radius: 2px; }
+
+/* dotted colour strip under the top bar: week/section colour, or all five on the cover */
+#main::before {
+  content: ''; display: block; height: 7px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--acc) 72%, var(--ink)) 0.9px, transparent 1.25px) 0 0 / 4px 4px, color-mix(in srgb, var(--acc) 55%, var(--paper));
+}
+body:not([data-week]) #main::before {
+  background: radial-gradient(circle, color-mix(in srgb, var(--ink) 35%, transparent) 0.9px, transparent 1.25px) 0 0 / 4px 4px,
+    linear-gradient(90deg, var(--w1) 0 20%, var(--w2) 20% 40%, var(--w3) 40% 60%, var(--w4) 60% 80%, var(--w5) 80%);
+  opacity: 0.85;
+}
+.topbar { border-bottom-color: color-mix(in srgb, var(--acc) 35%, var(--rule)); }
+.prose > h2::before { height: 4px; border-radius: 2px; }
+
+/* rail: active tile carries the section colour; Telegram in its own blue */
+.rail > a[aria-current='page'], .rail > button[data-active] { background: var(--acc-ink); color: var(--paper); }
+@media (hover: hover) { .rail > a:hover, .rail > button:hover { background: var(--tint-2, var(--paper-3)); } }
+.rail .tg { color: var(--tg); }
+@media (hover: hover) { .rail .tg:hover { background: var(--tg); color: #f4f1ea; } }
+
+/* Telegram join button: solid dusty blue */
+.btn.tg { background: var(--tg); border-color: var(--tg); color: #f4f1ea; }
+@media (hover: hover) { .btn.tg:hover { background: color-mix(in srgb, var(--tg) 80%, var(--ink)); border-color: color-mix(in srgb, var(--tg) 80%, var(--ink)); } }
+
+/* pressed tabs and presets take the page colour */
+.seg button[aria-pressed='true'], .seg button[aria-pressed='true']:hover,
+.btn[aria-pressed='true'], .btn[aria-pressed='true']:hover { background: var(--acc-ink); border-color: var(--acc-ink); color: var(--paper); box-shadow: none; }
+.seg { background: color-mix(in srgb, var(--acc) 9%, var(--paper-2)); }
+
+/* callouts: each kind has its own colour, independent of the week */
+.co { --c: var(--w1); }
+.co.example { --c: var(--w2); }
+.co.exam { --c: var(--w3); }
+.co.warn, .pen, .pit { --c: var(--pen); }
+.formula { --c: var(--w5); }
+details.deep { --c: var(--wb); }
+.brief { --c: var(--acc); }
+.co { background: color-mix(in srgb, var(--c) 14%, var(--paper)); border-left: 4px solid var(--c); }
+.co.example { background: color-mix(in srgb, var(--c) 9%, var(--sheet)); border: 1px dashed color-mix(in srgb, var(--c) 55%, var(--paper)); border-left: 4px solid var(--c); }
+.co.exam { background: color-mix(in srgb, var(--c) 15%, var(--paper)); border: 1px solid color-mix(in srgb, var(--c) 55%, var(--ink)); border-left-width: 4px; }
+.co.warn { background: color-mix(in srgb, var(--c) 11%, var(--paper)); border-left-color: var(--c); }
+.formula { background: color-mix(in srgb, var(--c) 8%, var(--sheet)); border-color: color-mix(in srgb, var(--c) 38%, var(--paper)); }
+.pen { background: color-mix(in srgb, var(--c) 6%, var(--sheet)); border-color: color-mix(in srgb, var(--c) 32%, var(--paper)); }
+.pit { background: color-mix(in srgb, var(--c) 10%, var(--paper)); border-left: 4px solid var(--c); }
+.brief { background: color-mix(in srgb, var(--c) 14%, var(--paper)); border-left: 4px solid var(--c); }
+.co .co-k, .co.exam .co-k, .co.warn .co-k, .formula .co-k, .pen .co-k, .pit .co-k, .brief h4 { color: color-mix(in srgb, var(--c) 68%, var(--ink)); }
+.co:not(.exam) .co-k::before, .formula .co-k::before, .pit .co-k::before {
+  content: ''; display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.45rem; vertical-align: 0.02em;
+  border-radius: 50%; background: var(--c);
+}
+details.deep { border-color: color-mix(in srgb, var(--c) 45%, var(--rule)); }
+details.deep > summary::before { border-color: var(--c); color: color-mix(in srgb, var(--c) 70%, var(--ink)); }
+details.deep[open] > summary::before { background: var(--c); color: var(--paper); }
+
+/* dark surfaces pick up the page colour */
+.panel { background: color-mix(in srgb, var(--acc) 20%, var(--panel)); box-shadow: inset 0 4px 0 var(--acc); }
+.panel .p-sec { border-top-color: color-mix(in srgb, var(--acc) 30%, var(--panel-rule)); }
+.panel .p-link { border-bottom-color: color-mix(in srgb, var(--acc) 30%, var(--panel-rule)); }
+.panel .p-link:hover, .panel .p-link[aria-current='page'] { background: color-mix(in srgb, var(--acc) 34%, var(--panel)); }
+.panel li::before { background: color-mix(in srgb, var(--acc) 70%, var(--panel-ink)); height: 2px; }
+.cap { background: color-mix(in srgb, var(--acc) 18%, var(--panel)); }
+details.answer > summary { background: color-mix(in srgb, var(--acc) 22%, var(--panel)); }
+.tip { background: color-mix(in srgb, var(--acc) 16%, var(--panel)); }
+
+/* paper and lab headers, cards */
+.qp-h, .lab-h { background: color-mix(in srgb, var(--acc) 16%, var(--paper-2)); }
+.qp { border-color: color-mix(in srgb, var(--acc) 45%, var(--ink)); }
+.qp-h { border-bottom-color: color-mix(in srgb, var(--acc) 45%, var(--ink)); }
+.card .kicker .dot { width: 0.5rem; height: 0.5rem; }
+a.card:hover { background: color-mix(in srgb, var(--acc) 14%, var(--paper)); }
+th { border-bottom-color: color-mix(in srgb, var(--acc) 55%, var(--ink)); }
+.bar { background: color-mix(in srgb, var(--acc) 18%, var(--paper-3)); }
+@media print { #main::before { display: none; } }

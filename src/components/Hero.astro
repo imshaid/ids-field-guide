@@ -7,12 +7,12 @@ const counts = [1, 2, 3, 5, 7, 9, 10, 9, 7, 5, 3, 2, 1];
 const MU = 220, BIN = 28, BASE = 246, STEP = 11.5, AXIS = 254;
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-const dots: { x: number; y: number; dx: number; dy: number; d: number }[] = [];
+const dots: { x: number; y: number; dx: number; dy: number; d: number; c: number }[] = [];
 counts.forEach((c, b) => {
   for (let k = 0; k < c; k++) {
     const x = MU + (b - 6) * BIN; const y = BASE - k * STEP;
     const sx = 24 + rnd() * 392; const sy = 118 + rnd() * 122;
-    dots.push({ x, y, dx: sx - x, dy: sy - y, d: 0 });
+    dots.push({ x, y, dx: sx - x, dy: sy - y, d: 0, c: Math.min(4, Math.abs(b - 6)) });
   }
 });
 const order = dots.map((_, i) => i).sort(() => rnd() - 0.5);
@@ -30,7 +30,7 @@ const bell = pts.join('');
     <text x="418" y="104" text-anchor="end" class="cnt"> </text>
   </g>
   <path d={`M24,${AXIS} H416`} class="ax" />
-  {dots.map((p, i) => <circle class="hd" data-x={p.x} cx={p.x} cy={p.y.toFixed(1)} r="4.6" style={`--dx:${p.dx.toFixed(1)}px;--dy:${p.dy.toFixed(1)}px;--d:${p.d}ms`} />)}
+  {dots.map((p, i) => <circle class={`hd c${p.c}`} data-x={p.x} cx={p.x} cy={p.y.toFixed(1)} r="4.6" style={`--dx:${p.dx.toFixed(1)}px;--dy:${p.dy.toFixed(1)}px;--d:${p.d}ms`} />)}
   <path d={bell} class="bell" pathLength="1" />
   <g class="hf" style="--t:2.5s">
     <path d={`M${MU},120 V${AXIS}`} class="mu" />
@@ -84,7 +84,8 @@ const bell = pts.join('');
   .ax { stroke: var(--ink-3); stroke-width: 1; fill: none; }
   .mu { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 4; fill: none; }
   .bell { fill: none; stroke: var(--ink); stroke-width: 1.6; }
-  .hd { fill: var(--w1); fill-opacity: 0.62; transform-box: fill-box; transform-origin: center; transition: fill 0.35s, fill-opacity 0.35s, transform 0.35s var(--ease); }
+  .c0 { fill: var(--w4); } .c1 { fill: var(--w3); } .c2 { fill: var(--w2); } .c3 { fill: var(--w5); } .c4 { fill: var(--w1); }
+  .hd { fill-opacity: 0.78; transform-box: fill-box; transform-origin: center; transition: fill 0.35s, fill-opacity 0.35s, transform 0.35s var(--ease); }
   .hd.pk, .pkd { fill: var(--ink); fill-opacity: 1; }
   .hd.pk { transform: scale(1.22); }
   .mk { fill: var(--pen); }
